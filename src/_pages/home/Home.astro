@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ToolExplorer from './ui/ToolExplorer.tsx';
+import { ToolHub } from './ui/ToolHub.tsx';
 ---
 <BaseLayout 
   title="Toolkit by Pabitra Mohan Singh" 
@@ -9,17 +9,16 @@ import ToolExplorer from './ui/ToolExplorer.tsx';
 >
   <div class="min-h-screen bg-gray-50 dark:bg-gray-950 pb-24">
     
-    <section class="pt-24 pb-16 px-4 text-center">
-      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-6">
-        Fast, private tools. <br class="hidden sm:block" />
-        <span class="text-gray-500 dark:text-gray-400">Zero tracking.</span>
+    <section class="pt-6 pb-4 px-4 text-center flex flex-col items-center">
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-black dark:text-white mb-2 max-w-2xl">
+        Fast, private tools. <span class="text-gray-400 dark:text-gray-500">Zero tracking.</span>
       </h1>
-      <p class="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-medium">
-        A growing collection of browser-based utilities. All processing happens locally on your device. No uploads, no servers, no signup required.
+      <p class="text-base text-gray-500 dark:text-gray-400 max-w-lg mx-auto font-medium">
+        A growing collection of browser-based utilities. No uploads, no servers, no signup.
       </p>
     </section>
 
-    <ToolExplorer client:load />
+    <ToolHub client:load />
 
   </div>
 </BaseLayout>

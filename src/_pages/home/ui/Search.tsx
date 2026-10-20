@@ -1,29 +1,69 @@
 import { FiSearch } from 'react-icons/fi';
+import { Motion } from '@/core/motion/motion';
+import { searchMotion } from '@/core/motion/compositions/searchMotion';
 
-interface SearchProperties {
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  placeholderText?: string;
+interface SearchProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  offset?: string;
 }
 
 export function Search({
-  searchQuery,
-  onSearchChange,
-  placeholderText = 'Search tools...',
-}: SearchProperties) {
+  value,
+  onChange,
+  placeholder = 'Search tools...',
+  offset = 'top-[60px]'
+}: SearchProps) {
   return (
-    <div className="relative w-full max-w-2xl mx-auto group">
-      <FiSearch
-        className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 transition-colors duration-200 group-focus-within:text-blue-500"
-        size={20}
-      />
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={(event) => onSearchChange(event.target.value)}
-        placeholder={placeholderText}
-        className="w-full pl-14 pr-6 py-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-      />
+    <div className={`sticky ${offset} z-40 py-4`}>
+      <div className="flex justify-center">
+        <div className="relative w-full max-w-md group">
+          <Motion
+            preset={searchMotion}
+            as="div"
+            className={`
+              relative w-full
+              rounded-full
+              overflow-hidden
+              bg-white dark:bg-gray-800
+              border border-gray-200 dark:border-gray-700
+              hover:border-gray-300 dark:hover:border-gray-600
+              focus-within:border-blue-500
+              focus-within:ring-2 focus-within:ring-blue-500/20
+            `}
+          >
+            <FiSearch
+              className={`
+                absolute left-4 top-1/2 -translate-y-1/2
+                w-5 h-5
+                text-gray-500 dark:text-gray-400
+                transition-colors duration-200
+                group-hover:text-blue-500 dark:group-hover:text-blue-400
+                group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400
+                pointer-events-none
+                z-10
+              `}
+            />
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={placeholder}
+              className={`
+                w-full pl-11 pr-4 py-3
+                bg-transparent
+                text-sm
+                text-gray-900 dark:text-white
+                placeholder:text-gray-500 dark:placeholder:text-gray-400
+                outline-none
+                border-none
+                focus:ring-0
+              `}
+            />
+          </Motion>
+        </div>
+      </div>
     </div>
   );
 }
