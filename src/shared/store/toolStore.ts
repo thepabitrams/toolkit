@@ -1,17 +1,18 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import type { ToolConfig } from '@/config/tools';
 import { saveToolData, loadToolData, clearToolData, type ToolData } from '@/core/services/toolDB';
 
 const toolIndexedDBStorage = {
-  getItem: async (): Promise<string | null> => {
+  getItem: async (name: string): Promise<string | null> => {
     const data = await loadToolData();
     return data ? JSON.stringify(data) : null;
   },
-  setItem: async (_name: string, value: string): Promise<void> => {
+  setItem: async (name: string, value: string): Promise<void> => {
     const data = JSON.parse(value) as ToolData;
     await saveToolData(data);
   },
-  removeItem: async (): Promise<void> => {
+  removeItem: async (name: string): Promise<void> => {
     await clearToolData();
   },
 };
@@ -19,10 +20,12 @@ const toolIndexedDBStorage = {
 interface ToolStore {
   favorites: string[];
   usageCounts: Record<string, number>;
+  currentTool: ToolConfig | null;
   currentToolId: string | null;
   toggleFavorite: (toolId: string) => void;
   incrementUsage: (toolId: string) => void;
-  setCurrentToolId: (id: string | null) => void;
+  setCurrentTool: (tool: ToolConfig | null) => void;
+  reset: () => void;
 }
 
 export const useToolStore = create<ToolStore>()(
@@ -30,13 +33,17 @@ export const useToolStore = create<ToolStore>()(
     (set) => ({
       favorites: [],
       usageCounts: {},
+      currentTool: null,
       currentToolId: null,
+
       toggleFavorite: (toolId: string) =>
-        set((state) => ({
-          favorites: state.favorites.includes(toolId)
+        set((state) => {
+          const favs = state.favorites.includes(toolId)
             ? state.favorites.filter((id) => id !== toolId)
-            : [...state.favorites, toolId],
-        })),
+            : [...state.favorites, toolId];
+          return { favorites: favs };
+        }),
+
       incrementUsage: (toolId: string) =>
         set((state) => ({
           usageCounts: {
@@ -44,10 +51,23 @@ export const useToolStore = create<ToolStore>()(
             [toolId]: (state.usageCounts[toolId] || 0) + 1,
           },
         })),
-      setCurrentToolId: (id) => set({ currentToolId: id }),
+
+      setCurrentTool: (tool: ToolConfig | null) =>
+        set({
+          currentTool: tool,
+          currentToolId: tool?.slug || null,
+        }),
+
+      reset: () =>
+        set({
+          favorites: [],
+          usageCounts: {},
+          currentTool: null,
+          currentToolId: null,
+        }),
     }),
     {
-      name: 'toolkit-storage',
+      name: 'tool-storage',
       storage: createJSONStorage(() => toolIndexedDBStorage),
       partialize: (state) => ({
         favorites: state.favorites,
