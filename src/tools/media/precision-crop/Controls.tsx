@@ -1,0 +1,77 @@
+import React from "react";
+import { FiZoomIn, FiZoomOut, FiRefreshCw } from "react-icons/fi";
+import { Button } from "@/shared/components/Button";
+import { IconButton } from "@/shared/components/IconButton";
+import { Container } from "@/shared/components/Container";
+
+interface CropControlsProps {
+  zoom: number;
+  isZoomMin: boolean;
+  isZoomMax: boolean;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onReset: () => void;
+  onCrop: () => void;
+}
+
+export const CropControls: React.FC<CropControlsProps> = ({
+  zoom,
+  isZoomMin,
+  isZoomMax,
+  onZoomIn,
+  onZoomOut,
+  onReset,
+  onCrop,
+}) => {
+  return (
+    <Container className="px-4 py-4">
+      <div className="space-y-4">
+        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+          <IconButton
+            onClick={onZoomOut}
+            disabled={isZoomMin}
+            variant="standard"
+            size="sm"
+            ariaLabel="Zoom out"
+            className={isZoomMin ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'hover:text-blue-600 dark:hover:text-blue-400'}
+          >
+            <FiZoomOut className="w-5 h-5" />
+          </IconButton>
+
+          <IconButton
+            onClick={onZoomIn}
+            disabled={isZoomMax}
+            variant="standard"
+            size="sm"
+            ariaLabel="Zoom in"
+            className={isZoomMax ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'hover:text-blue-600 dark:hover:text-blue-400'}
+          >
+            <FiZoomIn className="w-5 h-5" />
+          </IconButton>
+
+          <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+
+          <IconButton
+            onClick={onReset}
+            variant="standard"
+            size="sm"
+            ariaLabel="Reset crop"
+            className="hover:text-red-600 dark:hover:text-red-400"
+          >
+            <FiRefreshCw className="w-5 h-5" />
+          </IconButton>
+        </div>
+
+        <div className="text-center">
+          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+            {Math.round(zoom * 100)}%
+          </span>
+        </div>
+
+        <Button onClick={onCrop} variant="primary" className="w-full">
+          Apply Crop
+        </Button>
+      </div>
+    </Container>
+  );
+};
