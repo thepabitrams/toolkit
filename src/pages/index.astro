@@ -1,7 +1,4 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import HomeView from '../_pages/HomeView.tsx';
+import { Home } from '../_pages/home';
 ---
-<BaseLayout title="Browser Tools" description="A growing collection of browser-based tools." canonicalPath="/">
-  <HomeView client:only="react" />
-</BaseLayout>
+<Home />

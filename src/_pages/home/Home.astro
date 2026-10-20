@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolExplorer from './ui/ToolExplorer.tsx';
+---
+<BaseLayout 
+  title="Toolkit by Pabitra Mohan Singh" 
+  description="Privacy-first, browser-based tools. No uploads, no servers." 
+  canonicalPath="/"
+>
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-950 pb-24">
+    
+    <section class="pt-24 pb-16 px-4 text-center">
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-6">
+        Fast, private tools. <br class="hidden sm:block" />
+        <span class="text-gray-500 dark:text-gray-400">Zero tracking.</span>
+      </h1>
+      <p class="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-medium">
+        A growing collection of browser-based utilities. All processing happens locally on your device. No uploads, no servers, no signup required.
+      </p>
+    </section>
+
+    <ToolExplorer client:load />
+
+  </div>
+</BaseLayout>
