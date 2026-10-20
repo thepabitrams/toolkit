@@ -5,6 +5,8 @@ export interface SiteDetails {
   readonly description: string;
   readonly domain: string;
   readonly jobTitle: string;
+  readonly locale: string;
+  readonly openGraphImage: string;
 }
 
 export interface SocialMediaLinks {
@@ -17,6 +19,7 @@ export interface SocialMediaLinks {
 
 export interface SponsorLinksConfig {
   readonly page: string;
+  readonly buyMeACoffee: string;
 }
 
 export const site: SiteDetails = {
@@ -26,6 +29,8 @@ export const site: SiteDetails = {
   description: 'Privacy-first, browser-based tools. No uploads, no servers.',
   domain: 'https://toolkit.pabitramohansingh.com',
   jobTitle: 'Software Engineer',
+  locale: 'en_US',
+  openGraphImage: 'https://toolkit.pabitramohansingh.com/og-image.png',
 } as const;
 
 export const social: SocialMediaLinks = {
@@ -38,4 +43,5 @@ export const social: SocialMediaLinks = {
 
 export const sponsor: SponsorLinksConfig = {
   page: 'https://pabitramohansingh.com/sponsor',
+  buyMeACoffee: 'https://buymeacoffee.com/pabitramohansingh',
 } as const;

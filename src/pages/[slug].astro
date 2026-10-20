@@ -1,6 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ToolView from '../_pages/tool/ToolView.tsx';
+import Tool from '../_pages/tool/Tool.astro';
 import { tools, getTool } from '../config/tools';
 
 export async function getStaticPaths() {
@@ -13,41 +12,5 @@ const tool = getTool(slug as string);
 if (!tool) {
   return Astro.redirect('/404');
 }
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: tool.seoTitle,
-  description: tool.seoDescription,
-  url: new URL(`/${tool.slug}`, Astro.site).toString(),
-  author: { '@type': 'Person', name: 'Pabitra Mohan Singh' },
-};
 ---
-<BaseLayout 
-  title={tool.seoTitle} 
-  description={tool.seoDescription} 
-  canonicalPath={`/${tool.slug}`} 
-  jsonLd={jsonLd}
->
-  <div class="max-w-6xl mx-auto px-4 py-8">
-    
-    <header class="mb-8 text-center sm:text-left">
-      <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-        {tool.name}
-      </h1>
-      <p class="text-gray-500 dark:text-gray-400 mt-1">
-        by Pabitra Mohan Singh
-      </p>
-    </header>
-
-    <div class="w-full">
-      <ToolView slug={slug as string} client:only="react" />
-    </div>
-
-    <section class="prose dark:prose-invert mt-16 max-w-none">
-      <h2>About {tool.name}</h2>
-      <p>{tool.seoDescription}</p>
-    </section>
-
-  </div>
-</BaseLayout>
+<Tool tool={tool} slug={slug as string} />

@@ -1,0 +1,44 @@
+---
+import { ToolLayout } from '../../layouts';
+import ToolHero from './ui/ToolHero.astro';
+import ToolView from './ui/ToolView.tsx';
+import ToolDrawer from './ui/ToolDrawer.tsx';
+import type { ToolConfig } from '../../config/tools';
+
+interface Props {
+  tool: ToolConfig;
+  slug: string;
+}
+
+const { tool, slug } = Astro.props;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: tool.seoTitle,
+  description: tool.seoDescription,
+  url: new URL(`/${tool.slug}`, Astro.site).toString(),
+  author: { '@type': 'Person', name: 'Pabitra Mohan Singh' },
+};
+---
+<ToolLayout 
+  title={tool.seoTitle} 
+  description={tool.seoDescription} 
+  canonicalPath={`/${tool.slug}`} 
+  jsonLd={jsonLd}
+>
+  <div class="max-w-7xl mx-auto px-4 py-8 relative">
+    <ToolHero tool={tool} />
+    
+    <div class="w-full mt-8">
+      <ToolView slug={slug} client:only="react" />
+    </div>
+    
+    <section class="prose dark:prose-invert mt-16 max-w-none">
+      <h2>About {tool.name}</h2>
+      <p>{tool.seoDescription}</p>
+    </section>
+  </div>
+  
+  <ToolDrawer currentSlug={slug} client:load />
+</ToolLayout>

@@ -1,0 +1,19 @@
+---
+import BaseLayout from './Base.astro';
+import { ToolHeader } from '../core/components/header';
+import { HomeFooter } from '../core/components/footer';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  jsonLd?: Record<string, unknown>;
+}
+---
+<BaseLayout {...Astro.props}>
+  <ToolHeader />
+  <main class="flex-1">
+    <slot />
+  </main>
+  <HomeFooter />
+</BaseLayout>

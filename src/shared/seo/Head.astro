@@ -1,0 +1,126 @@
+---
+import { site, social } from '@/config/site';
+
+export interface BreadcrumbItem {
+  readonly name: string;
+  readonly url: string;
+}
+
+export interface HeadProps {
+  title: string;
+  description?: string;
+  openGraphImage?: string;
+  canonicalUrl?: string;
+  noindex?: boolean;
+  breadcrumbItems?: readonly BreadcrumbItem[];
+}
+
+const {
+  title,
+  description = site.description,
+  openGraphImage = site.openGraphImage,
+  canonicalUrl = Astro.url.href,
+  noindex = false,
+  breadcrumbItems = [],
+} = Astro.props;
+
+const personId = `${site.domain}/#person`;
+const webSiteId = `${site.domain}/#website`;
+const webPageId = `${canonicalUrl.replace(/\/$/, '')}/#webpage`;
+
+const personSchema = {
+  '@type': 'Person',
+  '@id': personId,
+  name: site.author,
+  url: site.domain,
+  image: site.openGraphImage,
+  jobTitle: site.jobTitle,
+  sameAs: Object.values(social),
+  worksFor: {
+    '@type': 'Organization',
+    name: site.name,
+  },
+} as const;
+
+const webSiteSchema = {
+  '@type': 'WebSite',
+  '@id': webSiteId,
+  name: site.name,
+  url: site.domain,
+  description: site.description,
+  publisher: { '@id': personId },
+} as const;
+
+const webPageSchema = {
+  '@type': 'WebPage',
+  '@id': webPageId,
+  name: title,
+  description: description,
+  url: canonicalUrl,
+  mainEntityOfPage: { '@id': canonicalUrl },
+  dateModified: new Date().toISOString(),
+  inLanguage: 'en',
+  isPartOf: { '@id': webSiteId },
+  about: { '@id': personId },
+} as const;
+
+const breadcrumbSchema =
+  breadcrumbItems.length >= 2
+    ? {
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbItems.map(
+          (breadcrumbItem: BreadcrumbItem, index: number) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: breadcrumbItem.name,
+            item: breadcrumbItem.url,
+          })
+        ),
+      }
+    : null;
+
+const graphSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    personSchema,
+    webSiteSchema,
+    webPageSchema,
+    ...(breadcrumbSchema ? [breadcrumbSchema] : []),
+  ],
+};
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>{title}</title>
+<meta name="description" content={description} />
+
+{noindex ? (
+  <meta name="robots" content="noindex, follow" />
+) : (
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+)}
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content={site.locale} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={openGraphImage} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={openGraphImage} />
+
+<link rel="canonical" href={canonicalUrl} />
+
+<link rel="icon" type="image/svg+xml" href="/icons/pabitra-avatar-black.svg" media="(prefers-color-scheme: light)" />
+<link rel="icon" type="image/svg+xml" href="/icons/pabitra-avatar-white.svg" media="(prefers-color-scheme: dark)" />
+
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171717" />
+
+<script is:inline type="application/ld+json" set:html={JSON.stringify(graphSchema)} />
