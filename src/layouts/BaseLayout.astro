@@ -3,45 +3,41 @@ import '../styles/global.css';
 import Header from '../core/components/Header.astro';
 import Footer from '../core/components/Footer.astro';
 
-interface SEOProperties {
-  pageTitle: string;
-  pageDescription: string;
+interface Props {
+  title: string;
+  description: string;
   canonicalPath: string;
-  structuredData?: Record<string, unknown>;
+  jsonLd?: Record<string, unknown>;
 }
 
-const { pageTitle, pageDescription, canonicalPath, structuredData } = Astro.props;
+const { title, description, canonicalPath, jsonLd } = Astro.props;
 const canonicalUrl = new URL(canonicalPath, Astro.site).toString();
-const AUTHOR_NAME = 'Pabitra Mohan Singh';
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{pageTitle} | Toolkit</title>
-    <meta name="description" content={pageDescription} />
+    <title>{title} | Toolkit</title>
+    <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
-    <meta name="author" content={AUTHOR_NAME} />
-    
-    {structuredData && (
-      <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
-    )}
-
-    <!-- 2026 Standard: Pre-paint Theme Initialization -->
+    <meta name="author" content="Pabitra Mohan Singh" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <script is:inline>
-      (function initializeTheme() {
-        const persistedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const shouldUseDarkMode = persistedTheme === 'dark' || (!persistedTheme && systemPrefersDark);
-        
-        document.documentElement.classList.toggle('dark', shouldUseDarkMode);
+      (function() {
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (stored === 'dark' || (!stored && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
       })();
     </script>
   </head>
-  <body class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased">
+  <body class="min-h-screen flex flex-col">
     <Header />
-    <main>
+    <main class="flex-1">
       <slot />
     </main>
     <Footer />

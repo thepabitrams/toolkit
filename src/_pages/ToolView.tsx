@@ -16,7 +16,6 @@ export default function ToolView({ slug }: { slug: string }) {
         const module = await tool.component();
         setDynamicTool(() => module.default || module);
       } catch (err) {
-        console.error(err);
         setLoadError('Failed to load the tool.');
       }
     }

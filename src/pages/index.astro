@@ -1,19 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeView from '../_pages/HomeView.tsx';
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'Toolkit by Pabitra Mohan Singh',
-  url: Astro.site,
-};
 ---
-<BaseLayout 
-  pageTitle="Browser Tools" 
-  pageDescription="A growing collection of browser-based tools. No uploads, no signup." 
-  canonicalPath="/"
-  structuredData={jsonLd}
->
-  <HomeView client:load />
+<BaseLayout title="Browser Tools" description="A growing collection of browser-based tools." canonicalPath="/">
+  <HomeView client:only="react" />
 </BaseLayout>

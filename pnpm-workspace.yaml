@@ -1,2 +1,5 @@
+allowBuilds:
+  onnxruntime-node: false
+  protobufjs: false
 minimumReleaseAgeExclude:
   - astro@7.4.1
