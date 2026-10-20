@@ -1,0 +1,13 @@
+---
+import ThemeToggle from '../../shared/components/ThemeToggle.tsx';
+---
+<header class="border-b border-slate-200 dark:border-slate-800">
+  <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+    <a href="/" class="text-xl font-bold tracking-tighter">Toolkit</a>
+    <nav class="flex items-center gap-6">
+      <a href="/" class="text-sm font-medium hover:text-blue-500 transition-colors">Directory</a>
+      <a href="https://pabitramohansingh.com" class="text-sm font-medium hover:text-blue-500 transition-colors">Portfolio</a>
+      <ThemeToggle client:load />
+    </nav>
+  </div>
+</header>

@@ -1,16 +1,19 @@
 ---
----
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeView from '../_pages/HomeView.tsx';
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Toolkit by Pabitra Mohan Singh',
+  url: Astro.site,
+};
+---
+<BaseLayout 
+  pageTitle="Browser Tools" 
+  pageDescription="A growing collection of browser-based tools. No uploads, no signup." 
+  canonicalPath="/"
+  structuredData={jsonLd}
+>
+  <HomeView client:load />
+</BaseLayout>

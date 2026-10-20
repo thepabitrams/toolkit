@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolView from '../_pages/ToolView.tsx';
+import { tools, getTool } from '../config/tools'; // Using the correct exports
+
+export async function getStaticPaths() {
+  return tools.map((tool) => ({
+    params: { slug: tool.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const tool = getTool(slug as string);
+
+if (!tool) {
+  return Astro.redirect('/404');
+}
+
+const structuredDataSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: tool.seoTitle,
+  description: tool.seoDescription,
+  url: new URL(`/${tool.slug}`, Astro.site).toString(),
+  author: { '@type': 'Person', name: 'Pabitra Mohan Singh' },
+};
+---
+<BaseLayout 
+  pageTitle={tool.seoTitle} 
+  pageDescription={tool.seoDescription} 
+  canonicalPath={`/${tool.slug}`} 
+  structuredData={structuredDataSchema}
+>
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-extrabold tracking-tight">{tool.name}</h1>
+      <p class="text-slate-500 dark:text-slate-400 mt-2">{tool.seoDescription}</p>
+    </header>
+
+    <section class="my-8 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 bg-slate-50 dark:bg-slate-900 shadow-sm">
+      <!-- Changed prop from toolSlug to slug to match ToolView.tsx -->
+      <ToolView slug={slug as string} client:only="react" />
+    </section>
+  </div>
+</BaseLayout>
