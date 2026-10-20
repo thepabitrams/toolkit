@@ -1,7 +1,7 @@
 import React from 'react';
 import { FilePreview } from './FilePreview';
 import { FileDetails } from './FileDetails';
-import { Container } from '@/shared/components/Container';
+import { Container } from '@/shared/ui/Container';
 import { MdClose } from 'react-icons/md';
 import type { FileRef } from '@/shared/store/fileStore';
 

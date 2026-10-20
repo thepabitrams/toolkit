@@ -1,6 +1,6 @@
 import { useState, useDeferredValue } from 'react';
 import { tools as allTools } from '@/config/tools';
-import { ToolCard } from '@/shared/components/ToolCard';
+import { ToolCard } from '@/shared/ui/ToolCard';
 import { useToolStore } from '@/shared/store/toolStore';
 
 export default function HomeView() {

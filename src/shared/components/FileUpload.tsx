@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FileCard } from './FileCard';
-import { Container } from '@/shared/components/Container';
-import { Card } from '@/shared/components/Card';
+import { Container } from '@/shared/ui/Container';
+import { Card } from '@/shared/ui/Card';
 import type { FileRef } from '@/shared/store/fileStore';
 
 interface FileUploadProps {

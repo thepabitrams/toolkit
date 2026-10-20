@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/shared/components/Button';
+import { Button } from '@/shared/ui/Button';
 import { useAction } from '@/shared/hooks/useAction';
 import { tools } from '@/config/tools';
 

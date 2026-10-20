@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { Container } from '@/shared/components/Container';
-import { Card } from '@/shared/components/Card';
-import { Input } from '@/shared/components/Input';
+import { Container } from '@/shared/ui/Container';
+import { Card } from '@/shared/ui/Card';
+import { Input } from '@/shared/ui/Input';
 
 export type Unit = 'px' | 'mm' | 'cm' | 'inch';
 

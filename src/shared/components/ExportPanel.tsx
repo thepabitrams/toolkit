@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/shared/components/Button';
+import { Button } from '@/shared/ui/Button';
 import { ActionButton } from '@/shared/components/ActionButton';
 import { useFileStore, type FileRef } from '@/shared/store/fileStore';
-import { Container } from '@/shared/components/Container';
-import { Card } from '@/shared/components/Card';
-import { Input } from '@/shared/components/Input';
+import { Container } from '@/shared/ui/Container';
+import { Card } from '@/shared/ui/Card';
+import { Input } from '@/shared/ui/Input';
 
 interface ExportPanelProps {
   file: FileRef | null;

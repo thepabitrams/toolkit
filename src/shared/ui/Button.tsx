@@ -1,4 +1,6 @@
 import React, { type ReactNode, type ButtonHTMLAttributes } from 'react';
+import { Motion } from '@/core/motion/motion';
+import { buttonMotion } from '@/core/motion/compositions/buttonMotion';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
@@ -26,7 +28,9 @@ export const Button = ({
   };
 
   return (
-    <button
+    <Motion
+      preset={buttonMotion}
+      as="button"
       type={type}
       onClick={onClick}
       disabled={disabled}
@@ -34,7 +38,6 @@ export const Button = ({
         inline-flex items-center justify-center
         px-6 py-2.5 text-sm font-medium rounded-lg
         select-none cursor-pointer
-        transition-all duration-150 active:scale-[0.98]
         disabled:opacity-50 disabled:pointer-events-none
         ${variantStyles[variant]}
         ${className}
@@ -42,6 +45,6 @@ export const Button = ({
       {...rest}
     >
       {children}
-    </button>
+    </Motion>
   );
 };

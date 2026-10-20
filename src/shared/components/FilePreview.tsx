@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFileStore, type FileRef } from '@/shared/store/fileStore';
-import { Card } from '@/shared/components/Card';
-import { Container } from '@/shared/components/Container';
+import { Card } from '@/shared/ui/Card';
+import { Container } from '@/shared/ui/Container';
 
 interface FilePreviewProps {
   file: FileRef | null;

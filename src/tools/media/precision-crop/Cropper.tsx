@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect } from "react";
 import ReactEasyCrop from "react-easy-crop";
-import type { Area } from "react-easy-crop/types";
+import type { Area } from "react-easy-crop";
 import { usePrecisionCrop } from "./usePrecisionCrop";
 import { CropControls } from "./Controls";
 import { useFileStore } from '@/shared/store/fileStore';
-import { Container } from '@/shared/components/Container';
-import { Card } from '@/shared/components/Card';
+import { Container } from '@/shared/ui/Container';
+import { Card } from '@/shared/ui/Card';
 import type { FileRef } from '@/shared/store/fileStore';
 import { loadImage, exportCanvas, prepareCanvas } from '@/shared/lib/browser';
 import { writeDpi } from '@/shared/entities/image';
@@ -147,7 +147,7 @@ export const Cropper: React.FC<CropperProps> = ({
   if (!file || !imageUrl) {
     return (
       <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
-        <Card className="p-4 flex flex-col items-center justify-center min-h-[200px]">
+        <Card className="p-4 flex flex-col items-center justify-center min-h-50">
           <p className="text-sm text-gray-500 dark:text-gray-400">Upload an image to crop</p>
         </Card>
       </Container>
@@ -157,7 +157,7 @@ export const Cropper: React.FC<CropperProps> = ({
   return (
     <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
       <Card className="overflow-hidden p-0">
-        <div className="relative w-full aspect-square min-h-[300px] sm:min-h-[400px] bg-gray-100 dark:bg-gray-700" style={{ touchAction: 'none' }}>
+        <div className="relative w-full aspect-square min-h-75 sm:min-h-100 bg-gray-100 dark:bg-gray-700" style={{ touchAction: 'none' }}>
           <ReactEasyCrop
             image={imageUrl}
             crop={crop}
