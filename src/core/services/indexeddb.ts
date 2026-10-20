@@ -1,6 +1,6 @@
 import { openDB } from 'idb';
 
-const DB_NAME = 'ToolkitDB';
+const DB_NAME = 'ToolPabitraMSDB';
 const DB_VERSION = 1;
 
 export const db = await openDB(DB_NAME, DB_VERSION, {

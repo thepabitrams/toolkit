@@ -1,5 +1,3 @@
-// src/core/services/opfs.ts
-
 let root: FileSystemDirectoryHandle | null = null;
 
 async function getRoot() {
@@ -29,7 +27,6 @@ export async function remove(path: string) {
     const root = await getRoot();
     await root.removeEntry(path);
   } catch {
-    // File doesn't exist—ignore (silent cleanup)
   }
 }
 
