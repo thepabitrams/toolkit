@@ -1,3 +1,5 @@
+// src/core/services/toolDB.ts
+
 import { openDB, type IDBPDatabase } from 'idb';
 
 const DB_NAME = 'ToolPabitraMS_ToolDB';

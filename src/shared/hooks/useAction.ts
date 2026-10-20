@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { tools as allTools, type ToolConfig } from '@/config/tools';
+import { loadTool } from '@/core/registry/toolRegistry';
+import type { Tool } from '@/core/registry/toolRegistry';
 
 interface UseActionOptions {
   toolId: string;
@@ -24,7 +25,7 @@ interface UseActionReturn {
 
 export const useAction = ({ toolId }: UseActionOptions): UseActionReturn => {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentTool, setCurrentTool] = useState<ToolConfig | null>(null);
+  const [currentTool, setCurrentTool] = useState<Tool | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef<number | null>(null);
@@ -34,9 +35,13 @@ export const useAction = ({ toolId }: UseActionOptions): UseActionReturn => {
 
   useEffect(() => {
     if (toolId) {
-      const found = allTools.find(t => t.slug === toolId);
-      if (found) setCurrentTool(found);
-      else setCurrentTool(null);
+      loadTool(toolId)
+        .then((tool) => {
+          if (tool) setCurrentTool(tool);
+        })
+        .catch(() => {
+          setCurrentTool(null);
+        });
     }
   }, [toolId]);
 
@@ -55,14 +60,17 @@ export const useAction = ({ toolId }: UseActionOptions): UseActionReturn => {
   }, []);
 
   const toggle = useCallback(() => {
-    if (isOpen) close();
-    else open();
+    if (isOpen) {
+      close();
+    } else {
+      open();
+    }
   }, [isOpen, open, close]);
 
   const filter = currentTool
     ? {
         category: currentTool.category,
-        inputType: 'single',
+        inputType: currentTool.input || 'single',
       }
     : undefined;
 
@@ -147,8 +155,11 @@ export const useAction = ({ toolId }: UseActionOptions): UseActionReturn => {
 
   const handleMouseLeave = useCallback(() => {
     if (isDragging) {
-      if (dragOffset > 80) close();
-      else setDragOffset(0);
+      if (dragOffset > 80) {
+        close();
+      } else {
+        setDragOffset(0);
+      }
       setIsDragging(false);
       startY.current = null;
       currentY.current = null;
@@ -164,8 +175,19 @@ export const useAction = ({ toolId }: UseActionOptions): UseActionReturn => {
   }, [isOpen]);
 
   return {
-    isOpen, open, close, toggle, dragOffset, isDragging, filter,
-    handleTouchStart, handleTouchMove, handleTouchEnd,
-    handleMouseDown, handleMouseMove, handleMouseUp, handleMouseLeave,
+    isOpen,
+    open,
+    close,
+    toggle,
+    dragOffset,
+    isDragging,
+    filter,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleMouseLeave,
   };
 };

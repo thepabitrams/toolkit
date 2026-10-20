@@ -1,5 +1,7 @@
+// src/shared/hooks/useExportPanel.ts
 import { useCallback, useState } from 'react';
-import { useFileStore, type FileRef } from '@/shared/store/fileStore';
+import { useFileStore } from '@/core/store/fileStore';
+import { FileRef } from '@/core/store/fileStore';
 
 interface useExportPanelOptions {
   file: FileRef | null;
@@ -7,12 +9,12 @@ interface useExportPanelOptions {
 }
 
 interface UseExportPanelReturn {
-  download: (fileName: string, format?: string) => Promise<void>;
+  export: (fileName: string, format?: string) => Promise<void>;
   isDownloading: boolean;
   error: Error | null;
 }
 
-export const useExportPanel = ({ file }: useExportPanelOptions): UseExportPanelReturn => {
+export const useExportPanel = ({ file, variant }: useExportPanelOptions): UseExportPanelReturn => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const { read } = useFileStore();
@@ -42,9 +44,9 @@ export const useExportPanel = ({ file }: useExportPanelOptions): UseExportPanelR
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       
     } catch (err) {
-      const errObj = err instanceof Error ? err : new Error('Download failed');
-      setError(errObj);
-      throw errObj;
+      const error = err instanceof Error ? err : new Error('Download failed');
+      setError(error);
+      throw error;
     } finally {
       setIsDownloading(false);
     }

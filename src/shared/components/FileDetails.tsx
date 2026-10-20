@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useFileStore, type FileRef } from '@/shared/store/fileStore';
-import { Card } from '@/shared/ui/Card';
-import { Container } from '@/shared/ui/Container';
+// src/shared/components/FileDetails.tsx
 
-// TODO: Move these from your old entities/image folder later
-const readDimensions = async (file: File) => ({ width: 100, height: 100, unit: 'px' });
-const readDpi = async (file: File) => ({ dpi: 96 });
+import React, { useState, useEffect } from 'react';
+import { useFileStore } from '@/core/store/fileStore';
+import { Card } from '@/core/components/ui/Card';
+import { Container } from '@/core/components/ui/Container';
+import { readDimensions, readDpi } from '@/entities/image/metadata';
+import type { FileRef } from '@/core/store/fileStore';
 
 interface FileDetailsProps {
   file: FileRef | null;
@@ -23,9 +23,18 @@ const formatFileSize = (bytes: number): string => {
 };
 
 export const FileDetails: React.FC<FileDetailsProps> = ({
-  file: fileRef, className = '', minWidth = 260, minHeight = 200, padding = 0,
+  file: fileRef,
+  className = '',
+  minWidth = 260,
+  minHeight = 200,
+  padding = 0,
 }) => {
-  const [imageMetadata, setImageMetadata] = useState({ width: '—', height: '—', dpi: '—', unit: 'px' });
+  const [imageMetadata, setImageMetadata] = useState({
+    width: '—',
+    height: '—',
+    dpi: '—',
+    unit: 'px',
+  });
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
   const { readFile } = useFileStore();
 
@@ -68,7 +77,10 @@ export const FileDetails: React.FC<FileDetailsProps> = ({
     };
 
     loadImageMetadata();
-    return () => { isMounted = false; };
+
+    return () => {
+      isMounted = false;
+    };
   }, [fileRef, readFile]);
 
   const renderContent = () => {
@@ -88,7 +100,9 @@ export const FileDetails: React.FC<FileDetailsProps> = ({
     return (
       <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
         <div className={`w-full px-3 pb-3 ${className}`}>
-          <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{fileRef.name}</p>
+          <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+            {fileRef.name}
+          </p>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-gray-500 dark:text-gray-400">
             <span>{size}</span>
             <span className="w-px h-2.5 bg-gray-300 dark:bg-gray-600" />
@@ -109,5 +123,9 @@ export const FileDetails: React.FC<FileDetailsProps> = ({
     );
   };
 
-  return <Card className="p-3 flex-1">{renderContent()}</Card>;
+  return (
+    <Card className="p-3 flex-1">
+      {renderContent()}
+    </Card>
+  );
 };

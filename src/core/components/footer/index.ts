@@ -1,1 +1,0 @@
-export { default as HomeFooter } from './Home.astro';

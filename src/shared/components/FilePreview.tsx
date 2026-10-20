@@ -1,7 +1,10 @@
+// src/shared/components/FilePreview.tsx
+
 import React, { useState, useEffect } from 'react';
-import { useFileStore, type FileRef } from '@/shared/store/fileStore';
-import { Card } from '@/shared/ui/Card';
-import { Container } from '@/shared/ui/Container';
+import { useFileStore } from '@/core/store/fileStore';
+import { Card } from '@/core/components/ui/Card';
+import type { FileRef } from '@/core/store/fileStore';
+import { Container } from '@/core/components/ui/Container';
 
 interface FilePreviewProps {
   file: FileRef | null;
@@ -12,7 +15,11 @@ interface FilePreviewProps {
 }
 
 export const FilePreview: React.FC<FilePreviewProps> = ({ 
-  file, className = '', minWidth = 260, minHeight = 200, padding = 0 
+  file, 
+  className = '', 
+  minWidth = 260, 
+  minHeight = 200, 
+  padding = 0 
 }) => {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,7 +53,9 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
 
     return () => {
       isMounted = false;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
     };
   }, [file, read]);
 
@@ -99,7 +108,14 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
 
   return (
     <Card className="overflow-hidden p-0 flex-1">
-      <Container className={`px-0 ${className}`} style={{ minWidth, minHeight, padding }}>
+      <Container 
+        className={`px-0 ${className}`}
+        style={{
+          minWidth: `${minWidth}px`,
+          minHeight: `${minHeight}px`,
+          padding: `${padding}px`,
+        }}
+      >
         {renderPreview()}
       </Container>
     </Card>

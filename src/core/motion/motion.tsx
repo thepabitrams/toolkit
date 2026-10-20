@@ -1,4 +1,5 @@
-import React, { type ElementType, type HTMLAttributes } from 'react';
+// core/motion/motion.tsx
+import React from 'react';
 import { injectKeyframes } from './core/injection/keyframes';
 
 interface Preset {
@@ -15,72 +16,87 @@ type MotionPreset =
   | { className: string; style?: Record<string, any> };
 
 interface MotionProps {
-  preset?: MotionPreset | undefined;
-  as?: ElementType;
+  preset: MotionPreset;
+  as?: keyof JSX.IntrinsicElements;
   duration?: number;
   easing?: string;
   delay?: number;
   className?: string;
-  style?: React.CSSProperties;
+  style?: Record<string, any>;
   children?: React.ReactNode;
 }
 
 export function getMotion(
-  preset: MotionPreset | undefined,
+  preset: MotionPreset,
   options?: {
     duration?: number;
     easing?: string;
     delay?: number;
     className?: string;
-    style?: React.CSSProperties;
+    style?: Record<string, any>;
   }
-): { className: string; style: React.CSSProperties } {
-  if (!preset) {
-    return { className: options?.className || '', style: options?.style || {} };
-  }
-
+): { className: string; style: Record<string, any> } {
   if (typeof preset === 'object' && preset !== null && 'name' in preset && 'keyframes' in preset) {
     const p = preset as Preset;
     injectKeyframes(p.name, p.keyframes);
+
     const duration = options?.duration ?? p.duration ?? 200;
     const easing = options?.easing ?? p.easing ?? 'ease';
+
+    let style = { ...(options?.style || {}) };
     
-    let style: React.CSSProperties = { 
-      ...(options?.style || {}),
-      animationName: p.name, 
-      animationDuration: `${duration}ms`, 
-      animationTimingFunction: easing, 
-      animationFillMode: 'both' 
+    style = {
+      ...style,
+      animationName: p.name,
+      animationDuration: `${duration}ms`,
+      animationTimingFunction: easing,
+      animationFillMode: 'both',
     };
-    
+
     if (options?.delay !== undefined) {
-      style = { ...style, animationDelay: `${options.delay}ms` };
+      style = {
+        ...style,
+        animationDelay: `${options.delay}ms`,
+      };
     }
-    
-    return { className: options?.className || '', style };
+
+    let className = options?.className || '';
+
+    return {
+      className,
+      style,
+    };
   }
 
   if (typeof preset === 'function') {
     const result = preset();
+    const mergedStyle = { ...(result.style || {}), ...(options?.style || {}) };
     return {
       className: (result.className || '') + (options?.className ? ` ${options.className}` : ''),
-      style: { ...(result.style || {}), ...(options?.style || {}) },
+      style: mergedStyle,
     };
   }
 
   if (typeof preset === 'string') {
-    return { className: preset + (options?.className ? ` ${options.className}` : ''), style: options?.style ?? {} };
+    return {
+      className: preset + (options?.className ? ` ${options.className}` : ''),
+      style: options?.style ?? {},
+    };
   }
 
   if (typeof preset === 'object' && preset !== null && 'className' in preset) {
     const result = preset as { className: string; style?: Record<string, any> };
+    const mergedStyle = { ...(result.style || {}), ...(options?.style || {}) };
     return {
       className: (result.className || '') + (options?.className ? ` ${options.className}` : ''),
-      style: { ...(result.style || {}), ...(options?.style || {}) },
+      style: mergedStyle,
     };
   }
 
-  return { className: options?.className || '', style: options?.style || {} };
+  return {
+    className: options?.className || '',
+    style: options?.style || {},
+  };
 }
 
 export function Motion({
@@ -92,14 +108,14 @@ export function Motion({
   className = '',
   style = {},
   children,
+  show,
   ...props
-}: MotionProps & HTMLAttributes<HTMLElement> & { [key: string]: any }) {
+}: MotionProps & React.HTMLAttributes<HTMLElement>) {
   const result = getMotion(preset, { duration, easing, delay, className, style });
-  const Tag = Component as ElementType;
 
   return (
-    <Tag className={result.className} style={result.style} {...props}>
+    <Component className={result.className} style={result.style} {...props}>
       {children}
-    </Tag>
+    </Component>
   );
 }

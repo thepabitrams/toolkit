@@ -1,8 +1,9 @@
+// src/tools/image/precision-crop/Controls.tsx
 import React from "react";
 import { FiZoomIn, FiZoomOut, FiRefreshCw } from "react-icons/fi";
-import { Button } from "@/shared/ui/Button";
-import { IconButton } from "@/shared/ui/IconButton";
-import { Container } from "@/shared/ui/Container";
+import { Button } from "@/core/components/ui/Button";
+import { IconButton } from "@/core/components/ui/IconButton";
+import { Container } from "@/core/components/ui/Container";
 
 interface CropControlsProps {
   zoom: number;
@@ -68,7 +69,11 @@ export const CropControls: React.FC<CropControlsProps> = ({
           </span>
         </div>
 
-        <Button onClick={onCrop} variant="primary" className="w-full">
+        <Button
+          onClick={onCrop}
+          variant="primary"
+          className="w-full"
+        >
           Apply Crop
         </Button>
       </div>

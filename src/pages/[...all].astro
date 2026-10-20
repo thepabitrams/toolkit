@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import App from '@/App';
+
+// This tells Astro to build the root page and hand control to React Router
+export async function getStaticPaths() {
+  return [
+    { params: { all: undefined } } 
+  ];
+}
+---
+<Base title="Toolkit" description="Old App running inside Astro">
+  <App client:only="react" />
+</Base>

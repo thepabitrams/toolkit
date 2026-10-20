@@ -1,7 +1,10 @@
+// src/tools/image/precision-crop/DimensionInput.tsx
 import { useState, useCallback } from 'react';
-import { Container } from '@/shared/ui/Container';
-import { Card } from '@/shared/ui/Card';
-import { Input } from '@/shared/ui/Input';
+import { Container } from '@/core/components/ui/Container';
+import { Card } from '@/core/components/ui/Card';
+import { Input } from '@/core/components/ui/Input';
+import { Motion } from '@/core/motion/motion';
+import { buttonMotion } from '@/core/motion/compositions/buttonMotion';
 
 export type Unit = 'px' | 'mm' | 'cm' | 'inch';
 
@@ -100,7 +103,10 @@ export const DimensionInput: React.FC<DimensionInputProps> = ({
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => e.target.select();
 
   return (
-    <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
+    <Container 
+      className={`px-0 flex-1 ${className}`}
+      style={{ minWidth, minHeight, padding }}
+    >
       <Card className="p-4 flex flex-col h-full w-full">
         <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
           Dimension Input
@@ -127,8 +133,10 @@ export const DimensionInput: React.FC<DimensionInputProps> = ({
           </label>
           <div className="grid grid-cols-2 gap-1.5">
             {UNITS.map((u) => (
-              <button
+              <Motion
                 key={u}
+                preset={buttonMotion}
+                as="button"
                 onClick={() => handleUnitChange(u)}
                 className={`
                   px-3 py-1.5 text-xs font-medium rounded-lg
@@ -140,7 +148,7 @@ export const DimensionInput: React.FC<DimensionInputProps> = ({
                 `}
               >
                 {u.toUpperCase()}
-              </button>
+              </Motion>
             ))}
           </div>
         </div>

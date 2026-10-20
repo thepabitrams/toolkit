@@ -1,0 +1,340 @@
+// src/tools/productivity/infinite-type/Viewport.tsx
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Card } from '@/core/components/ui/Card';
+import { Container } from '@/core/components/ui/Container';
+import type { Session, Line } from './useInfiniteType';
+
+const DEFAULT_VIEWPORT_HEIGHT = 400;
+const MIN_VIEWPORT_HEIGHT = 180;
+const VIEWPORT_BOTTOM_MARGIN = 16;
+const ACTIVE_LINE_TOP_OFFSET_RATIO = 0.25;
+const SCROLL_TRIGGER_TOP_RATIO = 0.10;
+const SCROLL_TRIGGER_BOTTOM_RATIO = 0.35;
+const PROGRAMMATIC_SCROLL_LOCK_MS = 600;
+const USER_SCROLL_COOLDOWN_MS = 1200;
+const HEIGHT_SETTLE_MS = 300;
+
+interface ViewportProps {
+  state: Session;
+  isRunning: boolean;
+  isFocused: boolean;
+  containerRef: React.RefObject<HTMLDivElement>;
+  probeRef: React.RefObject<HTMLSpanElement>;
+  onContainerWidth: (width: number) => void;
+  onCharWidth: (width: number) => void;
+}
+
+export const Viewport: React.FC<ViewportProps> = React.memo(({
+  state,
+  isRunning,
+  isFocused,
+  containerRef,
+  probeRef,
+  onContainerWidth,
+  onCharWidth,
+}) => {
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const activeLineRef = useRef<HTMLDivElement>(null);
+  const isUserScrollingRef = useRef(false);
+  const userScrollTimeoutRef = useRef<number | null>(null);
+  const isProgrammaticScrollRef = useRef(false);
+  const [viewportHeight, setViewportHeight] = useState<number>(DEFAULT_VIEWPORT_HEIGHT);
+  const { lines } = state;
+
+  const activeTypedLength = lines.length > 0 ? lines[lines.length - 1].typed.length : 0;
+
+  const markUserScrolling = useCallback(() => {
+    isUserScrollingRef.current = true;
+    if (userScrollTimeoutRef.current) {
+      window.clearTimeout(userScrollTimeoutRef.current);
+    }
+    userScrollTimeoutRef.current = window.setTimeout(() => {
+      isUserScrollingRef.current = false;
+    }, USER_SCROLL_COOLDOWN_MS);
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        onContainerWidth(entry.contentRect.width);
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [containerRef, onContainerWidth]);
+
+  useEffect(() => {
+    if (!probeRef.current) return;
+    const measureProbe = () => {
+      if (!probeRef.current) return;
+      const width = probeRef.current.getBoundingClientRect().width;
+      if (width > 0) onCharWidth(width);
+    };
+    measureProbe();
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measureProbe);
+    }
+  }, [probeRef, onCharWidth]);
+
+  useEffect(() => {
+    const visualViewport = window.visualViewport;
+
+    const updateHeight = () => {
+      const viewportElement = viewportRef.current;
+      if (!viewportElement) return;
+      const viewportRect = viewportElement.getBoundingClientRect();
+
+      let availableHeight: number;
+      if (visualViewport) {
+        const visibleBottom = visualViewport.offsetTop + visualViewport.height;
+        availableHeight = visibleBottom - viewportRect.top - VIEWPORT_BOTTOM_MARGIN;
+      } else {
+        availableHeight = window.innerHeight - viewportRect.top - VIEWPORT_BOTTOM_MARGIN;
+      }
+
+      const clampedHeight = Math.max(
+        MIN_VIEWPORT_HEIGHT,
+        Math.min(DEFAULT_VIEWPORT_HEIGHT, availableHeight)
+      );
+
+      setViewportHeight((previousHeight) =>
+        Math.abs(previousHeight - clampedHeight) > 1 ? clampedHeight : previousHeight
+      );
+    };
+
+    updateHeight();
+
+    if (visualViewport) {
+      visualViewport.addEventListener('resize', updateHeight);
+      visualViewport.addEventListener('scroll', updateHeight);
+    }
+    window.addEventListener('resize', updateHeight);
+    window.addEventListener('orientationchange', updateHeight);
+    document.addEventListener('focusin', updateHeight);
+    document.addEventListener('focusout', updateHeight);
+
+    return () => {
+      if (visualViewport) {
+        visualViewport.removeEventListener('resize', updateHeight);
+        visualViewport.removeEventListener('scroll', updateHeight);
+      }
+      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener('orientationchange', updateHeight);
+      document.removeEventListener('focusin', updateHeight);
+      document.removeEventListener('focusout', updateHeight);
+    };
+  }, []);
+
+  useEffect(() => {
+    const viewportElement = viewportRef.current;
+    if (!viewportElement) return;
+
+    const onTouchStart = () => markUserScrolling();
+    const onWheel = () => markUserScrolling();
+
+    viewportElement.addEventListener('touchstart', onTouchStart, { passive: true });
+    viewportElement.addEventListener('wheel', onWheel, { passive: true });
+
+    return () => {
+      viewportElement.removeEventListener('touchstart', onTouchStart);
+      viewportElement.removeEventListener('wheel', onWheel);
+      if (userScrollTimeoutRef.current) {
+        window.clearTimeout(userScrollTimeoutRef.current);
+      }
+    };
+  }, [markUserScrolling]);
+
+  const handleScroll = () => {
+    if (isProgrammaticScrollRef.current) return;
+    markUserScrolling();
+  };
+
+  const scrollActiveLineIntoView = (behavior: ScrollBehavior) => {
+    const viewportElement = viewportRef.current;
+    const activeLineElement = activeLineRef.current;
+    if (!viewportElement || !activeLineElement) return;
+
+    const activeLineTop = activeLineElement.offsetTop;
+    const activeLineTopOffsetPx = viewportElement.clientHeight * ACTIVE_LINE_TOP_OFFSET_RATIO;
+    const targetScrollTop = activeLineTop - activeLineTopOffsetPx;
+
+    isProgrammaticScrollRef.current = true;
+    viewportElement.scrollTo({ top: Math.max(0, targetScrollTop), behavior });
+
+    window.setTimeout(() => {
+      isProgrammaticScrollRef.current = false;
+    }, PROGRAMMATIC_SCROLL_LOCK_MS);
+  };
+
+  useLayoutEffect(() => {
+    if (!isRunning) return;
+    if (isUserScrollingRef.current) return;
+
+    const viewportElement = viewportRef.current;
+    const activeLineElement = activeLineRef.current;
+    if (!viewportElement || !activeLineElement) return;
+
+    const activeLineTop = activeLineElement.offsetTop;
+    const activeLineBottom = activeLineTop + activeLineElement.offsetHeight;
+    const viewportScrollTop = viewportElement.scrollTop;
+
+    const triggerTop =
+      viewportScrollTop + viewportElement.clientHeight * SCROLL_TRIGGER_TOP_RATIO;
+    const triggerBottom =
+      viewportScrollTop + viewportElement.clientHeight * SCROLL_TRIGGER_BOTTOM_RATIO;
+
+    if (activeLineTop < triggerTop || activeLineBottom > triggerBottom) {
+      scrollActiveLineIntoView('smooth');
+    }
+  }, [lines.length, activeTypedLength, isRunning]);
+
+  useEffect(() => {
+    if (!isRunning) return;
+    if (!isFocused) return;
+    if (isUserScrollingRef.current) return;
+
+    const timeoutId = window.setTimeout(() => {
+      if (isUserScrollingRef.current) return;
+      scrollActiveLineIntoView('auto');
+    }, HEIGHT_SETTLE_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isFocused, viewportHeight, isRunning]);
+
+  const cursorClassName = isFocused ? 'cursor-blink' : 'cursor-hidden';
+  const endCursorClassName = isFocused ? 'cursor-bar' : 'cursor-bar-hidden';
+
+  const renderLine = (line: Line, isActive: boolean) => {
+    return (
+      <div
+        className="w-full"
+        style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}
+      >
+        {line.target.split('').map((character, characterIndex) => {
+          const typedCharacter = line.typed[characterIndex] || '';
+          const isTyped = characterIndex < line.typed.length;
+          const isError = isTyped && typedCharacter !== character;
+          const isCursorHere = isActive && characterIndex === line.typed.length;
+
+          let characterClassName = 'text-gray-300 dark:text-gray-700';
+          if (isTyped) {
+            characterClassName = isError
+              ? 'text-red-500'
+              : 'text-gray-900 dark:text-gray-100';
+          }
+          if (isCursorHere) characterClassName += ' ' + cursorClassName;
+
+          const displayCharacter = character === ' ' ? '\u00A0' : character;
+          return (
+            <span key={characterIndex} className={characterClassName}>
+              {displayCharacter}
+            </span>
+          );
+        })}
+        {isActive && line.typed.length >= line.target.length && line.target.length > 0 && (
+          <span className={endCursorClassName} />
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <Container className="px-0 py-0 max-w-full">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes cursorBlinkShadow {
+              0%, 49% { box-shadow: -2px 0 0 rgb(59 130 246); }
+              50%, 100% { box-shadow: -2px 0 0 transparent; }
+            }
+            .cursor-blink {
+              box-shadow: -2px 0 0 rgb(59 130 246);
+              animation: cursorBlinkShadow 1s step-end infinite;
+            }
+            .cursor-hidden {
+              box-shadow: none;
+            }
+            @keyframes cursorBlinkBar {
+              0%, 49% { opacity: 1; }
+              50%, 100% { opacity: 0; }
+            }
+            .cursor-bar {
+              display: inline-block;
+              position: relative;
+              width: 0;
+              height: 1em;
+              vertical-align: text-bottom;
+            }
+            .cursor-bar::after {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 2px;
+              height: 100%;
+              background-color: rgb(59 130 246);
+              animation: cursorBlinkBar 1s step-end infinite;
+            }
+            .cursor-bar-hidden {
+              display: none;
+            }
+            .infinite-type-scroll {
+              scrollbar-width: thin;
+              scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+              scrollbar-gutter: stable;
+            }
+            .dark .infinite-type-scroll {
+              scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+            }
+          `,
+        }}
+      />
+      <Card className="overflow-hidden p-0 min-h-[180px]">
+        <div
+          ref={viewportRef}
+          onScroll={handleScroll}
+          className="infinite-type-scroll relative px-6 py-4 overflow-y-auto font-mono text-lg leading-[46px]"
+          style={{
+            height: `${viewportHeight}px`,
+            touchAction: 'pan-y',
+            transition: 'height 200ms ease-out',
+          }}
+        >
+          <span
+            ref={probeRef}
+            aria-hidden="true"
+            className="absolute invisible pointer-events-none top-0 left-0"
+            style={{ whiteSpace: 'pre' }}
+          >
+            M
+          </span>
+          <div ref={containerRef} className="flex flex-col w-full gap-1">
+            {lines.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500 text-sm">
+                Press Start to begin typing
+              </div>
+            ) : (
+              lines.map((line, lineIndex) => {
+                const isActive = lineIndex === lines.length - 1;
+                const isCompleted = lineIndex < lines.length - 1;
+                const opacityClassName = isCompleted ? 'opacity-50' : 'opacity-100';
+                return (
+                  <div
+                    key={lineIndex}
+                    ref={isActive ? activeLineRef : undefined}
+                    className={`w-full ${opacityClassName}`}
+                  >
+                    {renderLine(line, isActive)}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </Card>
+    </Container>
+  );
+});
+
+Viewport.displayName = 'Viewport';

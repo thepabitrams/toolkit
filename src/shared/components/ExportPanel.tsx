@@ -1,10 +1,12 @@
+// src/shared/components/ExportPanel.tsx
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/shared/ui/Button';
+import { Button } from '@/core/components/ui/Button';
 import { ActionButton } from '@/shared/components/ActionButton';
-import { useFileStore, type FileRef } from '@/shared/store/fileStore';
-import { Container } from '@/shared/ui/Container';
-import { Card } from '@/shared/ui/Card';
-import { Input } from '@/shared/ui/Input';
+import { useFileStore } from '@/core/store/fileStore';
+import { Container } from '@/core/components/ui/Container';
+import { Card } from '@/core/components/ui/Card';
+import { Input } from '@/core/components/ui/Input';
+import type { FileRef } from '@/core/store/fileStore';
 
 interface ExportPanelProps {
   file: FileRef | null;
@@ -21,28 +23,50 @@ interface ExportPanelProps {
 
 function getExtensionFromMimeType(mimeType: string): string {
   const mimeMap: Record<string, string> = {
-    'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png', 'image/webp': 'webp',
-    'image/gif': 'gif', 'image/bmp': 'bmp', 'image/tiff': 'tiff', 'image/svg+xml': 'svg',
-    'application/pdf': 'pdf', 'application/zip': 'zip', 'text/plain': 'txt', 'application/json': 'json',
+    'image/jpeg': 'jpg',
+    'image/jpg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+    'image/bmp': 'bmp',
+    'image/tiff': 'tiff',
+    'image/svg+xml': 'svg',
+    'application/pdf': 'pdf',
+    'application/zip': 'zip',
+    'text/plain': 'txt',
+    'application/json': 'json',
   };
   return mimeMap[mimeType] || '';
 }
 
 export const ExportPanel: React.FC<ExportPanelProps> = ({
-  file, variant, initialFileName = 'download', onClear, toolId, onToolSelect,
-  className = '', minWidth = 260, minHeight = 200, padding = 0,
+  file,
+  variant,
+  initialFileName = 'download',
+  onClear,
+  toolId,
+  onToolSelect,
+  className = '',
+  minWidth = 260,
+  minHeight = 200,
+  padding = 0,
 }) => {
   const [fileName, setFileName] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
   const { read } = useFileStore();
 
   useEffect(() => {
-    if (file) setFileName(file.name.replace(/\.[^.]+$/, ''));
-    else setFileName(initialFileName);
+    if (file) {
+      const name = file.name.replace(/\.[^.]+$/, '');
+      setFileName(name);
+    } else {
+      setFileName(initialFileName);
+    }
   }, [file, initialFileName]);
 
   const handleDownload = async () => {
     if (!file) return;
+
     setIsDownloading(true);
     try {
       const blob = await read(file.name);
@@ -62,25 +86,57 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
 
       await onClear();
     } catch {
+      // Silent fail
     } finally {
       setIsDownloading(false);
     }
   };
 
   const fileExt = file ? getExtensionFromMimeType(file.type) : '';
+
   if (!file) return null;
 
   return (
-    <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
+    <Container 
+      className={`px-0 flex-1 ${className}`}
+      style={{
+        minWidth: `${minWidth}px`,
+        minHeight: `${minHeight}px`,
+        padding: `${padding}px`,
+      }}
+    >
       <Card className="p-4 flex flex-col h-full w-full">
-        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Download</h3>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+          Download
+        </h3>
+
         <div className="mb-3">
-          <Input type="text" value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="Enter file name..." disabled={isDownloading} suffix={fileExt ? `.${fileExt}` : undefined} fullWidth />
+          <Input
+            type="text"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            placeholder="Enter file name..."
+            disabled={isDownloading}
+            suffix={fileExt ? `.${fileExt}` : undefined}
+            fullWidth
+          />
         </div>
+
         <div className="border-t border-gray-200/60 dark:border-gray-700/60 my-2" />
+
         <div className="flex items-center justify-between gap-3 mt-auto pt-1">
-          <ActionButton toolId={toolId} variant={variant} onToolSelect={onToolSelect} className="flex-1" />
-          <Button onClick={handleDownload} variant="primary" disabled={!file || isDownloading} className="flex-1 px-5 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+          <ActionButton
+            toolId={toolId}
+            variant={variant}
+            onToolSelect={onToolSelect}
+            className="flex-1"
+          />
+          <Button
+            onClick={handleDownload}
+            variant="primary"
+            disabled={!file || isDownloading}
+            className="flex-1 px-5 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             {isDownloading ? 'Downloading...' : 'Download'}
           </Button>
         </div>

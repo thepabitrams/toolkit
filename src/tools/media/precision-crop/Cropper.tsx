@@ -1,14 +1,15 @@
+// src/tools/image/precision-crop/Cropper.tsx
 import React, { useState, useCallback, useEffect } from "react";
 import ReactEasyCrop from "react-easy-crop";
-import type { Area } from "react-easy-crop";
+import type { Area } from "react-easy-crop/types";
 import { usePrecisionCrop } from "./usePrecisionCrop";
 import { CropControls } from "./Controls";
-import { useFileStore } from '@/shared/store/fileStore';
-import { Container } from '@/shared/ui/Container';
-import { Card } from '@/shared/ui/Card';
-import type { FileRef } from '@/shared/store/fileStore';
-import { loadImage, exportCanvas, prepareCanvas } from '@/shared/lib/browser';
-import { writeDpi } from '@/shared/entities/image';
+import { useFileStore } from '@/core/store/fileStore';
+import { Container } from '@/core/components/ui/Container';
+import { Card } from '@/core/components/ui/Card';
+import type { FileRef } from '@/core/store/fileStore';
+import { loadImage, exportCanvas, prepareCanvas } from '@/lib/browser';
+import { writeDpi } from '@/entities/image';
 
 interface CropperProps {
   file: FileRef | null;
@@ -68,6 +69,7 @@ export const Cropper: React.FC<CropperProps> = ({
           setImageUrl(objectUrl);
         }
       } catch {
+        // ignore
       }
     };
 
@@ -93,6 +95,7 @@ export const Cropper: React.FC<CropperProps> = ({
       if (!originalFile) throw new Error("Failed to read file");
 
       const image = await loadImage(originalFile);
+
       const originalMimeType = originalFile.type || 'image/png';
       const supportsAlpha = originalMimeType !== 'image/jpeg' && originalMimeType !== 'image/bmp';
 
@@ -106,7 +109,11 @@ export const Cropper: React.FC<CropperProps> = ({
       if ('imageSmoothingQuality' in ctx) {
         ctx.imageSmoothingQuality = 'high';
       }
-      ctx.drawImage(image, x, y, width, height, 0, 0, targetWidthPx, targetHeightPx);
+      ctx.drawImage(
+        image,
+        x, y, width, height,
+        0, 0, targetWidthPx, targetHeightPx
+      );
 
       let blob: Blob;
       const quality = (originalMimeType === 'image/jpeg' || originalMimeType === 'image/webp') ? 0.92 : undefined;
@@ -129,6 +136,7 @@ export const Cropper: React.FC<CropperProps> = ({
       }
 
       const finalMimeType = actualMimeType;
+
       const fileObj = new File([blob], file.name, { type: finalMimeType });
       const finalBlob = await writeDpi(fileObj, inputDpi);
 
@@ -147,7 +155,7 @@ export const Cropper: React.FC<CropperProps> = ({
   if (!file || !imageUrl) {
     return (
       <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
-        <Card className="p-4 flex flex-col items-center justify-center min-h-50">
+        <Card className="p-4 flex flex-col items-center justify-center min-h-[200px]">
           <p className="text-sm text-gray-500 dark:text-gray-400">Upload an image to crop</p>
         </Card>
       </Container>
@@ -157,7 +165,10 @@ export const Cropper: React.FC<CropperProps> = ({
   return (
     <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
       <Card className="overflow-hidden p-0">
-        <div className="relative w-full aspect-square min-h-75 sm:min-h-100 bg-gray-100 dark:bg-gray-700" style={{ touchAction: 'none' }}>
+        <div
+          className="relative w-full aspect-square min-h-[300px] sm:min-h-[400px] bg-gray-100 dark:bg-gray-700"
+          style={{ touchAction: 'none' }}
+        >
           <ReactEasyCrop
             image={imageUrl}
             crop={crop}
@@ -185,6 +196,7 @@ export const Cropper: React.FC<CropperProps> = ({
             }}
           />
         </div>
+
         <CropControls
           zoom={zoom}
           isZoomMin={isZoomMin}

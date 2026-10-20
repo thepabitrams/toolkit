@@ -1,3 +1,4 @@
+// src/tools/image/precision-crop/usePrecisionCrop.ts
 import { useState, useCallback } from "react";
 
 const MAX_ZOOM = 5;

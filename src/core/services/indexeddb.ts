@@ -1,3 +1,4 @@
+// src/core/services/indexeddb.ts
 import { openDB } from 'idb';
 
 const DB_NAME = 'ToolPabitraMSDB';

@@ -1,5 +1,6 @@
+// src/shared/hooks/useFileUpload.ts
 import { useState, useCallback } from 'react';
-import { useFileStore } from '@/shared/store/fileStore';
+import { useFileStore } from '@/core/store/fileStore';
 
 export function useFileUpload() {
   const [isLoading, setIsLoading] = useState(false);
