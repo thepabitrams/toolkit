@@ -1,5 +1,5 @@
 // src/core/components/ui/Card.tsx
-import React, { ReactNode, HTMLAttributes } from 'react';
+import React, { type ReactNode, type HTMLAttributes } from 'react';
 import { Motion } from '@/core/motion/motion';
 import { cardMotion } from '@/core/motion/compositions/cardMotion';
 

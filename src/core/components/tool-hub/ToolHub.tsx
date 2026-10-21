@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search } from '@/core/components/ui/Search';
-import { ToolCatalog } from '@/core/components/ui/ToolCatalog';
+import { ToolCatalog } from './ToolCatalog';
 import { Container } from '@/core/components/ui/Container';
 import { tools } from '@/config/tools';
 

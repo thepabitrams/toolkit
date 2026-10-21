@@ -1,5 +1,5 @@
 import { ToolCard } from './ToolCard';
-import { Grid } from './Grid';
+import { Grid } from '@/core/components/ui/Grid';
 import type { ToolConfig } from '@/config/tools';
 
 interface ToolCatalogItem extends ToolConfig {

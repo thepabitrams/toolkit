@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/core/components/ui/Button';
-import { ToolHub } from '@/core/components/layout/ToolHub';
+import { ToolHub } from '@/core/components/tool-hub/ToolHub';
 import { useAction } from '@/shared/hooks/useAction';
 import { Overlay } from '@/core/components/ui/Overlay';
 
