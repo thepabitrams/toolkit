@@ -1,27 +1,35 @@
 ---
-import Container from '@/core/components/Container.astro';
-import Avatar from '@/core/components/Avatar.astro';
+// src/core/components/footer/home.astro
 import { site, social, sponsor } from '@/config/site';
 import { FaGithub, FaLinkedin, FaXTwitter, FaInstagram, FaYoutube } from 'react-icons/fa6';
 import { FiMail, FiHeart, FiExternalLink } from 'react-icons/fi';
 
-const currentYear = new Date().getFullYear();
+const currentCopyrightYear = new Date().getFullYear();
 
-const socialLinks = [
-  { name: 'GitHub', url: social.github, icon: FaGithub, hoverColor: 'hover:text-black dark:hover:text-white' },
-  { name: 'LinkedIn', url: social.linkedin, icon: FaLinkedin, hoverColor: 'hover:text-[#0A66C2]' },
-  { name: 'X', url: social.x, icon: FaXTwitter, hoverColor: 'hover:text-black dark:hover:text-white' },
-  { name: 'YouTube', url: social.youtube, icon: FaYoutube, hoverColor: 'hover:text-[#FF0000]' },
-  { name: 'Instagram', url: social.instagram, icon: FaInstagram, hoverColor: 'hover:text-[#E1306C]' },
+const socialMediaLinks = [
+  { platformName: 'GitHub', profileUrl: social.github, PlatformIcon: FaGithub, hoverColorClass: 'hover:text-black dark:hover:text-white' },
+  { platformName: 'LinkedIn', profileUrl: social.linkedin, PlatformIcon: FaLinkedin, hoverColorClass: 'hover:text-[#0A66C2]' },
+  { platformName: 'X', profileUrl: social.x, PlatformIcon: FaXTwitter, hoverColorClass: 'hover:text-black dark:hover:text-white' },
+  { platformName: 'YouTube', profileUrl: social.youtube, PlatformIcon: FaYoutube, hoverColorClass: 'hover:text-[#FF0000]' },
+  { platformName: 'Instagram', profileUrl: social.instagram, PlatformIcon: FaInstagram, hoverColorClass: 'hover:text-[#E1306C]' },
 ];
 ---
 <footer class="mt-auto bg-white pt-16 pb-8 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800">
-  <Container>
+  <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
       
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
         <div class="shrink-0">
-          <Avatar />
+          <img 
+            src="/icons/pabitra-avatar-black.svg" 
+            alt={site.author} 
+            class="h-32 w-32 object-contain block dark:hidden" 
+          />
+          <img 
+            src="/icons/pabitra-avatar-white.svg" 
+            alt={site.author} 
+            class="h-32 w-32 object-contain hidden dark:block" 
+          />
         </div>
         
         <div class="flex flex-col items-center sm:items-start text-center sm:text-left gap-3">
@@ -34,7 +42,6 @@ const socialLinks = [
               class="group inline-flex items-center gap-1 text-gray-900 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
             >
               {site.author}
-              <!-- Changed size to 16 -->
               <FiExternalLink size={16} className="text-gray-400 group-hover:text-blue-500 transition-colors mb-1" />
             </a>
           </h2>
@@ -44,21 +51,21 @@ const socialLinks = [
           </p>
           
           <div class="flex items-center gap-4 mt-2">
-            {socialLinks.map((item) => (
+            {socialMediaLinks.map((socialProfile) => (
               <a 
-                href={item.url} 
+                href={socialProfile.profileUrl} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                class={`text-gray-400 transition-all duration-200 ease-out hover:-translate-y-1 hover:scale-110 ${item.hoverColor}`}
+                class={`text-gray-400 transition-all duration-200 ease-out hover:-translate-y-1 hover:scale-110 ${socialProfile.hoverColorClass}`}
               >
-                <item.icon size={28} />
+                <socialProfile.PlatformIcon size={28} />
               </a>
             ))}
             
             <div class="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1"></div>
             
             <a 
-              href={`mailto:contactpabitrams@gmail.com`} 
+              href="mailto:contactpabitrams@gmail.com" 
               class="group inline-flex items-center gap-2 px-5 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-full shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-105 hover:bg-gray-200 hover:shadow-md dark:hover:bg-gray-700 active:translate-y-0 active:scale-95"
             >
               <FiMail size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" /> 
@@ -92,7 +99,7 @@ const socialLinks = [
 
     <div class="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
       <p class="text-sm text-gray-400 dark:text-gray-500">
-        © {currentYear} {site.author}. All rights reserved.
+        © {currentCopyrightYear} {site.author}. All rights reserved.
       </p>
       
       <div class="flex items-center gap-6 text-sm text-gray-400 dark:text-gray-500">
@@ -101,5 +108,5 @@ const socialLinks = [
         <a href="/terms" class="transition-colors hover:text-gray-900 dark:hover:text-white">Terms of Service</a>
       </div>
     </div>
-  </Container>
+  </div>
 </footer>
