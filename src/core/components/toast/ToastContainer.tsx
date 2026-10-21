@@ -1,9 +1,9 @@
-// src/core/components/ui/toast/ToastContainer.tsx
+// src/core/components/toast/ToastContainer.tsx
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Stagger } from '@/core/motion/core/Stagger';
 import { Toast } from './Toast';
-import { useToast } from '@/core/hooks/useToast';
+import { useToast } from './useToast';
 
 export function ToastContainer() {
   const { toasts: activeToasts, dismissToast: handleDismissToast, clearAll: handleClearAllToasts } = useToast();
@@ -18,7 +18,7 @@ export function ToastContainer() {
 
   return createPortal(
     <div
-      className="fixed left-0 right-0 z-[9999] flex justify-center pointer-events-none px-4 pt-2"
+      className="fixed left-0 right-0 z-9999 flex justify-center pointer-events-none px-4 pt-2"
       style={{
         top: 'calc(60px + 8px)',
       }}
