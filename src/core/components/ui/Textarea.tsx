@@ -1,5 +1,5 @@
 // src/core/components/ui/Textarea.tsx
-import React, { forwardRef, TextareaHTMLAttributes } from 'react';
+import React, { forwardRef, type TextareaHTMLAttributes } from 'react';
 import textareaMotion from '@/core/motion/compositions/textareaMotion';
 
 export interface TextareaProps

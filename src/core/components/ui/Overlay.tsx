@@ -84,7 +84,7 @@ export function Overlay({ isOpen, onClose, children }: OverlayProps) {
         className="w-full h-full flex flex-col"
         style={initialStyle}
       >
-        <div className="flex justify-end p-4 flex-shrink-0">
+        <div className="flex justify-end p-4 shrink-0">
           <button
             onClick={onClose}
             className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 active:scale-90 focus:outline-none focus:ring-2 focus:ring-blue-500/20"

@@ -145,7 +145,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         </button>
         <button
           onClick={centerOnClick}
-          className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-blue-500 transition-colors px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[60px]"
+          className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-blue-500 transition-colors px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 min-w-15"
           type="button"
         >
           {centerText}
@@ -272,7 +272,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         onClick={togglePicker}
         className="flex items-center gap-1 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg px-3 py-1.5 border border-gray-200 dark:border-gray-600 cursor-pointer transition-all select-none w-full"
       >
-        <MdCalendarToday className="w-4 h-4 text-blue-500 flex-shrink-0" />
+        <MdCalendarToday className="w-4 h-4 text-blue-500 shrink-0" />
         <span className="text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap">
           {displayText}
         </span>
@@ -280,7 +280,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
       {isOpen && (
         <div
-          className="absolute z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl w-[280px] max-w-[90vw] overflow-hidden"
+          className="absolute z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl w-70 max-w-[90vw] overflow-hidden"
           style={{
             [placement === 'top' ? 'bottom' : 'top']: '100%',
             [placement === 'top' ? 'top' : 'bottom']: 'auto',

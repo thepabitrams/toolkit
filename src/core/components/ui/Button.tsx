@@ -1,5 +1,5 @@
 // src/core/components/ui/Button.tsx
-import React, { ReactNode, ButtonHTMLAttributes } from 'react';
+import React, { type ReactNode, type ButtonHTMLAttributes, type ElementType, type ComponentType } from 'react';
 import { Motion } from '@/core/motion/motion';
 import { buttonMotion } from '@/core/motion/compositions/buttonMotion';
 
@@ -12,6 +12,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   onClick?: () => void;
 }
 
+const MotionButton = Motion as ComponentType<
+  ButtonHTMLAttributes<HTMLButtonElement> & { preset: any; as?: ElementType }
+>;
+
 export const Button = ({
   children,
   variant = 'primary',
@@ -19,9 +23,9 @@ export const Button = ({
   onClick,
   disabled = false,
   type = 'button',
-  ...rest
+  ...remainingProps
 }: ButtonProps) => {
-  const variantStyles = {
+  const buttonVariantStyles = {
     primary: `
       bg-blue-600 hover:bg-blue-700 
       dark:bg-blue-700 dark:hover:bg-blue-600
@@ -48,7 +52,7 @@ export const Button = ({
   };
 
   return (
-    <Motion
+    <MotionButton
       preset={buttonMotion}
       as="button"
       type={type}
@@ -62,12 +66,12 @@ export const Button = ({
         select-none
         cursor-pointer
         disabled:opacity-50 disabled:pointer-events-none
-        ${variantStyles[variant]}
+        ${buttonVariantStyles[variant]}
         ${className}
       `}
-      {...rest}
+      {...remainingProps}
     >
       {children}
-    </Motion>
+    </MotionButton>
   );
 };

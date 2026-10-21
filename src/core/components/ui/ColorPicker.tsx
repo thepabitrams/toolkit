@@ -24,7 +24,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className={`flex items-center gap-1.5 flex-shrink-0 ${className}`}>
+    <div className={`flex items-center gap-1.5 shrink-0 ${className}`}>
       {showLabel && label && (
         <label className={colorPickerMotion.label}>{label}</label>
       )}
