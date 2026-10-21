@@ -1,58 +1,25 @@
 ---
 import { site } from '@/config/site';
+import { Container } from '@/core/components/ui/Container';
+import ThemeToggle from '@/core/components/ui/ThemeToggle';
 ---
 
-<header class="sticky top-0 z-50 bg-gray-50 dark:bg-gray-950">
-  <div class="mx-auto w-full max-w-6xl px-4 py-3 flex items-center justify-between">
-    <a
-      href="/"
-      class="font-medium text-lg tracking-tight text-gray-800 dark:text-gray-100 hover:opacity-80 transition-opacity"
-    >
-      {site.name}
-    </a>
-
-    <div></div>
-
-    <button
-      type="button"
-      data-theme-toggle
-      aria-label="Toggle theme"
-      class="p-2 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-800/50"
-    >
-      <svg
-        class="block dark:hidden w-5 h-5 text-gray-600"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+<header class="sticky top-0 z-50 h-16 bg-gray-50 dark:bg-gray-950 flex items-center">
+  <Container className="w-full flex items-center justify-between">
+    
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 shrink-0" aria-hidden="true"></div>
+      <a
+        href="/"
+        class="font-medium text-lg tracking-tight text-gray-800 dark:text-gray-100 hover:opacity-80 transition-opacity"
       >
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-      </svg>
-      <svg
-        class="hidden dark:block w-5 h-5 text-yellow-400"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="12" cy="12" r="4"></circle>
-        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-      </svg>
-    </button>
-  </div>
+        {site.name}
+      </a>
+    </div>
+
+    <div class="flex items-center justify-end">
+      <ThemeToggle client:load />
+    </div>
+    
+  </Container>
 </header>
-
-<script>
-  document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((toggleButton) => {
-    toggleButton.addEventListener('click', () => {
-      const isDarkMode = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    });
-  });
-</script>

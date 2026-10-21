@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { IconButton } from '@/core/components/ui/IconButton';
 import { Container } from '@/core/components/ui/Container';
 import { FiMenu, FiX } from 'react-icons/fi';
-import { Motion } from '@/core/motion/motion';
-import { drawerMotion } from '@/core/motion/compositions/drawerMotion';
 import { tools } from '@/config/tools';
 import { site } from '@/config/site';
 import ThemeToggle from '@/core/components/ui/ThemeToggle';
@@ -11,28 +9,28 @@ import ThemeToggle from '@/core/components/ui/ThemeToggle';
 export default function ToolHeader() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
-  const toggleButtonRef = useRef<HTMLDivElement>(null);
+  const menuToggleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (mouseEvent: MouseEvent) => {
       if (!isDrawerOpen) return;
-      const clickTarget = mouseEvent.target as Node;
-      const isInsideDrawer = drawerRef.current?.contains(clickTarget);
-      const isInsideToggle = toggleButtonRef.current?.contains(clickTarget);
-      if (!isInsideDrawer && !isInsideToggle) setIsDrawerOpen(false);
+      const eventTarget = mouseEvent.target as Node;
+      const isTargetInsideDrawer = drawerRef.current?.contains(eventTarget);
+      const isTargetInsideToggle = menuToggleRef.current?.contains(eventTarget);
+      if (!isTargetInsideDrawer && !isTargetInsideToggle) setIsDrawerOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isDrawerOpen]);
 
-  const toggleDrawer = () => setIsDrawerOpen((previousState) => !previousState);
+  const toggleDrawer = () => setIsDrawerOpen((previousDrawerState) => !previousDrawerState);
 
   return (
-    <header className="sticky top-0 z-50 bg-gray-50 dark:bg-gray-950">
-      <Container className="py-3 flex items-center justify-between">
+    <header className="sticky top-0 z-50 h-16 bg-gray-50 dark:bg-gray-950 flex items-center">
+      <Container className="w-full flex items-center justify-between">
         
         <div className="flex items-center gap-3">
-          <div ref={toggleButtonRef}>
+          <div ref={menuToggleRef} className="w-9 h-9 shrink-0 flex items-center justify-center">
             <IconButton
               onClick={toggleDrawer}
               variant="standard"
@@ -52,33 +50,33 @@ export default function ToolHeader() {
           </a>
         </div>
 
-        <ThemeToggle />
+        <div className="flex items-center justify-end">
+          <ThemeToggle />
+        </div>
+        
       </Container>
 
-      <Motion
-        preset={drawerMotion}
-        as="div"
+      <div
         ref={drawerRef}
-        className={`
-          transform transition-all duration-300 ease-in-out
-          ${isDrawerOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
-        `}
+        className={`absolute top-full left-0 w-full bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 shadow-lg transition-all duration-300 ease-in-out transform ${
+          isDrawerOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-4 invisible pointer-events-none'
+        }`}
       >
-        <div className="p-4">
+        <div className="p-4 max-h-[calc(100vh-4rem)] overflow-y-auto">
           <nav className="flex flex-col gap-1">
-            {tools.map((toolItem) => (
+            {tools.map((registeredTool) => (
               <a
-                key={toolItem.slug}
-                href={`/${toolItem.slug}`}
+                key={registeredTool.slug}
+                href={`/${registeredTool.slug}`}
                 onClick={() => setIsDrawerOpen(false)}
                 className="px-3 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-gray-800/60 transition-colors"
               >
-                {toolItem.displayName}
+                {registeredTool.displayName}
               </a>
             ))}
           </nav>
         </div>
-      </Motion>
+      </div>
     </header>
   );
 }
