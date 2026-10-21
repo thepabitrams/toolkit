@@ -1,0 +1,16 @@
+---
+import Tool from '../_pages/tool/Tool.astro';
+import { tools, getTool } from '../config/tools';
+
+export async function getStaticPaths() {
+  return tools.map((tool) => ({ params: { slug: tool.slug } }));
+}
+
+const { slug } = Astro.params;
+const tool = getTool(slug as string);
+
+if (!tool) {
+  return Astro.redirect('/404');
+}
+---
+<Tool tool={tool} slug={slug as string} />

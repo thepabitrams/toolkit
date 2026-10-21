@@ -1,6 +1,6 @@
 // src/entities/image/detect.ts
 
-import { FormatResult } from './types/format';
+import type { FormatResult } from './types/format';
 
 export async function detectFormatAndAlpha(
   file: File

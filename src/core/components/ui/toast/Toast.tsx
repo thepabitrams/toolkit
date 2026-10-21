@@ -1,6 +1,6 @@
 // src/core/components/ui/toast/Toast.tsx
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import type { ToastType } from '@/core/hooks/useToast';
+import { ToastType } from '@/core/hooks/useToast';
 import { toastMotion } from '@/core/motion/compositions/toastMotion';
 
 interface ToastProps {

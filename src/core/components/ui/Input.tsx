@@ -1,8 +1,9 @@
 // src/core/components/ui/Input.tsx
-import React, { forwardRef, InputHTMLAttributes, ReactNode } from 'react';
+import React, { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
 import inputMotion from '@/core/motion/compositions/inputMotion';
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+// ✅ FIXED: Added Omit to ignore React's built-in prefix/suffix
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'prefix' | 'suffix'> {
   label?: string;
   error?: string;
   prefix?: ReactNode;
@@ -49,7 +50,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         <div className={inputMotion.container(!!error, className)}>
           {prefix && (
-            <span className="flex-shrink-0 text-gray-500 dark:text-gray-400 text-sm">
+            // ✅ FIXED: changed flex-shrink-0 to shrink-0
+            <span className="shrink-0 text-gray-500 dark:text-gray-400 text-sm">
               {prefix}
             </span>
           )}
@@ -64,7 +66,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {suffix && (
-            <span className="flex-shrink-0 text-gray-500 dark:text-gray-400 text-sm">
+            // ✅ FIXED: changed flex-shrink-0 to shrink-0
+            <span className="shrink-0 text-gray-500 dark:text-gray-400 text-sm">
               {suffix}
             </span>
           )}

@@ -1,3 +1,5 @@
+// src/config/site.ts
+
 export interface SiteDetails {
   readonly name: string;
   readonly author: string;

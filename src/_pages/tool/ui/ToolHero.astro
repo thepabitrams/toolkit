@@ -1,0 +1,46 @@
+---
+import type { ToolConfig } from '../../../config/tools';
+
+interface Props {
+  tool: ToolConfig;
+}
+
+const { tool } = Astro.props;
+---
+<header class="flex items-start justify-between mb-8">
+  <div>
+    <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+      {tool.name}
+    </h1>
+    <p class="text-gray-500 dark:text-gray-400 mt-1">
+      by Pabitra Mohan Singh
+    </p>
+  </div>
+
+  <button 
+    id="tool-menu-btn"
+    class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+    aria-label="Open tool menu"
+  >
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-300">
+      <circle cx="12" cy="12" r="1"></circle>
+      <circle cx="12" cy="5" r="1"></circle>
+      <circle cx="12" cy="19" r="1"></circle>
+    </svg>
+  </button>
+</header>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('tool-menu-btn');
+    const drawer = document.getElementById('tool-drawer');
+    const overlay = document.getElementById('tool-drawer-overlay');
+
+    if (btn && drawer && overlay) {
+      btn.addEventListener('click', () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      });
+    }
+  });
+</script>

@@ -1,3 +1,4 @@
+// src/core/hooks/useToast.ts
 import { useToastStore } from '@/core/store/toastStore';
 import type { ToastType } from '@/core/store/toastStore';
 

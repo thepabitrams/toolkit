@@ -1,6 +1,6 @@
 // src/core/components/ui/Grid.tsx
 
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 
 interface GridProps {
   children: ReactNode;

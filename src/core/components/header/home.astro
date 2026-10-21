@@ -1,0 +1,62 @@
+---
+// src/core/components/header/home/index.astro
+const title = 'ToolPabitraMS';
+---
+
+<header class="sticky top-0 z-50 bg-gray-50 dark:bg-gray-950">
+  <div class="mx-auto w-full max-w-6xl px-4 py-3 flex items-center justify-between">
+    {/* Left slot: empty on home — matches original grid variant */}
+    <div class="flex items-center gap-4"></div>
+
+    <a
+      href="/"
+      class="font-medium text-lg tracking-tight text-gray-800 dark:text-gray-100 hover:opacity-80 transition-opacity"
+    >
+      {title}
+    </a>
+
+    <button
+      type="button"
+      data-theme-toggle
+      aria-label="Toggle theme"
+      class="p-2 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-800/50"
+    >
+      {/* Moon — shown in light mode */}
+      <svg
+        class="block dark:hidden w-5 h-5 text-gray-600"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      {/* Sun — shown in dark mode */}
+      <svg
+        class="hidden dark:block w-5 h-5 text-yellow-400"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+  });
+</script>

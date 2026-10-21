@@ -1,6 +1,6 @@
 // src/core/store/toastStore.ts
 import { create } from 'zustand';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type ToastType = 'info' | 'success' | 'warning' | 'error';
 

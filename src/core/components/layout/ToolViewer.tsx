@@ -1,35 +1,56 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { loadTool } from '@/core/registry/toolRegistry';
-import type { Tool } from '@/core/registry/toolRegistry';
-import { useToolStore } from '@/core/store/toolStore';
+import { tools } from '@/config/tools';
+import type { ToolConfig } from '@/config/tools';
 
-export function ToolViewer() {
-  const { toolId } = useParams<{ toolId: string }>();
-  const [tool, setTool] = useState<Tool | null>(null);
+interface ToolViewerProps {
+  toolId: string;
+}
+
+export function ToolViewer({ toolId }: ToolViewerProps) {
+  const [tool, setTool] = useState<ToolConfig | null>(null);
+  const [ToolComponent, setToolComponent] = useState<React.ComponentType<any> | null>(null);
   const [loading, setLoading] = useState(true);
-  const setCurrentTool = useToolStore((state) => state.setCurrentTool);
 
   useEffect(() => {
+    let isMounted = true;
+    
     if (!toolId) {
       setTool(null);
-      setCurrentTool(null);
+      setToolComponent(null);
       setLoading(false);
       return;
     }
 
-    loadTool(toolId)
-      .then((loadedTool) => {
-        setTool(loadedTool);
-        setCurrentTool(loadedTool);
-        setLoading(false);
+    const foundTool = tools.find(t => t.slug === toolId);
+
+    if (!foundTool) {
+      setTool(null);
+      setToolComponent(null);
+      setLoading(false);
+      return;
+    }
+
+    setTool(foundTool);
+    
+    foundTool.component()
+      .then((mod) => {
+        if (isMounted) {
+          setToolComponent(() => mod.default);
+          setLoading(false);
+        }
       })
       .catch(() => {
-        setTool(null);
-        setCurrentTool(null);
-        setLoading(false);
+        if (isMounted) {
+          setTool(null);
+          setToolComponent(null);
+          setLoading(false);
+        }
       });
-  }, [toolId, setCurrentTool]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [toolId]);
 
   if (loading) {
     return (
@@ -39,7 +60,7 @@ export function ToolViewer() {
     );
   }
 
-  if (!tool) {
+  if (!tool || !ToolComponent) {
     return (
       <div className="w-full max-w-7xl mx-auto text-center py-12">
         <h2 className="text-2xl font-medium text-gray-700 dark:text-gray-300">
@@ -52,7 +73,6 @@ export function ToolViewer() {
     );
   }
 
-  const ToolComponent = tool.component;
   return (
     <div className="w-full max-w-7xl mx-auto">
       <ToolComponent

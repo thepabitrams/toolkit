@@ -1,5 +1,5 @@
 // src/core/components/ui/Container.tsx
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export function Container({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (

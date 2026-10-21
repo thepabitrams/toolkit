@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Search } from '@/core/components/ui/Search';
 import { ToolCatalog } from '@/core/components/ui/ToolCatalog';
 import { Container } from '@/core/components/ui/Container';
-import { useTools } from '@/core/hooks/useTools';
-import { useFilteredTools } from '@/core/hooks/useFilteredTools';
-import { useToolUsage } from '@/core/hooks/useToolUsage';
-import { preloadTool } from '@/core/registry/toolRegistry';
+import { tools as allTools } from '@/config/tools';
 
 interface ToolHubProps {
   variant?: 'grid' | 'list';
   category?: string | null;
   input?: string | null;
+  filter?: { category: string; inputType: string } | undefined;
   onToolSelect?: (toolId: string) => void;
 }
 
@@ -19,25 +16,30 @@ export function ToolHub({
   variant = 'grid',
   category = null,
   input = null,
+  filter,
   onToolSelect,
 }: ToolHubProps) {
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   
-  const { tools, loading } = useTools();
-  const filteredTools = useFilteredTools(tools, searchQuery, { category, input });
-  const { currentToolId } = useToolUsage();
+  const activeCategory = filter?.category || category;
+
+  const filteredTools = allTools.filter((tool) => {
+    const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory ? tool.category === activeCategory : true;
+    return matchesSearch && matchesCategory;
+  }).map(t => ({ ...t, id: t.slug }));
 
   const handleSelect = (toolId: string) => {
     if (onToolSelect) {
       onToolSelect(toolId);
     } else {
-      navigate(`/${toolId}`);
+      window.location.href = `/${toolId}`;
     }
   };
 
   const handleHover = (toolId: string) => {
-    preloadTool(toolId);
+    const tool = allTools.find(t => t.slug === toolId);
+    if (tool) tool.component();
   };
 
   return (
@@ -49,8 +51,8 @@ export function ToolHub({
         <ToolCatalog
           tools={filteredTools}
           variant={variant}
-          loading={loading}
-          currentToolId={currentToolId}
+          loading={false}
+          currentToolId={null}
           onToolSelect={handleSelect}
           onToolHover={handleHover}
         />

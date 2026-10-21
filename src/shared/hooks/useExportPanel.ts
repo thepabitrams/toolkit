@@ -1,7 +1,7 @@
 // src/shared/hooks/useExportPanel.ts
 import { useCallback, useState } from 'react';
 import { useFileStore } from '@/core/store/fileStore';
-import { FileRef } from '@/core/store/fileStore';
+import type { FileRef } from '@/core/store/fileStore';
 
 interface useExportPanelOptions {
   file: FileRef | null;
@@ -9,7 +9,8 @@ interface useExportPanelOptions {
 }
 
 interface UseExportPanelReturn {
-  export: (fileName: string, format?: string) => Promise<void>;
+  // ✅ FIXED: Changed 'export' to 'download' to match the return object below
+  download: (fileName: string, format?: string) => Promise<void>;
   isDownloading: boolean;
   error: Error | null;
 }

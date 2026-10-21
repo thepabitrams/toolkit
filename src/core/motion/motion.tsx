@@ -1,4 +1,4 @@
-// core/motion/motion.tsx
+// src/core/motion/motion.tsx
 import React from 'react';
 import { injectKeyframes } from './core/injection/keyframes';
 
@@ -17,13 +17,14 @@ type MotionPreset =
 
 interface MotionProps {
   preset: MotionPreset;
-  as?: keyof JSX.IntrinsicElements;
+  as?: React.ElementType;
   duration?: number;
   easing?: string;
   delay?: number;
   className?: string;
   style?: Record<string, any>;
   children?: React.ReactNode;
+  show?: boolean;
 }
 
 export function getMotion(
@@ -99,7 +100,11 @@ export function getMotion(
   };
 }
 
-export function Motion({
+// ✅ UPDATED: Wrapped in React.forwardRef to accept 'ref' props
+export const Motion = React.forwardRef<
+  HTMLElement,
+  MotionProps & React.HTMLAttributes<HTMLElement>
+>(({
   preset,
   as: Component = 'div',
   duration,
@@ -110,12 +115,17 @@ export function Motion({
   children,
   show,
   ...props
-}: MotionProps & React.HTMLAttributes<HTMLElement>) {
+}, ref) => {
   const result = getMotion(preset, { duration, easing, delay, className, style });
 
+  // Cast to React.ElementType to prevent TS errors when passing the ref
+  const Tag = Component as React.ElementType;
+
   return (
-    <Component className={result.className} style={result.style} {...props}>
+    <Tag ref={ref} className={result.className} style={result.style} {...props}>
       {children}
-    </Component>
+    </Tag>
   );
-}
+});
+
+Motion.displayName = 'Motion';

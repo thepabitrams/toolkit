@@ -1,0 +1,21 @@
+---
+import { HomeLayout } from '../../layouts';
+import { ToolHub } from './ui/ToolHub.tsx';
+---
+<HomeLayout 
+  title="Toolkit by Pabitra Mohan Singh" 
+  description="Privacy-first, browser-based tools. No uploads, no servers." 
+  canonicalPath="/"
+>
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-950 pb-24">
+    <section class="pt-10 pb-6 px-4 text-center flex flex-col items-center">
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-black dark:text-white mb-3 max-w-2xl">
+        Fast, private tools. <span class="text-gray-400 dark:text-gray-500">Zero tracking.</span>
+      </h1>
+      <p class="text-base text-gray-500 dark:text-gray-400 max-w-lg mx-auto font-medium">
+        A growing collection of browser-based utilities. No uploads, no servers, no signup.
+      </p>
+    </section>
+    <ToolHub client:load />
+  </div>
+</HomeLayout>

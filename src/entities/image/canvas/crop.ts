@@ -1,5 +1,5 @@
 // src/entities/image/canvas/crop.ts
-import { CropArea } from '../types/crop';
+import type { CropArea } from '../types/crop';
 
 export async function cropCanvas(
   blob: Blob,
