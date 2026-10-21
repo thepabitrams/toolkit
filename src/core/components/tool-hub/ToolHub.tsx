@@ -6,6 +6,7 @@ import { ToolCatalog } from './ToolCatalog';
 import { Container } from '@/core/components/ui/Container';
 import { tools } from '@/config/tools';
 import { useFilteredTools } from './useFilteredTools';
+import { useToolStore } from './toolStore';
 
 interface ToolHubProps {
   displayVariant?: 'grid' | 'list';
@@ -23,6 +24,8 @@ export function ToolHub({
   handleToolSelect,
 }: ToolHubProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  
+  const { currentToolSlug } = useToolStore();
   
   const activeCategory = actionFilter?.category || categoryFilter;
 
@@ -57,7 +60,7 @@ export function ToolHub({
           toolItems={filteredTools}
           displayVariant={displayVariant}
           isLoadingCatalog={false}
-          activeToolSlug={null}
+          activeToolSlug={currentToolSlug}
           handleToolSelect={handleSelect}
           handleToolHover={handleHover}
         />
