@@ -1,8 +1,11 @@
+// src/core/components/tool-hub/ToolHub.tsx
+
 import { useState } from 'react';
 import { Search } from '@/core/components/ui/Search';
 import { ToolCatalog } from './ToolCatalog';
 import { Container } from '@/core/components/ui/Container';
 import { tools } from '@/config/tools';
+import { useFilteredTools } from './useFilteredTools';
 
 interface ToolHubProps {
   displayVariant?: 'grid' | 'list';
@@ -21,18 +24,15 @@ export function ToolHub({
 }: ToolHubProps) {
   const [searchQuery, setSearchQuery] = useState('');
   
-  const registeredTools = tools;
   const activeCategory = actionFilter?.category || categoryFilter;
 
-  const filteredTools = registeredTools.filter((toolItem) => {
-    const matchesSearch = toolItem.displayName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory ? toolItem.category === activeCategory : true;
-    return matchesSearch && matchesCategory;
-  }).map((toolItem) => ({ 
+  const mappedTools = tools.map((toolItem) => ({ 
     ...toolItem, 
     id: toolItem.slug,
     name: toolItem.displayName 
   }));
+
+  const filteredTools = useFilteredTools(mappedTools, searchQuery, { category: activeCategory, input: inputFilter });
 
   const handleSelect = (toolSlug: string) => {
     if (handleToolSelect) {
@@ -43,7 +43,7 @@ export function ToolHub({
   };
 
   const handleHover = (toolSlug: string) => {
-    const matchedTool = registeredTools.find((toolItem) => toolItem.slug === toolSlug);
+    const matchedTool = tools.find((toolItem) => toolItem.slug === toolSlug);
     if (matchedTool) matchedTool.component();
   };
 

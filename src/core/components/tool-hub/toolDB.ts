@@ -1,8 +1,8 @@
-// src/core/services/toolDB.ts
+// src/core/components/tool-hub/toolDB.ts
 
 import { openDB, type IDBPDatabase } from 'idb';
 
-const DB_NAME = 'ToolPabitraMS_ToolDB';
+const DB_NAME = 'ToolKit_ToolDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'toolData';
 const RECORD_ID = 'main';
@@ -25,8 +25,8 @@ async function getDB(): Promise<IDBPDatabase> {
 
 export interface ToolData {
   favorites: string[];
-  usageCounts: Record<string, number>;
-  currentToolId: string | null;
+  usageMetrics: Record<string, { count: number; lastUsedTimestamp: number }>;
+  currentToolSlug: string | null;
 }
 
 export async function saveToolData(data: ToolData): Promise<void> {

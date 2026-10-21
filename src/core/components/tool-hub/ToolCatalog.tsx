@@ -1,4 +1,6 @@
-import { ToolCard } from './ToolCard';
+// src/core/components/tool-hub/ToolCatalog.tsx
+
+import { ToolCard } from '@/core/components/tool-hub/ToolCard';
 import { Grid } from '@/core/components/ui/Grid';
 import type { ToolConfig } from '@/config/tools';
 

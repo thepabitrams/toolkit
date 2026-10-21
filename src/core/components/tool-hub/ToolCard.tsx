@@ -1,5 +1,7 @@
+// src/core/components/tool-hub/ToolCard.tsx
+
 import { memo, useRef, useState, useEffect } from 'react';
-import { useToolStore } from '@/core/store/toolStore';
+import { useToolStore } from '@/core/components/tool-hub/toolStore';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import type { ToolConfig } from '@/config/tools';
 import { Motion } from '@/core/motion/motion';
