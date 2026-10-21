@@ -8,6 +8,8 @@ export interface Props {
   description?: string;
   noindex?: boolean;
   breadcrumbItems?: readonly BreadcrumbItem[];
+  canonicalPath?: string;
+  jsonLd?: Record<string, unknown>;
 }
 
 const { title, description, noindex, breadcrumbItems } = Astro.props;
@@ -59,4 +61,4 @@ const { title, description, noindex, breadcrumbItems } = Astro.props;
 
     <slot />
   </body>
-</html>
+</html> 
