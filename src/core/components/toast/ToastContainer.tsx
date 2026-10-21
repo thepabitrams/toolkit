@@ -6,7 +6,7 @@ import { Toast } from './Toast';
 import { useToast } from './useToast';
 
 export function ToastContainer() {
-  const { toasts: activeToasts, dismissToast: handleDismissToast, clearAll: handleClearAllToasts } = useToast();
+  const { toasts: visibleToasts, dismissToast: handleDismissToast, clearAll: handleClearAllToasts } = useToast();
 
   useEffect(() => {
     return () => {
@@ -14,18 +14,18 @@ export function ToastContainer() {
     };
   }, [handleClearAllToasts]);
 
-  if (activeToasts.length === 0) return null;
+  if (visibleToasts.length === 0) return null;
 
   return createPortal(
     <div
       className="fixed left-0 right-0 z-9999 flex justify-center pointer-events-none px-4 pt-2"
       style={{
-        top: 'calc(60px + 8px)',
+        top: '72px',
       }}
     >
       <div className="w-full max-w-120 flex flex-col gap-1.5">
         <Stagger delay={80}>
-          {activeToasts.map((toastItem) => (
+          {visibleToasts.map((toastItem) => (
             <Toast
               key={toastItem.id}
               id={toastItem.id}

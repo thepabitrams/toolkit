@@ -1,4 +1,4 @@
-// src/core/store/toastStore.ts
+// src/core/components/toast/toastStore.ts
 import { create } from 'zustand';
 import type { ReactNode } from 'react';
 
@@ -16,8 +16,8 @@ export interface ToastData {
 
 interface ToastStore {
   toasts: ToastData[];
-  idCounter: number;
-  MAX_VISIBLE: number;
+  nextToastId: number;
+  maxVisibleToasts: number;
   showToast: (
     type: ToastType,
     icon: ReactNode,
@@ -31,32 +31,32 @@ interface ToastStore {
 
 export const useToastStore = create<ToastStore>((set, get) => ({
   toasts: [],
-  idCounter: 0,
-  MAX_VISIBLE: 3,
+  nextToastId: 0,
+  maxVisibleToasts: 3,
 
   showToast: (type, icon, title, message, duration = 4000) => {
-    const { toasts, idCounter, MAX_VISIBLE, dismissToast } = get();
-    const id = idCounter + 1;
+    const { toasts, nextToastId, maxVisibleToasts, dismissToast } = get();
+    const newToastId = nextToastId + 1;
 
-    const existingIndex = toasts.findIndex(t => t.title === title && t.message === message);
-    if (existingIndex !== -1) {
-      const existing = toasts[existingIndex];
-      if (existing.timeoutId) clearTimeout(existing.timeoutId);
-      const timeoutId = setTimeout(() => dismissToast(existing.id), duration);
+    const duplicateToastIndex = toasts.findIndex(t => t.title === title && t.message === message);
+    if (duplicateToastIndex !== -1) {
+      const existingToast = toasts[duplicateToastIndex];
+      if (existingToast.timeoutId) clearTimeout(existingToast.timeoutId);
+      const timeoutId = setTimeout(() => dismissToast(existingToast.id), duration);
       set((state) => {
-        const updated = [...state.toasts];
-        updated[existingIndex] = { ...existing, timeoutId, duration };
-        return { toasts: updated };
+        const updatedToasts = [...state.toasts];
+        updatedToasts[duplicateToastIndex] = { ...existingToast, timeoutId, duration };
+        return { toasts: updatedToasts };
       });
-      return existing.id;
+      return existingToast.id;
     }
 
     const timeoutId = setTimeout(() => {
-      dismissToast(id);
+      dismissToast(newToastId);
     }, duration);
 
     const newToast: ToastData = {
-      id,
+      id: newToastId,
       type,
       icon,
       title,
@@ -67,29 +67,29 @@ export const useToastStore = create<ToastStore>((set, get) => ({
 
     set((state) => ({
       toasts: [newToast, ...state.toasts],
-      idCounter: id,
+      nextToastId: newToastId,
     }));
 
     setTimeout(() => {
       set((state) => {
-        if (state.toasts.length > MAX_VISIBLE) {
-          const toRemove = state.toasts.slice(MAX_VISIBLE);
-          toRemove.forEach(t => {
+        if (state.toasts.length > maxVisibleToasts) {
+          const toastsToRemove = state.toasts.slice(maxVisibleToasts);
+          toastsToRemove.forEach(t => {
             if (t.timeoutId) clearTimeout(t.timeoutId);
           });
-          return { toasts: state.toasts.slice(0, MAX_VISIBLE) };
+          return { toasts: state.toasts.slice(0, maxVisibleToasts) };
         }
         return state;
       });
     }, 100);
 
-    return id;
+    return newToastId;
   },
 
   dismissToast: (id: number) => {
     set((state) => {
-      const toast = state.toasts.find(t => t.id === id);
-      if (toast?.timeoutId) clearTimeout(toast.timeoutId);
+      const toastToRemove = state.toasts.find(t => t.id === id);
+      if (toastToRemove?.timeoutId) clearTimeout(toastToRemove.timeoutId);
       return { toasts: state.toasts.filter(t => t.id !== id) };
     });
   },

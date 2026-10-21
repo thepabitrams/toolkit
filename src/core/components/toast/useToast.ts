@@ -1,6 +1,5 @@
-// src/core/hooks/useToast.ts
-import { useToastStore } from '@/core/store/toastStore';
-import type { ToastType } from '@/core/store/toastStore';
+// src/core/components/toast/useToast.ts
+import { useToastStore, type ToastType } from './toastStore';
 
 export function useToast() {
   const { 

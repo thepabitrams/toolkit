@@ -24,10 +24,10 @@ export const Toast: React.FC<ToastProps> = ({
   const [isDismissing, setIsDismissing] = useState(false);
 
   useEffect(() => {
-    const element = toastElementRef.current;
-    if (!element) return;
-    void element.offsetWidth;
-    element.classList.add('visible');
+    const activeToastElement = toastElementRef.current;
+    if (!activeToastElement) return;
+    void activeToastElement.offsetWidth;
+    activeToastElement.classList.add('visible');
   }, []);
 
   const handleDismiss = useCallback((isImmediate = false) => {
@@ -37,10 +37,10 @@ export const Toast: React.FC<ToastProps> = ({
       onDismiss(id);
       return;
     }
-    const element = toastElementRef.current;
-    if (element) {
-      element.classList.remove('visible');
-      element.classList.add('hiding');
+    const activeToastElement = toastElementRef.current;
+    if (activeToastElement) {
+      activeToastElement.classList.remove('visible');
+      activeToastElement.classList.add('hiding');
     }
     setTimeout(() => {
       onDismiss(id);
@@ -49,12 +49,14 @@ export const Toast: React.FC<ToastProps> = ({
 
   useEffect(() => {
     if (isDismissing) return;
-    const element = toastElementRef.current;
-    if (!element) return;
+    const activeToastElement = toastElementRef.current;
+    if (!activeToastElement) return;
 
     let initialX = 0, initialY = 0, offsetX = 0, offsetY = 0;
     let hasStartedSwiping = false, swipeDirection: 'horizontal' | 'vertical' | null = null;
     let isCurrentlyDragging = false;
+
+    const handleContextMenu = (pointerEvent: MouseEvent) => pointerEvent.preventDefault();
 
     const handlePointerDown = (pointerEvent: TouchEvent | MouseEvent) => {
       const pointer = 'touches' in pointerEvent ? pointerEvent.touches[0] : pointerEvent;
@@ -64,7 +66,7 @@ export const Toast: React.FC<ToastProps> = ({
       hasStartedSwiping = false;
       swipeDirection = null;
       isCurrentlyDragging = true;
-      element.style.transition = 'none';
+      activeToastElement.style.transition = 'none';
     };
 
     const handlePointerMove = (pointerEvent: TouchEvent | MouseEvent) => {
@@ -88,20 +90,20 @@ export const Toast: React.FC<ToastProps> = ({
       if (swipeDirection === 'horizontal') {
         offsetX = deltaX;
         const swipeProgress = Math.min(Math.abs(deltaX) / 200, 1);
-        element.style.transform = `translateX(${deltaX}px) scale(${0.92 + (1 - swipeProgress) * 0.08})`;
-        element.style.opacity = String(1 - swipeProgress * 0.5);
+        activeToastElement.style.transform = `translateX(${deltaX}px) scale(${0.92 + (1 - swipeProgress) * 0.08})`;
+        activeToastElement.style.opacity = String(1 - swipeProgress * 0.5);
       } else if (swipeDirection === 'vertical' && deltaY < 0) {
         offsetY = deltaY;
         const swipeProgress = Math.min(Math.abs(deltaY) / 150, 1);
-        element.style.transform = `translateY(${deltaY}px) scale(${1 - swipeProgress * 0.08})`;
-        element.style.opacity = String(1 - swipeProgress * 0.5);
+        activeToastElement.style.transform = `translateY(${deltaY}px) scale(${1 - swipeProgress * 0.08})`;
+        activeToastElement.style.opacity = String(1 - swipeProgress * 0.5);
       }
     };
 
     const handlePointerUp = () => {
       isCurrentlyDragging = false;
       if (!hasStartedSwiping) {
-        element.style.transition = '';
+        activeToastElement.style.transition = '';
         return;
       }
 
@@ -111,26 +113,26 @@ export const Toast: React.FC<ToastProps> = ({
         if (Math.abs(offsetX) > dismissalThreshold) {
           handleDismiss(true);
         } else {
-          element.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-          element.style.transform = 'translateX(0) scale(1)';
-          element.style.opacity = '1';
+          activeToastElement.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+          activeToastElement.style.transform = 'translateX(0) scale(1)';
+          activeToastElement.style.opacity = '1';
           setTimeout(() => {
-            element.style.transition = '';
-            element.style.transform = '';
-            element.style.opacity = '';
+            activeToastElement.style.transition = '';
+            activeToastElement.style.transform = '';
+            activeToastElement.style.opacity = '';
           }, 350);
         }
       } else if (swipeDirection === 'vertical') {
         if (offsetY < -70) {
           handleDismiss(true);
         } else {
-          element.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-          element.style.transform = 'translateY(0) scale(1)';
-          element.style.opacity = '1';
+          activeToastElement.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+          activeToastElement.style.transform = 'translateY(0) scale(1)';
+          activeToastElement.style.opacity = '1';
           setTimeout(() => {
-            element.style.transition = '';
-            element.style.transform = '';
-            element.style.opacity = '';
+            activeToastElement.style.transition = '';
+            activeToastElement.style.transform = '';
+            activeToastElement.style.opacity = '';
           }, 350);
         }
       }
@@ -139,10 +141,10 @@ export const Toast: React.FC<ToastProps> = ({
       swipeDirection = null;
     };
 
-    element.addEventListener('touchstart', handlePointerDown, { passive: true });
-    element.addEventListener('touchmove', handlePointerMove, { passive: false });
-    element.addEventListener('touchend', handlePointerUp, { passive: true });
-    element.addEventListener('touchcancel', handlePointerUp, { passive: true });
+    activeToastElement.addEventListener('touchstart', handlePointerDown, { passive: true });
+    activeToastElement.addEventListener('touchmove', handlePointerMove, { passive: false });
+    activeToastElement.addEventListener('touchend', handlePointerUp, { passive: true });
+    activeToastElement.addEventListener('touchcancel', handlePointerUp, { passive: true });
 
     let isMouseDown = false;
     const handleMouseDown = (mouseEvent: MouseEvent) => {
@@ -159,20 +161,20 @@ export const Toast: React.FC<ToastProps> = ({
       handlePointerUp();
     };
 
-    element.addEventListener('mousedown', handleMouseDown);
+    activeToastElement.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-    element.addEventListener('contextmenu', (event) => event.preventDefault());
+    activeToastElement.addEventListener('contextmenu', handleContextMenu);
 
     return () => {
-      element.removeEventListener('touchstart', handlePointerDown);
-      element.removeEventListener('touchmove', handlePointerMove);
-      element.removeEventListener('touchend', handlePointerUp);
-      element.removeEventListener('touchcancel', handlePointerUp);
-      element.removeEventListener('mousedown', handleMouseDown);
+      activeToastElement.removeEventListener('touchstart', handlePointerDown);
+      activeToastElement.removeEventListener('touchmove', handlePointerMove);
+      activeToastElement.removeEventListener('touchend', handlePointerUp);
+      activeToastElement.removeEventListener('touchcancel', handlePointerUp);
+      activeToastElement.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
-      element.removeEventListener('contextmenu', () => {});
+      activeToastElement.removeEventListener('contextmenu', handleContextMenu);
     };
   }, [handleDismiss, isDismissing]);
 
