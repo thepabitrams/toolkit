@@ -2,44 +2,49 @@ import { useState } from 'react';
 import { Search } from '@/core/components/ui/Search';
 import { ToolCatalog } from '@/core/components/ui/ToolCatalog';
 import { Container } from '@/core/components/ui/Container';
-import { tools as allTools } from '@/config/tools';
+import { tools } from '@/config/tools';
 
 interface ToolHubProps {
-  variant?: 'grid' | 'list';
-  category?: string | null;
-  input?: string | null;
-  filter?: { category: string; inputType: string } | undefined;
-  onToolSelect?: (toolId: string) => void;
+  displayVariant?: 'grid' | 'list';
+  categoryFilter?: string | null;
+  inputFilter?: string | null;
+  actionFilter?: { category: string; inputType: string } | undefined;
+  handleToolSelect?: (toolSlug: string) => void;
 }
 
 export function ToolHub({
-  variant = 'grid',
-  category = null,
-  input = null,
-  filter,
-  onToolSelect,
+  displayVariant = 'grid',
+  categoryFilter = null,
+  inputFilter = null,
+  actionFilter,
+  handleToolSelect,
 }: ToolHubProps) {
   const [searchQuery, setSearchQuery] = useState('');
   
-  const activeCategory = filter?.category || category;
+  const registeredTools = tools;
+  const activeCategory = actionFilter?.category || categoryFilter;
 
-  const filteredTools = allTools.filter((tool) => {
-    const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory ? tool.category === activeCategory : true;
+  const filteredTools = registeredTools.filter((toolItem) => {
+    const matchesSearch = toolItem.displayName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory ? toolItem.category === activeCategory : true;
     return matchesSearch && matchesCategory;
-  }).map(t => ({ ...t, id: t.slug }));
+  }).map((toolItem) => ({ 
+    ...toolItem, 
+    id: toolItem.slug,
+    name: toolItem.displayName 
+  }));
 
-  const handleSelect = (toolId: string) => {
-    if (onToolSelect) {
-      onToolSelect(toolId);
+  const handleSelect = (toolSlug: string) => {
+    if (handleToolSelect) {
+      handleToolSelect(toolSlug);
     } else {
-      window.location.href = `/${toolId}`;
+      window.location.href = `/${toolSlug}`;
     }
   };
 
-  const handleHover = (toolId: string) => {
-    const tool = allTools.find(t => t.slug === toolId);
-    if (tool) tool.component();
+  const handleHover = (toolSlug: string) => {
+    const matchedTool = registeredTools.find((toolItem) => toolItem.slug === toolSlug);
+    if (matchedTool) matchedTool.component();
   };
 
   return (
@@ -49,12 +54,12 @@ export function ToolHub({
       </Container>
       <Container className="px-0">
         <ToolCatalog
-          tools={filteredTools}
-          variant={variant}
-          loading={false}
-          currentToolId={null}
-          onToolSelect={handleSelect}
-          onToolHover={handleHover}
+          toolItems={filteredTools}
+          displayVariant={displayVariant}
+          isLoadingCatalog={false}
+          activeToolSlug={null}
+          handleToolSelect={handleSelect}
+          handleToolHover={handleHover}
         />
       </Container>
     </div>

@@ -1,17 +1,20 @@
 ---
 import BaseLayout from './Base.astro';
-import { ToolHeader } from '../core/components/header';
-import { HomeFooter } from '../core/components/footer';
+import { ToolHeader } from '@/core/components/header';
+import { HomeFooter } from '@/core/components/footer';
 
 interface Props {
   title: string;
   description: string;
   canonicalPath: string;
   jsonLd?: Record<string, unknown>;
+  toolName?: string;
 }
+
+const { toolName, ...layoutProps } = Astro.props;
 ---
-<BaseLayout {...Astro.props}>
-  <ToolHeader />
+<BaseLayout {...layoutProps}>
+  <ToolHeader client:only="react" toolName={toolName} />
   <main class="flex-1">
     <slot />
   </main>

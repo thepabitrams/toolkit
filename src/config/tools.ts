@@ -1,41 +1,35 @@
-// src/config/tools.ts
-
 export type ToolCategory = 'media' | 'productivity' | 'finance';
 
 export interface ToolConfig {
   slug: string;
-  name: string;
+  displayName: string;
+  displayDescription: string;
   seoTitle: string;
   seoDescription: string;
   category: ToolCategory;
-  icon?: string;
   component: () => Promise<{ default: React.ComponentType<any> }>;
 }
 
 export const tools: ToolConfig[] = [
   {
     slug: 'precision-crop',
-    name: 'Precision Crop',
-    seoTitle: 'Precision Crop Image Online',
-    seoDescription: 'Crop images with pixel-perfect precision in your browser.',
+    displayName: 'Precision Crop',
+    displayDescription: 'Crop images with pixel-perfect precision in your browser.',
+    seoTitle: 'Free Precision Image Cropper Online - 100% Private',
+    seoDescription: 'Crop JPG, PNG, and WebP images with exact pixel dimensions directly in your browser. No uploads, no servers, completely private.',
     category: 'media',
-    icon: '🖼️',
     component: () => import('@/tools/media/precision-crop'),
   },
 ];
 
-/** Lookup map — used by [slug].astro getStaticPaths */
 export const toolsBySlug: Record<string, ToolConfig> = Object.fromEntries(
-  tools.map((t) => [t.slug, t])
+  tools.map((toolItem) => [toolItem.slug, toolItem])
 );
 
-/** Getter with a loud error on typo */
 export function getTool(slug: string): ToolConfig {
-  const tool = toolsBySlug[slug];
-  if (!tool) {
-    throw new Error(
-      `Unknown tool slug: "${slug}". Add it to src/config/tools.ts.`
-    );
+  const matchingTool = toolsBySlug[slug];
+  if (!matchingTool) {
+    throw new Error(`Unknown tool slug: "${slug}". Add it to src/config/tools.ts.`);
   }
-  return tool;
+  return matchingTool;
 }

@@ -1,58 +1,58 @@
 import { useEffect, useState } from 'react';
-import { tools } from '@/config/tools';
+import { tools as registeredTools } from '@/config/tools';
 import type { ToolConfig } from '@/config/tools';
 
 interface ToolViewerProps {
-  toolId: string;
+  toolSlug: string;
 }
 
-export function ToolViewer({ toolId }: ToolViewerProps) {
-  const [tool, setTool] = useState<ToolConfig | null>(null);
+export function ToolViewer({ toolSlug }: ToolViewerProps) {
+  const [activeTool, setActiveTool] = useState<ToolConfig | null>(null);
   const [ToolComponent, setToolComponent] = useState<React.ComponentType<any> | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
+    let isComponentMounted = true;
     
-    if (!toolId) {
-      setTool(null);
+    if (!toolSlug) {
+      setActiveTool(null);
       setToolComponent(null);
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
 
-    const foundTool = tools.find(t => t.slug === toolId);
+    const matchingTool = registeredTools.find((toolItem) => toolItem.slug === toolSlug);
 
-    if (!foundTool) {
-      setTool(null);
+    if (!matchingTool) {
+      setActiveTool(null);
       setToolComponent(null);
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
 
-    setTool(foundTool);
+    setActiveTool(matchingTool);
     
-    foundTool.component()
-      .then((mod) => {
-        if (isMounted) {
-          setToolComponent(() => mod.default);
-          setLoading(false);
+    matchingTool.component()
+      .then((toolModule) => {
+        if (isComponentMounted) {
+          setToolComponent(() => toolModule.default);
+          setIsLoading(false);
         }
       })
       .catch(() => {
-        if (isMounted) {
-          setTool(null);
+        if (isComponentMounted) {
+          setActiveTool(null);
           setToolComponent(null);
-          setLoading(false);
+          setIsLoading(false);
         }
       });
 
     return () => {
-      isMounted = false;
+      isComponentMounted = false;
     };
-  }, [toolId]);
+  }, [toolSlug]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="w-full max-w-7xl mx-auto">
         <div className="h-64 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
@@ -60,7 +60,7 @@ export function ToolViewer({ toolId }: ToolViewerProps) {
     );
   }
 
-  if (!tool || !ToolComponent) {
+  if (!activeTool || !ToolComponent) {
     return (
       <div className="w-full max-w-7xl mx-auto text-center py-12">
         <h2 className="text-2xl font-medium text-gray-700 dark:text-gray-300">
@@ -76,8 +76,8 @@ export function ToolViewer({ toolId }: ToolViewerProps) {
   return (
     <div className="w-full max-w-7xl mx-auto">
       <ToolComponent
-        category={tool.category}
-        toolId={toolId}
+        category={activeTool.category}
+        toolId={toolSlug}
       />
     </div>
   );

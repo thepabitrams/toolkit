@@ -1,32 +1,30 @@
 ---
-import { ToolLayout } from '../../layouts';
-import { ToolHeader } from '@/core/components/header';
+import { ToolLayout } from '@/layouts';
 import ToolHero from './ui/ToolHero.astro';
 import ToolView from './ui/ToolView.tsx';
-import type { ToolConfig } from '../../config/tools';
+import type { ToolConfig } from '@/config/tools';
 
 interface Props {
   tool: ToolConfig;
   slug: string;
 }
 
-const { tool, slug } = Astro.props;
+const { tool: activeToolConfig, slug: activeToolSlug } = Astro.props;
 ---
 <ToolLayout 
-  title={tool.seoTitle} 
-  description={tool.seoDescription} 
-  canonicalPath={`/${tool.slug}`} 
+  title={activeToolConfig.seoTitle} 
+  description={activeToolConfig.seoDescription} 
+  canonicalPath={`/${activeToolConfig.slug}`} 
+  toolName={activeToolConfig.displayName}
 >
-  <ToolHeader client:only="react" toolName={tool.name} currentSlug={slug} />
-  
   <div class="max-w-7xl mx-auto px-4 py-8 relative">
-    <ToolHero tool={tool} />
+    <ToolHero tool={activeToolConfig} />
     <div class="w-full mt-8">
-      <ToolView slug={slug} client:only="react" />
+      <ToolView toolSlug={activeToolSlug} client:only="react" />
     </div>
     <section class="prose dark:prose-invert mt-16 max-w-none">
-      <h2>About {tool.name}</h2>
-      <p>{tool.seoDescription}</p>
+      <h2>About {activeToolConfig.displayName}</h2>
+      <p>{activeToolConfig.seoDescription}</p>
     </section>
   </div>
 </ToolLayout>

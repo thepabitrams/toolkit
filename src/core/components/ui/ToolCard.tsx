@@ -1,18 +1,17 @@
 import { memo, useRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToolStore } from '@/core/store/toolStore';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import type { Tool } from '@/core/registry/toolRegistry';
+import type { ToolConfig } from '@/config/tools';
 import { Motion } from '@/core/motion/motion';
 import { toolCardGridMotion, toolCardListMotion } from '@/core/motion/compositions/toolCardMotion';
 import { marqueeSwing } from '@/core/motion/presets/marqueeSwing';
 import { injectKeyframes } from '@/core/motion/core/injection/keyframes';
 
 interface ToolCardProps {
-  tool: Tool;
+  tool: ToolConfig;
   variant?: 'grid' | 'list';
-  onToolSelect?: (toolId: string) => void;
-  onToolHover?: (toolId: string) => void;
+  onToolSelect?: (toolSlug: string) => void;
+  onToolHover?: (toolSlug: string) => void;
   isLoading?: boolean;
 }
 
@@ -23,41 +22,40 @@ export const ToolCard = memo(function ToolCard({
   onToolHover,
   isLoading,
 }: ToolCardProps) {
-  const navigate = useNavigate();
   const { favorites, toggleFavorite, incrementUsage } = useToolStore();
-  const isFavorite = favorites.includes(tool.id);
+  const isFavorite = favorites.includes(tool.slug);
 
-  const handleClick = () => {
-    incrementUsage(tool.id);
+  const handleToolClick = () => {
+    incrementUsage(tool.slug);
     
     if (onToolSelect) {
-      onToolSelect(tool.id);
+      onToolSelect(tool.slug);
     } else {
-      navigate(`/${tool.id}`);
+      window.location.href = `/${tool.slug}`;
     }
   };
 
-  const handleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toggleFavorite(tool.id);
+  const handleFavoriteToggle = (mouseEvent: React.MouseEvent) => {
+    mouseEvent.stopPropagation();
+    toggleFavorite(tool.slug);
   };
 
-  const textRef = useRef<HTMLHeadingElement>(null);
-  const [isOverflowing, setIsOverflowing] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [isTitleOverflowing, setIsTitleOverflowing] = useState(false);
 
-  const injectedRef = useRef(false);
+  const hasInjectedKeyframes = useRef(false);
   useEffect(() => {
-    if (!injectedRef.current) {
+    if (!hasInjectedKeyframes.current) {
       injectKeyframes(marqueeSwing.name, marqueeSwing.keyframes);
-      injectedRef.current = true;
+      hasInjectedKeyframes.current = true;
     }
   }, []);
 
   useEffect(() => {
-    if (textRef.current) {
-      setIsOverflowing(textRef.current.scrollWidth > textRef.current.clientWidth);
+    if (titleRef.current) {
+      setIsTitleOverflowing(titleRef.current.scrollWidth > titleRef.current.clientWidth);
     }
-  }, [tool.name]);
+  }, [tool.displayName]);
 
   if (variant === 'list') {
     return (
@@ -67,31 +65,31 @@ export const ToolCard = memo(function ToolCard({
         className={`flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer select-none transition-opacity ${
           isLoading ? 'opacity-50 cursor-wait' : ''
         }`}
-        onClick={handleClick}
-        onMouseEnter={() => onToolHover?.(tool.id)}
+        onClick={handleToolClick}
+        onMouseEnter={() => onToolHover?.(tool.slug)}
       >
         <div className="flex-1 min-w-0 overflow-hidden">
-          {isOverflowing ? (
+          {isTitleOverflowing ? (
             <div
               className="text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap inline-block"
               style={{
                 animation: 'marquee-swing 4s ease-in-out infinite',
               }}
             >
-              {tool.name}
+              {tool.displayName}
             </div>
           ) : (
             <div
-              ref={textRef}
+              ref={titleRef}
               className="text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap"
             >
-              {tool.name}
+              {tool.displayName}
             </div>
           )}
         </div>
         <button
-          onClick={handleFavorite}
-          className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+          onClick={handleFavoriteToggle}
+          className="text-gray-400 hover:text-red-500 transition-colors shrink-0"
           aria-label="Toggle favorite"
         >
           {isFavorite ? (
@@ -109,7 +107,7 @@ export const ToolCard = memo(function ToolCard({
       preset={toolCardGridMotion}
       as="div"
       className={`
-        w-full max-w-[280px] mx-auto 
+        w-full max-w-70 mx-auto 
         cursor-pointer select-none
         bg-white dark:bg-gray-900
         rounded-2xl 
@@ -118,12 +116,12 @@ export const ToolCard = memo(function ToolCard({
         transition-opacity
         ${isLoading ? 'opacity-50 cursor-wait' : ''}
       `}
-      onClick={handleClick}
-      onMouseEnter={() => onToolHover?.(tool.id)}
+      onClick={handleToolClick}
+      onMouseEnter={() => onToolHover?.(tool.slug)}
     >
       <div className="relative p-6">
         <button
-          onClick={handleFavorite}
+          onClick={handleFavoriteToggle}
           className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-10"
           aria-label="Toggle favorite"
         >
@@ -135,24 +133,24 @@ export const ToolCard = memo(function ToolCard({
         </button>
 
         <div className="pr-8 overflow-hidden">
-          {isOverflowing ? (
+          {isTitleOverflowing ? (
             <div
               className="tool-title mb-1 whitespace-nowrap inline-block"
               style={{
                 animation: 'marquee-swing 4s ease-in-out infinite',
               }}
             >
-              {tool.name}
+              {tool.displayName}
             </div>
           ) : (
-            <h3 ref={textRef} className="tool-title mb-1 whitespace-nowrap">
-              {tool.name}
+            <h3 ref={titleRef} className="tool-title mb-1 whitespace-nowrap">
+              {tool.displayName}
             </h3>
           )}
         </div>
 
         <p className="tool-description line-clamp-2">
-          {tool.description}
+          {tool.displayDescription}
         </p>
       </div>
     </Motion>
