@@ -8,11 +8,7 @@ import { tools } from '@/config/tools';
 import { site } from '@/config/site';
 import ThemeToggle from '@/core/components/ui/ThemeToggle';
 
-interface ToolHeaderProps {
-  toolName?: string;
-}
-
-export default function ToolHeader({ toolName = '' }: ToolHeaderProps) {
+export default function ToolHeader() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLDivElement>(null);
@@ -29,13 +25,13 @@ export default function ToolHeader({ toolName = '' }: ToolHeaderProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isDrawerOpen]);
 
-  const toggleDrawer = () => setIsDrawerOpen((previousDrawerState) => !previousDrawerState);
-  const headerTitle = toolName ? `${toolName} | ${site.name}` : site.name;
+  const toggleDrawer = () => setIsDrawerOpen((previousState) => !previousState);
 
   return (
     <header className="sticky top-0 z-50 bg-gray-50 dark:bg-gray-950">
       <Container className="py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        
+        <div className="flex items-center gap-3">
           <div ref={toggleButtonRef}>
             <IconButton
               onClick={toggleDrawer}
@@ -47,14 +43,14 @@ export default function ToolHeader({ toolName = '' }: ToolHeaderProps) {
               {isDrawerOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
             </IconButton>
           </div>
+          
+          <a
+            href="/"
+            className="font-medium text-lg tracking-tight text-gray-800 dark:text-gray-100 hover:opacity-80 transition-opacity"
+          >
+            {site.name}
+          </a>
         </div>
-
-        <a
-          href="/"
-          className="font-medium text-lg tracking-tight text-gray-800 dark:text-gray-100 hover:opacity-80 transition-opacity"
-        >
-          {headerTitle}
-        </a>
 
         <ThemeToggle />
       </Container>
@@ -64,7 +60,7 @@ export default function ToolHeader({ toolName = '' }: ToolHeaderProps) {
         as="div"
         ref={drawerRef}
         className={`
-          transform transition-all duration-300 ease-[cubic-bezier(0.4,0.0,0.2,1)]
+          transform transition-all duration-300 ease-in-out
           ${isDrawerOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
         `}
       >
