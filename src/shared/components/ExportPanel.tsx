@@ -2,27 +2,27 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/core/components/ui/Button';
 import { ActionButton } from '@/shared/components/ActionButton';
-import { useFileStore } from '@/core/store/fileStore';
+import { useFileStore } from '@/shared/store/file-store';
 import { Container } from '@/core/components/ui/Container';
 import { Card } from '@/core/components/ui/Card';
 import { Input } from '@/core/components/ui/Input';
-import type { FileRef } from '@/core/store/fileStore';
+import type { FileReference } from '@/shared/store/file-store';
 
-interface ExportPanelProps {
-  file: FileRef | null;
-  variant: 'single' | 'multiple';
-  initialFileName?: string;
-  onClear: () => Promise<void>;
-  toolId: string;
-  onToolSelect: (selectedToolId: string, variant: 'single' | 'multiple') => Promise<void>;
+interface ExportPanelProperties {
+  fileReference: FileReference | null;
+  actionVariant: 'single' | 'multiple';
+  defaultFileName?: string;
+  handleClearFiles: () => Promise<void>;
+  currentToolSlug: string;
+  handleToolSelection: (selectedToolSlug: string, variant: 'single' | 'multiple') => Promise<void>;
   className?: string;
   minWidth?: number;
   minHeight?: number;
   padding?: number;
 }
 
-function getExtensionFromMimeType(mimeType: string): string {
-  const mimeMap: Record<string, string> = {
+function getFileExtensionFromMimeType(mimeType: string): string {
+  const mimeTypeExtensionMap: Record<string, string> = {
     'image/jpeg': 'jpg',
     'image/jpg': 'jpg',
     'image/png': 'png',
@@ -36,111 +36,106 @@ function getExtensionFromMimeType(mimeType: string): string {
     'text/plain': 'txt',
     'application/json': 'json',
   };
-  return mimeMap[mimeType] || '';
+  return mimeTypeExtensionMap[mimeType] || '';
 }
 
-export const ExportPanel: React.FC<ExportPanelProps> = ({
-  file,
-  variant,
-  initialFileName = 'download',
-  onClear,
-  toolId,
-  onToolSelect,
+export const ExportPanel: React.FC<ExportPanelProperties> = ({
+  fileReference,
+  actionVariant,
+  defaultFileName = 'download',
+  handleClearFiles,
+  currentToolSlug,
+  handleToolSelection,
   className = '',
   minWidth = 260,
   minHeight = 200,
   padding = 0,
 }) => {
-  const [fileName, setFileName] = useState('');
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [fileNameInput, setFileNameInput] = useState('');
+  const [isDownloadingFile, setIsDownloadingFile] = useState(false);
   const { read } = useFileStore();
 
   useEffect(() => {
-    if (file) {
-      const name = file.name.replace(/\.[^.]+$/, '');
-      setFileName(name);
+    if (fileReference) {
+      const nameWithoutExtension = fileReference.name.replace(/\.[^.]+$/, '');
+      setFileNameInput(nameWithoutExtension);
     } else {
-      setFileName(initialFileName);
+      setFileNameInput(defaultFileName);
     }
-  }, [file, initialFileName]);
+  }, [fileReference, defaultFileName]);
 
-  const handleDownload = async () => {
-    if (!file) return;
+  const handleFileDownload = async () => {
+    if (!fileReference) return;
 
-    setIsDownloading(true);
+    setIsDownloadingFile(true);
     try {
-      const blob = await read(file.name);
-      if (!blob) throw new Error('Failed to read file');
+      const downloadedBlob = await read(fileReference.name);
+      if (!downloadedBlob) throw new Error('Failed to read file');
 
-      const ext = getExtensionFromMimeType(file.type) || 'png';
-      const fullName = fileName ? `${fileName}.${ext}` : file.name;
+      const fileExtension = getFileExtensionFromMimeType(fileReference.type) || 'png';
+      const completeFileName = fileNameInput ? `${fileNameInput}.${fileExtension}` : fileReference.name;
 
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fullName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const objectUrl = URL.createObjectURL(downloadedBlob);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = objectUrl;
+      downloadAnchor.download = completeFileName;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      document.body.removeChild(downloadAnchor);
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 
-      await onClear();
-    } catch {
-      // Silent fail
+      await handleClearFiles();
+    } catch (error) {
+      console.warn('Download failed:', error);
     } finally {
-      setIsDownloading(false);
+      setIsDownloadingFile(false);
     }
   };
 
-  const fileExt = file ? getExtensionFromMimeType(file.type) : '';
+  const fileExtensionForInput = fileReference ? getFileExtensionFromMimeType(fileReference.type) : '';
 
-  if (!file) return null;
+  if (!fileReference) return null;
 
   return (
-    <Container 
-      className={`px-0 flex-1 ${className}`}
-      style={{
-        minWidth: `${minWidth}px`,
-        minHeight: `${minHeight}px`,
-        padding: `${padding}px`,
-      }}
-    >
-      <Card className="p-4 flex flex-col h-full w-full">
-        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
-          Download
-        </h3>
+    <div style={{ minWidth, minHeight, padding }} className={`flex-1 ${className}`}>
+      <Container className="px-0 h-full">
+        <Card className="p-4 flex flex-col h-full w-full">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+            Download
+          </h3>
 
-        <div className="mb-3">
-          <Input
-            type="text"
-            value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
-            placeholder="Enter file name..."
-            disabled={isDownloading}
-            suffix={fileExt ? `.${fileExt}` : undefined}
-            fullWidth
-          />
-        </div>
+          <div className="mb-3">
+            <Input
+              type="text"
+              value={fileNameInput}
+              onChange={(changeEvent) => setFileNameInput(changeEvent.target.value)}
+              placeholder="Enter file name..."
+              disabled={isDownloadingFile}
+              suffix={fileExtensionForInput ? `.${fileExtensionForInput}` : undefined}
+              fullWidth
+            />
+          </div>
 
-        <div className="border-t border-gray-200/60 dark:border-gray-700/60 my-2" />
+          <div className="border-t border-gray-200/60 dark:border-gray-700/60 my-2" />
 
-        <div className="flex items-center justify-between gap-3 mt-auto pt-1">
-          <ActionButton
-            toolId={toolId}
-            variant={variant}
-            onToolSelect={onToolSelect}
-            className="flex-1"
-          />
-          <Button
-            onClick={handleDownload}
-            variant="primary"
-            disabled={!file || isDownloading}
-            className="flex-1 px-5 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isDownloading ? 'Downloading...' : 'Download'}
-          </Button>
-        </div>
-      </Card>
-    </Container>
+          <div className="flex items-center justify-between gap-3 mt-auto pt-1">
+            <ActionButton
+              currentToolSlug={currentToolSlug}
+              actionVariant={actionVariant}
+              handleToolSelection={handleToolSelection}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleFileDownload}
+              variant="primary"
+              disabled={!fileReference || isDownloadingFile}
+              className="flex-1 px-5 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isDownloadingFile ? 'Downloading...' : 'Download'}
+            </Button>
+          </div>
+        </Card>
+      </Container>
+    </div>
   );
 };

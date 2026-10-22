@@ -1,135 +1,135 @@
-// src/tools/image/precision-crop/Cropper.tsx
+// src/tools/media/precision-crop/Cropper.tsx
 import React, { useState, useCallback, useEffect } from "react";
 import ReactEasyCrop from "react-easy-crop";
-import type { Area } from "react-easy-crop/types";
+import type { Area } from "react-easy-crop";
 import { usePrecisionCrop } from "./usePrecisionCrop";
 import { CropControls } from "./Controls";
-import { useFileStore } from '@/core/store/fileStore';
+import { useFileStore } from '@/shared/store/file-store';
 import { Container } from '@/core/components/ui/Container';
 import { Card } from '@/core/components/ui/Card';
-import type { FileRef } from '@/core/store/fileStore';
+import type { FileReference } from '@/shared/store/file-store';
 import { loadImage, exportCanvas, prepareCanvas } from '@/lib/browser';
 import { writeDpi } from '@/entities/image';
 
-interface CropperProps {
-  file: FileRef | null;
+interface CropperProperties {
+  fileReference: FileReference | null;
   aspectRatio: number;
-  targetWidthPx: number;
-  targetHeightPx: number;
+  targetWidthPixels: number;
+  targetHeightPixels: number;
   inputDpi?: number;
-  onCrop: (blob: Blob, name: string, originalMimeType: string, actualMimeType: string) => Promise<void>;
+  handleCropConfirm: (croppedBlob: Blob, fileName: string, originalMimeType: string, actualMimeType: string) => Promise<void>;
   className?: string;
   minWidth?: number;
   minHeight?: number;
   padding?: number;
 }
 
-export const Cropper: React.FC<CropperProps> = ({
-  file,
+export const Cropper: React.FC<CropperProperties> = ({
+  fileReference,
   aspectRatio,
-  targetWidthPx,
-  targetHeightPx,
+  targetWidthPixels,
+  targetHeightPixels,
   inputDpi = 96,
-  onCrop,
+  handleCropConfirm,
   className = '',
   minWidth = 260,
   minHeight = 200,
   padding = 0,
 }) => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const { readFile } = useFileStore();
+  const [imageObjectUrl, setImageObjectUrl] = useState<string | null>(null);
+  const { readRawFile } = useFileStore();
 
   const {
-    crop,
-    zoom,
-    setCrop,
-    setZoom,
-    zoomIn,
-    zoomOut,
-    reset,
-    isZoomMin,
-    isZoomMax,
+    cropPosition,
+    zoomLevel,
+    setCropPosition,
+    setZoomLevel,
+    handleZoomIn,
+    handleZoomOut,
+    handleReset,
+    isAtMinZoom,
+    isAtMaxZoom,
   } = usePrecisionCrop();
 
   useEffect(() => {
-    let isMounted = true;
-    let objectUrl: string | null = null;
+    let isComponentMounted = true;
+    let objectUrlInstance: string | null = null;
 
-    const fetchImage = async () => {
-      if (!file) {
-        setImageUrl(null);
+    const fetchImageFile = async () => {
+      if (!fileReference) {
+        setImageObjectUrl(null);
         return;
       }
 
       try {
-        const fileObj = await readFile(file.storageKey);
-        if (fileObj && isMounted) {
-          objectUrl = URL.createObjectURL(fileObj);
-          setImageUrl(objectUrl);
+        const originalFileObject = await readRawFile(fileReference.storageKey);
+        if (originalFileObject && isComponentMounted) {
+          objectUrlInstance = URL.createObjectURL(originalFileObject);
+          setImageObjectUrl(objectUrlInstance);
         }
-      } catch {
-        // ignore
+      } catch (error) {
+        console.warn('Failed to load image for cropper:', error);
       }
     };
 
-    fetchImage();
+    fetchImageFile();
 
     return () => {
-      isMounted = false;
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
+      isComponentMounted = false;
+      if (objectUrlInstance) {
+        URL.revokeObjectURL(objectUrlInstance);
       }
     };
-  }, [file, readFile]);
+  }, [fileReference, readRawFile]);
 
-  const onCropAreaComplete = useCallback((_: Area, croppedAreaPixels: Area) => {
-    setCroppedAreaPixels(croppedAreaPixels);
+  const onCropAreaComplete = useCallback((_: Area, completedCroppedAreaPixels: Area) => {
+    setCroppedAreaPixels(completedCroppedAreaPixels);
   }, []);
 
-  const handleCrop = useCallback(async () => {
-    if (!file || !croppedAreaPixels || !imageUrl) return;
+  const handleCropExecution = useCallback(async () => {
+    if (!fileReference || !croppedAreaPixels || !imageObjectUrl) return;
 
     try {
-      const originalFile = await readFile(file.storageKey);
-      if (!originalFile) throw new Error("Failed to read file");
+      const originalFileObject = await readRawFile(fileReference.storageKey);
+      if (!originalFileObject) throw new Error("Failed to read file");
 
-      const image = await loadImage(originalFile);
+      const sourceImage = await loadImage(originalFileObject);
 
-      const originalMimeType = originalFile.type || 'image/png';
-      const supportsAlpha = originalMimeType !== 'image/jpeg' && originalMimeType !== 'image/bmp';
+      const originalMimeType = originalFileObject.type || 'image/png';
+      const supportsAlphaChannel = originalMimeType !== 'image/jpeg' && originalMimeType !== 'image/bmp';
 
-      const canvas = document.createElement('canvas');
-      canvas.width = targetWidthPx;
-      canvas.height = targetHeightPx;
-      const ctx = prepareCanvas(canvas, supportsAlpha);
+      const canvasElement = document.createElement('canvas');
+      canvasElement.width = targetWidthPixels;
+      canvasElement.height = targetHeightPixels;
+      const canvasContext = prepareCanvas(canvasElement, supportsAlphaChannel);
 
       const { x, y, width, height } = croppedAreaPixels;
-      ctx.imageSmoothingEnabled = true;
-      if ('imageSmoothingQuality' in ctx) {
-        ctx.imageSmoothingQuality = 'high';
+      canvasContext.imageSmoothingEnabled = true;
+      if ('imageSmoothingQuality' in canvasContext) {
+        canvasContext.imageSmoothingQuality = 'high';
       }
-      ctx.drawImage(
-        image,
+      canvasContext.drawImage(
+        sourceImage,
         x, y, width, height,
-        0, 0, targetWidthPx, targetHeightPx
+        0, 0, targetWidthPixels, targetHeightPixels
       );
 
-      let blob: Blob;
-      const quality = (originalMimeType === 'image/jpeg' || originalMimeType === 'image/webp') ? 0.92 : undefined;
+      let croppedBlob: Blob;
+      const exportQuality = (originalMimeType === 'image/jpeg' || originalMimeType === 'image/webp') ? 0.92 : undefined;
 
       try {
-        blob = await exportCanvas(canvas, originalMimeType, quality);
+        croppedBlob = await exportCanvas(canvasElement, originalMimeType, exportQuality);
       } catch {
-        blob = await exportCanvas(canvas, 'image/png');
+        croppedBlob = await exportCanvas(canvasElement, 'image/png');
       }
 
-      let actualMimeType = blob.type || '';
+      let actualMimeType = croppedBlob.type || '';
 
       if (!actualMimeType) {
         try {
-          const tempFile = new File([blob], 'temp', { type: originalMimeType });
-          actualMimeType = tempFile.type || originalMimeType;
+          const temporaryFile = new File([croppedBlob], 'temp', { type: originalMimeType });
+          actualMimeType = temporaryFile.type || originalMimeType;
         } catch {
           actualMimeType = originalMimeType;
         }
@@ -137,76 +137,80 @@ export const Cropper: React.FC<CropperProps> = ({
 
       const finalMimeType = actualMimeType;
 
-      const fileObj = new File([blob], file.name, { type: finalMimeType });
-      const finalBlob = await writeDpi(fileObj, inputDpi);
+      const finalFileObject = new File([croppedBlob], fileReference.name, { type: finalMimeType });
+      const dpiProcessedBlob = await writeDpi(finalFileObject, inputDpi);
 
-      const extension = finalMimeType.split('/')[1] || 'jpg';
-      const baseName = file.name.replace(/\.[^.]+$/, '');
-      const newName = `${baseName}_cropped_${targetWidthPx}x${targetHeightPx}.${extension}`;
+      const fileExtension = finalMimeType.split('/')[1] || 'jpg';
+      const baseName = fileReference.name.replace(/\.[^.]+$/, '');
+      const newFileName = `${baseName}_cropped_${targetWidthPixels}x${targetHeightPixels}.${fileExtension}`;
 
-      await onCrop(finalBlob, newName, originalMimeType, actualMimeType);
+      await handleCropConfirm(dpiProcessedBlob, newFileName, originalMimeType, actualMimeType);
 
-    } catch (err) {
-      console.error('Crop error:', err);
+    } catch (error) {
+      console.error('Crop error:', error);
       throw new Error('Failed to crop image. Please try again.');
     }
-  }, [file, croppedAreaPixels, targetWidthPx, targetHeightPx, inputDpi, onCrop, imageUrl, readFile]);
+  }, [fileReference, croppedAreaPixels, targetWidthPixels, targetHeightPixels, inputDpi, handleCropConfirm, imageObjectUrl, readRawFile]);
 
-  if (!file || !imageUrl) {
+  if (!fileReference || !imageObjectUrl) {
     return (
-      <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
-        <Card className="p-4 flex flex-col items-center justify-center min-h-[200px]">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Upload an image to crop</p>
-        </Card>
-      </Container>
+      <div style={{ minWidth, minHeight, padding }} className={`flex-1 ${className}`}>
+        <Container className="px-0 h-full">
+          <Card className="p-4 flex flex-col items-center justify-center min-h-50">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Upload an image to crop</p>
+          </Card>
+        </Container>
+      </div>
     );
   }
 
   return (
-    <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
-      <Card className="overflow-hidden p-0">
-        <div
-          className="relative w-full aspect-square min-h-[300px] sm:min-h-[400px] bg-gray-100 dark:bg-gray-700"
-          style={{ touchAction: 'none' }}
-        >
-          <ReactEasyCrop
-            image={imageUrl}
-            crop={crop}
-            zoom={zoom}
-            rotation={0}
-            aspect={aspectRatio}
-            minZoom={1}
-            maxZoom={5}
-            restrictPosition={true}
-            zoomWithScroll={true}
-            onCropChange={setCrop}
-            onZoomChange={setZoom}
-            onCropComplete={onCropAreaComplete}
-            style={{
-              containerStyle: { width: "100%", height: "100%", position: "relative" },
-              cropAreaStyle: {
-                border: "2px solid rgba(59, 130, 246, 0.8)",
-                borderRadius: "8px",
-                boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
-              },
-              mediaStyle: {
-                transition: "transform 0.15s ease-out",
-                willChange: "transform",
-              },
-            }}
-          />
-        </div>
+    <div style={{ minWidth, minHeight, padding }} className={`flex-1 ${className}`}>
+      <Container className="px-0 h-full">
+        <Card className="overflow-hidden p-0 h-full">
+          <div
+            className="relative w-full aspect-square min-h-75 sm:min-h-100 bg-gray-100 dark:bg-gray-700"
+            style={{ touchAction: 'none' }}
+          >
+            <ReactEasyCrop
+              image={imageObjectUrl}
+              crop={cropPosition}
+              zoom={zoomLevel}
+              rotation={0}
+              aspect={aspectRatio}
+              minZoom={1}
+              maxZoom={5}
+              restrictPosition={true}
+              zoomWithScroll={true}
+              onCropChange={setCropPosition}
+              onZoomChange={setZoomLevel}
+              onCropComplete={onCropAreaComplete}
+              style={{
+                containerStyle: { width: "100%", height: "100%", position: "relative" },
+                cropAreaStyle: {
+                  border: "2px solid rgba(59, 130, 246, 0.8)",
+                  borderRadius: "8px",
+                  boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
+                },
+                mediaStyle: {
+                  transition: "transform 0.15s ease-out",
+                  willChange: "transform",
+                },
+              }}
+            />
+          </div>
 
-        <CropControls
-          zoom={zoom}
-          isZoomMin={isZoomMin}
-          isZoomMax={isZoomMax}
-          onZoomIn={zoomIn}
-          onZoomOut={zoomOut}
-          onReset={reset}
-          onCrop={handleCrop}
-        />
-      </Card>
-    </Container>
+          <CropControls
+            currentZoom={zoomLevel}
+            isAtMinZoom={isAtMinZoom}
+            isAtMaxZoom={isAtMaxZoom}
+            handleZoomIn={handleZoomIn}
+            handleZoomOut={handleZoomOut}
+            handleReset={handleReset}
+            handleApplyCrop={handleCropExecution}
+          />
+        </Card>
+      </Container>
+    </div>
   );
 };

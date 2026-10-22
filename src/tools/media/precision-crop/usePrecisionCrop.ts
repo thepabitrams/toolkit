@@ -1,38 +1,38 @@
-// src/tools/image/precision-crop/usePrecisionCrop.ts
+// src/tools/media/precision-crop/usePrecisionCrop.ts
 import { useState, useCallback } from "react";
 
-const MAX_ZOOM = 5;
-const ZOOM_STEP = 0.1;
+const MAXIMUM_ZOOM_LEVEL = 5;
+const ZOOM_INCREMENT_STEP = 0.1;
 
 export function usePrecisionCrop() {
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
+  const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
+  const [zoomLevel, setZoomLevel] = useState(1);
 
-  const zoomIn = useCallback(() => {
-    setZoom((prev) => Math.min(MAX_ZOOM, prev + ZOOM_STEP));
+  const handleZoomIn = useCallback(() => {
+    setZoomLevel((previousZoom) => Math.min(MAXIMUM_ZOOM_LEVEL, previousZoom + ZOOM_INCREMENT_STEP));
   }, []);
 
-  const zoomOut = useCallback(() => {
-    setZoom((prev) => Math.max(1, prev - ZOOM_STEP));
+  const handleZoomOut = useCallback(() => {
+    setZoomLevel((previousZoom) => Math.max(1, previousZoom - ZOOM_INCREMENT_STEP));
   }, []);
 
-  const reset = useCallback(() => {
-    setCrop({ x: 0, y: 0 });
-    setZoom(1);
+  const handleReset = useCallback(() => {
+    setCropPosition({ x: 0, y: 0 });
+    setZoomLevel(1);
   }, []);
 
-  const isZoomMin = zoom <= 1;
-  const isZoomMax = zoom >= MAX_ZOOM;
+  const isAtMinZoom = zoomLevel <= 1;
+  const isAtMaxZoom = zoomLevel >= MAXIMUM_ZOOM_LEVEL;
 
   return {
-    crop,
-    zoom,
-    setCrop,
-    setZoom,
-    zoomIn,
-    zoomOut,
-    reset,
-    isZoomMin,
-    isZoomMax,
+    cropPosition,
+    zoomLevel,
+    setCropPosition,
+    setZoomLevel,
+    handleZoomIn,
+    handleZoomOut,
+    handleReset,
+    isAtMinZoom,
+    isAtMaxZoom,
   };
 }

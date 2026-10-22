@@ -1,14 +1,13 @@
 // src/shared/components/FileDetails.tsx
-
 import React, { useState, useEffect } from 'react';
-import { useFileStore } from '@/core/store/fileStore';
+import { useFileStore } from '@/shared/store/file-store';
 import { Card } from '@/core/components/ui/Card';
 import { Container } from '@/core/components/ui/Container';
 import { readDimensions, readDpi } from '@/entities/image/metadata';
-import type { FileRef } from '@/core/store/fileStore';
+import type { FileReference } from '@/shared/store/file-store';
 
-interface FileDetailsProps {
-  file: FileRef | null;
+interface FileDetailsProperties {
+  fileReference: FileReference | null;
   className?: string;
   minWidth?: number;
   minHeight?: number;
@@ -22,47 +21,47 @@ const formatFileSize = (bytes: number): string => {
   return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
 };
 
-export const FileDetails: React.FC<FileDetailsProps> = ({
-  file: fileRef,
+export const FileDetails: React.FC<FileDetailsProperties> = ({
+  fileReference,
   className = '',
   minWidth = 260,
   minHeight = 200,
   padding = 0,
 }) => {
-  const [imageMetadata, setImageMetadata] = useState({
+  const [imageMetadataState, setImageMetadataState] = useState({
     width: '—',
     height: '—',
     dpi: '—',
     unit: 'px',
   });
-  const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
-  const { readFile } = useFileStore();
+  const [isLoadingMetadataState, setIsLoadingMetadataState] = useState(false);
+  const { readRawFile } = useFileStore();
 
   useEffect(() => {
-    if (!fileRef) {
-      setImageMetadata({ width: '—', height: '—', dpi: '—', unit: 'px' });
-      setIsLoadingMetadata(false);
+    if (!fileReference) {
+      setImageMetadataState({ width: '—', height: '—', dpi: '—', unit: 'px' });
+      setIsLoadingMetadataState(false);
       return;
     }
 
-    let isMounted = true;
+    let isComponentMounted = true;
 
     const loadImageMetadata = async () => {
-      setIsLoadingMetadata(true);
+      setIsLoadingMetadataState(true);
       try {
-        const resolvedFile = await readFile(fileRef.storageKey);
-        if (!resolvedFile || !isMounted) {
-          setIsLoadingMetadata(false);
+        const resolvedFileObject = await readRawFile(fileReference.storageKey);
+        if (!resolvedFileObject || !isComponentMounted) {
+          setIsLoadingMetadataState(false);
           return;
         }
 
         const [imageDimensions, imageResolution] = await Promise.all([
-          readDimensions(resolvedFile),
-          readDpi(resolvedFile),
+          readDimensions(resolvedFileObject),
+          readDpi(resolvedFileObject),
         ]);
 
-        if (isMounted) {
-          setImageMetadata({
+        if (isComponentMounted) {
+          setImageMetadataState({
             width: imageDimensions.width?.toString() || '—',
             height: imageDimensions.height?.toString() || '—',
             dpi: imageResolution.dpi?.toString() || '—',
@@ -72,60 +71,64 @@ export const FileDetails: React.FC<FileDetailsProps> = ({
       } catch (error) {
         console.warn('FileDetails: Error reading metadata:', error);
       } finally {
-        if (isMounted) setIsLoadingMetadata(false);
+        if (isComponentMounted) setIsLoadingMetadataState(false);
       }
     };
 
     loadImageMetadata();
 
     return () => {
-      isMounted = false;
+      isComponentMounted = false;
     };
-  }, [fileRef, readFile]);
+  }, [fileReference, readRawFile]);
 
-  const renderContent = () => {
-    if (!fileRef) {
+  const renderMetadataContent = () => {
+    if (!fileReference) {
       return (
-        <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
-          <div className={`w-full px-3 pb-3 ${className}`}>
-            <p className="text-xs text-gray-400 dark:text-gray-500">No file uploaded</p>
-          </div>
-        </Container>
+        <div style={{ minWidth, minHeight, padding }} className={`flex-1 ${className}`}>
+          <Container className="px-0 h-full">
+            <div className={`w-full px-3 pb-3 ${className}`}>
+              <p className="text-xs text-gray-400 dark:text-gray-500">No file uploaded</p>
+            </div>
+          </Container>
+        </div>
       );
     }
 
-    const size = formatFileSize(fileRef.size);
-    const formatLabel = fileRef.type?.split('/')[1]?.toUpperCase() || 'FILE';
+    const formattedSize = formatFileSize(fileReference.size);
+    const formatLabel = fileReference.type?.split('/')[1]?.toUpperCase() || 'FILE';
 
     return (
-      <Container className={`px-0 flex-1 ${className}`} style={{ minWidth, minHeight, padding }}>
-        <div className={`w-full px-3 pb-3 ${className}`}>
-          <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-            {fileRef.name}
-          </p>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-gray-500 dark:text-gray-400">
-            <span>{size}</span>
-            <span className="w-px h-2.5 bg-gray-300 dark:bg-gray-600" />
-            {isLoadingMetadata ? (
-              <span>Reading metadata...</span>
-            ) : (
-              <>
-                <span>{imageMetadata.width} × {imageMetadata.height} {imageMetadata.unit}</span>
-                <span className="w-px h-2.5 bg-gray-300 dark:bg-gray-600" />
-                <span>{imageMetadata.dpi} DPI</span>
-              </>
-            )}
-            <span className="w-px h-2.5 bg-gray-300 dark:bg-gray-600" />
-            <span>{formatLabel}</span>
+      <div style={{ minWidth, minHeight, padding }} className={`flex-1 ${className}`}>
+        <Container className="px-0 h-full">
+          <div className={`w-full px-3 pb-3 ${className}`}>
+            <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+              {fileReference.name}
+            </p>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-gray-500 dark:text-gray-400">
+              <span>{formattedSize}</span>
+              <span className="w-px h-2.5 bg-gray-300 dark:bg-gray-600" />
+              {isLoadingMetadataState ? (
+                <span>Reading metadata...</span>
+              ) : (
+                <>
+                  <span>{imageMetadataState.width} × {imageMetadataState.height} {imageMetadataState.unit}</span>
+                  <span className="w-px h-2.5 bg-gray-300 dark:bg-gray-600" />
+                  <span>{imageMetadataState.dpi} DPI</span>
+                </>
+              )}
+              <span className="w-px h-2.5 bg-gray-300 dark:bg-gray-600" />
+              <span>{formatLabel}</span>
+            </div>
           </div>
-        </div>
-      </Container>
+        </Container>
+      </div>
     );
   };
 
   return (
     <Card className="p-3 flex-1">
-      {renderContent()}
+      {renderMetadataContent()}
     </Card>
   );
 };

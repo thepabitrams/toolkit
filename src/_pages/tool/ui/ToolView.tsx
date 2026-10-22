@@ -1,49 +1,53 @@
+// src/_pages/tool/ui/ToolView.tsx
 import { useEffect, useState } from 'react';
 import { tools as registeredTools } from '@/config/tools';
 import type { ToolConfig } from '@/config/tools';
+import { setActiveToolIdentifier } from '@/shared/store/file-store';
 
 interface ToolViewProps {
   toolSlug: string;
 }
 
 export default function ToolView({ toolSlug }: ToolViewProps) {
-  const [activeTool, setActiveTool] = useState<ToolConfig | null>(null);
-  const [ToolComponent, setToolComponent] = useState<React.ComponentType<any> | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [activeToolConfig, setActiveToolConfig] = useState<ToolConfig | null>(null);
+  const [DynamicToolComponent, setDynamicToolComponent] = useState<React.ComponentType<any> | null>(null);
+  const [isComponentLoading, setIsComponentLoading] = useState(true);
 
   useEffect(() => {
     let isComponentMounted = true;
     
     if (!toolSlug) {
-      setActiveTool(null);
-      setToolComponent(null);
-      setIsLoading(false);
+      setActiveToolConfig(null);
+      setDynamicToolComponent(null);
+      setIsComponentLoading(false);
       return;
     }
 
-    const matchingTool = registeredTools.find((toolItem) => toolItem.slug === toolSlug);
+    setActiveToolIdentifier(toolSlug);
+
+    const matchingTool = registeredTools.find((registeredTool) => registeredTool.slug === toolSlug);
 
     if (!matchingTool) {
-      setActiveTool(null);
-      setToolComponent(null);
-      setIsLoading(false);
+      setActiveToolConfig(null);
+      setDynamicToolComponent(null);
+      setIsComponentLoading(false);
       return;
     }
 
-    setActiveTool(matchingTool);
+    setActiveToolConfig(matchingTool);
     
     matchingTool.component()
-      .then((toolModule) => {
+      .then((dynamicToolModule) => {
         if (isComponentMounted) {
-          setToolComponent(() => toolModule.default);
-          setIsLoading(false);
+          setDynamicToolComponent(() => dynamicToolModule.default);
+          setIsComponentLoading(false);
         }
       })
       .catch(() => {
         if (isComponentMounted) {
-          setActiveTool(null);
-          setToolComponent(null);
-          setIsLoading(false);
+          setActiveToolConfig(null);
+          setDynamicToolComponent(null);
+          setIsComponentLoading(false);
         }
       });
 
@@ -52,7 +56,7 @@ export default function ToolView({ toolSlug }: ToolViewProps) {
     };
   }, [toolSlug]);
 
-  if (isLoading) {
+  if (isComponentLoading) {
     return (
       <div className="w-full max-w-7xl mx-auto">
         <div className="h-64 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
@@ -60,7 +64,7 @@ export default function ToolView({ toolSlug }: ToolViewProps) {
     );
   }
 
-  if (!activeTool || !ToolComponent) {
+  if (!activeToolConfig || !DynamicToolComponent) {
     return (
       <div className="w-full max-w-7xl mx-auto text-center py-12">
         <h2 className="text-2xl font-medium text-gray-700 dark:text-gray-300">
@@ -75,8 +79,8 @@ export default function ToolView({ toolSlug }: ToolViewProps) {
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      <ToolComponent
-        category={activeTool.category}
+      <DynamicToolComponent
+        category={activeToolConfig.category}
         toolId={toolSlug}
       />
     </div>

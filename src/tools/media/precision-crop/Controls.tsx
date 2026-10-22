@@ -1,51 +1,51 @@
-// src/tools/image/precision-crop/Controls.tsx
+// src/tools/media/precision-crop/Controls.tsx
 import React from "react";
 import { FiZoomIn, FiZoomOut, FiRefreshCw } from "react-icons/fi";
 import { Button } from "@/core/components/ui/Button";
 import { IconButton } from "@/core/components/ui/IconButton";
 import { Container } from "@/core/components/ui/Container";
 
-interface CropControlsProps {
-  zoom: number;
-  isZoomMin: boolean;
-  isZoomMax: boolean;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  onReset: () => void;
-  onCrop: () => void;
+interface CropControlsProperties {
+  currentZoom: number;
+  isAtMinZoom: boolean;
+  isAtMaxZoom: boolean;
+  handleZoomIn: () => void;
+  handleZoomOut: () => void;
+  handleReset: () => void;
+  handleApplyCrop: () => void;
 }
 
-export const CropControls: React.FC<CropControlsProps> = ({
-  zoom,
-  isZoomMin,
-  isZoomMax,
-  onZoomIn,
-  onZoomOut,
-  onReset,
-  onCrop,
+export const CropControls: React.FC<CropControlsProperties> = ({
+  currentZoom,
+  isAtMinZoom,
+  isAtMaxZoom,
+  handleZoomIn,
+  handleZoomOut,
+  handleReset,
+  handleApplyCrop,
 }) => {
   return (
     <Container className="px-4 py-4">
       <div className="space-y-4">
         <div className="flex items-center justify-center gap-1.5 flex-wrap">
           <IconButton
-            onClick={onZoomOut}
-            disabled={isZoomMin}
+            onClick={handleZoomOut}
+            disabled={isAtMinZoom}
             variant="standard"
             size="sm"
             ariaLabel="Zoom out"
-            className={isZoomMin ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'hover:text-blue-600 dark:hover:text-blue-400'}
+            className={isAtMinZoom ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'hover:text-blue-600 dark:hover:text-blue-400'}
           >
             <FiZoomOut className="w-5 h-5" />
           </IconButton>
 
           <IconButton
-            onClick={onZoomIn}
-            disabled={isZoomMax}
+            onClick={handleZoomIn}
+            disabled={isAtMaxZoom}
             variant="standard"
             size="sm"
             ariaLabel="Zoom in"
-            className={isZoomMax ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'hover:text-blue-600 dark:hover:text-blue-400'}
+            className={isAtMaxZoom ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'hover:text-blue-600 dark:hover:text-blue-400'}
           >
             <FiZoomIn className="w-5 h-5" />
           </IconButton>
@@ -53,7 +53,7 @@ export const CropControls: React.FC<CropControlsProps> = ({
           <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
 
           <IconButton
-            onClick={onReset}
+            onClick={handleReset}
             variant="standard"
             size="sm"
             ariaLabel="Reset crop"
@@ -65,12 +65,12 @@ export const CropControls: React.FC<CropControlsProps> = ({
 
         <div className="text-center">
           <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-            {Math.round(zoom * 100)}%
+            {Math.round(currentZoom * 100)}%
           </span>
         </div>
 
         <Button
-          onClick={onCrop}
+          onClick={handleApplyCrop}
           variant="primary"
           className="w-full"
         >

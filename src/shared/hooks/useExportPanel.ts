@@ -1,57 +1,56 @@
 // src/shared/hooks/useExportPanel.ts
 import { useCallback, useState } from 'react';
-import { useFileStore } from '@/core/store/fileStore';
-import type { FileRef } from '@/core/store/fileStore';
+import { useFileStore } from '@/shared/store/file-store';
+import type { FileReference } from '@/shared/store/file-store';
 
-interface useExportPanelOptions {
-  file: FileRef | null;
+interface UseExportPanelOptions {
+  fileReference: FileReference | null;
   variant: 'single' | 'multiple';
 }
 
 interface UseExportPanelReturn {
-  // ✅ FIXED: Changed 'export' to 'download' to match the return object below
-  download: (fileName: string, format?: string) => Promise<void>;
-  isDownloading: boolean;
-  error: Error | null;
+  handleDownload: (fileName: string, format?: string) => Promise<void>;
+  isDownloadingFile: boolean;
+  downloadError: Error | null;
 }
 
-export const useExportPanel = ({ file, variant }: useExportPanelOptions): UseExportPanelReturn => {
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+export const useExportPanel = ({ fileReference, variant }: UseExportPanelOptions): UseExportPanelReturn => {
+  const [isDownloadingFile, setIsDownloadingFile] = useState(false);
+  const [downloadError, setDownloadError] = useState<Error | null>(null);
   const { read } = useFileStore();
 
-  const download = useCallback(async (fileName: string, format: string = 'original') => {
-    if (!file) {
+  const handleDownload = useCallback(async (fileName: string, format: string = 'original') => {
+    if (!fileReference) {
       throw new Error('No file to download');
     }
 
-    setIsDownloading(true);
-    setError(null);
+    setIsDownloadingFile(true);
+    setDownloadError(null);
 
     try {
-      const blob = await read(file.name);
-      if (!blob) throw new Error('Failed to read file');
+      const fileBlob = await read(fileReference.name);
+      if (!fileBlob) throw new Error('Failed to read file');
 
-      const ext = file.name.includes('.') ? file.name.split('.').pop() : 'png';
-      const fullName = fileName ? `${fileName}.${ext}` : file.name;
+      const fileExtension = fileReference.name.includes('.') ? fileReference.name.split('.').pop() : 'png';
+      const completeFileName = fileName ? `${fileName}.${fileExtension}` : fileReference.name;
       
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fullName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const objectUrl = URL.createObjectURL(fileBlob);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = objectUrl;
+      downloadAnchor.download = completeFileName;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      document.body.removeChild(downloadAnchor);
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
       
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Download failed');
-      setError(error);
-      throw error;
+    } catch (caughtError) {
+      const processedError = caughtError instanceof Error ? caughtError : new Error('Download failed');
+      setDownloadError(processedError);
+      throw processedError;
     } finally {
-      setIsDownloading(false);
+      setIsDownloadingFile(false);
     }
-  }, [file, read]);
+  }, [fileReference, read]);
 
-  return { download, isDownloading, error };
+  return { handleDownload, isDownloadingFile, downloadError };
 };

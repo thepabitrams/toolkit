@@ -1,6 +1,7 @@
-// src/tools/image/precision-crop/PrecisionCrop.tsx
-import { useState, useEffect, useCallback } from 'react';
-import { useFileStore } from '@/core/store/fileStore';
+// src/tools/media/precision-crop/PrecisionCrop.tsx
+import { useState, useCallback } from 'react';
+import { useFileStore } from '@/shared/store/file-store';
+import { syncCatalogToDatabase } from '@/shared/store/file-store/file-utils';
 import { FileUpload } from '@/shared/components/FileUpload';
 import { FileCard } from '@/shared/components/FileCard';
 import { Motion } from '@/core/motion/motion';
@@ -12,91 +13,102 @@ import { ExportPanel } from '@/shared/components/ExportPanel';
 import type { Unit } from './DimensionInput';
 import { Grid } from '@/core/components/ui/Grid';
 import { IMAGE_CONFIG } from '@/entities/image';
+import type { FileReference } from '@/shared/store/file-store';
 
-interface PrecisionCropProps {
+interface PrecisionCropProperties {
   category: string;
   toolId: string;
 }
 
-export function PrecisionCrop({ toolId }: PrecisionCropProps) {
-  const { list, upload, save, clear, promote, remove } = useFileStore();
-  const [isLoading, setIsLoading] = useState(false);
+export function PrecisionCrop({ toolId }: PrecisionCropProperties) {
+  const { 
+    list: listToolFiles, 
+    upload: uploadFiles, 
+    save: saveProcessedFiles, 
+    clear: clearToolFiles, 
+    promote: promoteFile, 
+    remove: removeFile 
+  } = useFileStore();
+  
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
 
-  const originalFiles = list('original');
-  const currentFile = originalFiles.length > 0 ? originalFiles[0] : null;
+  const originalFileList = listToolFiles('original');
+  const activeOriginalFile = originalFileList.length > 0 ? originalFileList[0] : null;
 
-  const processedFiles = list('process');
-  const latestProcessed = processedFiles.length > 0 ? processedFiles[processedFiles.length - 1] : null;
+  const processedFileList = listToolFiles('process');
+  const latestProcessedFile = processedFileList.length > 0 ? processedFileList[processedFileList.length - 1] : null;
 
-  const [cropData, setCropData] = useState({
+  const [cropConfiguration, setCropConfiguration] = useState({
     rawWidth: 1,
     rawHeight: 1,
     unit: 'px' as Unit,
     dpi: 96,
-    widthPx: 1,
-    heightPx: 1,
+    widthPixels: 1,
+    heightPixels: 1,
   });
 
-  const handleUpload = useCallback(async (files: File[]) => {
-    setIsLoading(true);
+  const handleFileUpload = useCallback(async (selectedFiles: File[]) => {
+    setIsProcessingImage(true);
     try {
-      await upload(files);
-    } catch {
+      await uploadFiles(selectedFiles);
+    } catch (error) {
+      console.warn('Upload failed:', error);
     } finally {
-      setIsLoading(false);
+      setIsProcessingImage(false);
     }
-  }, [upload]);
+  }, [uploadFiles]);
 
-  const handleRemove = useCallback(async () => {
-    if (currentFile) {
-      await clear();
+  const handleFileRemove = useCallback(async () => {
+    if (activeOriginalFile) {
+      await clearToolFiles();
     }
-  }, [currentFile, clear]);
+  }, [activeOriginalFile, clearToolFiles]);
 
-  const handleCrop = useCallback(async (croppedBlob: Blob, name: string) => {
-    setIsLoading(true);
+  const handleCropConfirm = useCallback(async (croppedBlob: Blob, generatedFileName: string) => {
+    setIsProcessingImage(true);
     try {
-      const file = new File([croppedBlob], name, { type: croppedBlob.type });
-      await save([file]);
-    } catch {
+      const processedFileObject = new File([croppedBlob], generatedFileName, { type: croppedBlob.type });
+      await saveProcessedFiles([processedFileObject]);
+    } catch (error) {
+      console.warn('Save failed:', error);
     } finally {
-      setIsLoading(false);
+      setIsProcessingImage(false);
     }
-  }, [save]);
+  }, [saveProcessedFiles]);
 
-  const handleAction = useCallback(
-    async (selectedToolId: string, variant: 'single' | 'multiple') => {
-      if (!selectedToolId) {
+  const handleToolSelection = useCallback(
+    async (targetToolSlug: string, promotionVariant: 'single' | 'multiple') => {
+      if (!targetToolSlug) {
         alert('Error: No tool selected.');
         return;
       }
 
-      const processedFiles = list('process');
-      if (processedFiles.length === 0) {
+      const currentProcessedList = listToolFiles('process');
+      if (currentProcessedList.length === 0) {
         alert('No processed files to promote');
         return;
       }
 
-      const latestName = processedFiles[processedFiles.length - 1]?.name;
+      const latestFileName = currentProcessedList[currentProcessedList.length - 1]?.name;
 
-      const state = useFileStore.getState();
-      const targetOriginals = state.original.filter(f => f.toolId === selectedToolId);
+      const currentState = useFileStore.getState();
+      const targetToolOriginals = currentState.original.filter((ref: FileReference) => ref.toolId === targetToolSlug);
 
-      if (targetOriginals.length > 0) {
-        const userChoice = window.confirm(
-          `The target tool already has ${targetOriginals.length} file(s).\n\n` +
+      if (targetToolOriginals.length > 0) {
+        const userConfirmed = window.confirm(
+          `The target tool already has ${targetToolOriginals.length} file(s).\n\n` +
           `• Click "OK" → REPLACE (delete old files, use new ones)\n` +
           `• Click "CANCEL" → Stay in current tool`
         );
 
-        if (userChoice) {
-          for (const ref of targetOriginals) {
-            await remove(ref.storageKey);
+        if (userConfirmed) {
+          for (const fileReference of targetToolOriginals) {
+            await removeFile(fileReference.name);
           }
-          useFileStore.setState((prevState) => ({
-            original: prevState.original.filter(f => f.toolId !== selectedToolId),
+          useFileStore.setState((previousState) => ({
+            original: previousState.original.filter((ref: FileReference) => ref.toolId !== targetToolSlug),
           }));
-          await syncToDB(
+          await syncCatalogToDatabase(
             useFileStore.getState().original,
             useFileStore.getState().process
           );
@@ -105,44 +117,38 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps) {
         }
       }
 
-      if (variant === 'single' && latestName) {
-        await promote(latestName, selectedToolId);
+      if (promotionVariant === 'single' && latestFileName) {
+        await promoteFile(latestFileName, targetToolSlug);
       } else {
-        await promote(undefined, selectedToolId);
+        await promoteFile(undefined, targetToolSlug);
       }
 
-      window.location.href = `/${selectedToolId}`;
+      window.location.href = `/${targetToolSlug}`;
     },
-    [list, promote, remove]
+    [listToolFiles, promoteFile, removeFile]
   );
 
-  const handleSizeChange = (
-    widthPx: number,
-    heightPx: number,
+  const handleDimensionChange = (
+    widthPixels: number,
+    heightPixels: number,
     rawWidth: number,
     rawHeight: number,
     unit: Unit,
     dpi: number
   ) => {
-    setCropData({
+    setCropConfiguration({
       rawWidth,
       rawHeight,
       unit,
       dpi,
-      widthPx,
-      heightPx,
+      widthPixels,
+      heightPixels,
     });
   };
 
-  const aspectRatio = cropData.widthPx / cropData.heightPx;
-
-  const hasFile = !!currentFile;
-  const hasProcessed = !!latestProcessed;
-
-  async function syncToDB(original: any[], process: any[]) {
-    const { saveCatalog } = await import('@/core/services/indexeddb');
-    await saveCatalog({ original, process });
-  }
+  const calculatedAspectRatio = cropConfiguration.widthPixels / cropConfiguration.heightPixels;
+  const hasOriginalFile = !!activeOriginalFile;
+  const hasProcessedOutput = !!latestProcessedFile;
 
   return (
     <div className="w-full py-6 px-4 sm:px-6 lg:px-8">
@@ -156,21 +162,21 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps) {
             style={{ opacity: 0, transform: 'scale(0.5)' }}
           >
             <FileUpload
-              file={currentFile}
-              variant="single"
-              accept={IMAGE_CONFIG.accept}
-              label={IMAGE_CONFIG.label}
-              extensions={IMAGE_CONFIG.extensions}
-              isLoading={isLoading}
-              onUpload={handleUpload}
-              onRemove={handleRemove}
+              fileReference={activeOriginalFile}
+              uploadVariant="single"
+              acceptedMimeTypes={IMAGE_CONFIG.accept}
+              uploadLabel={IMAGE_CONFIG.label}
+              fileExtensions={IMAGE_CONFIG.extensions}
+              isUploading={isProcessingImage}
+              handleFileUpload={handleFileUpload}
+              handleFileRemove={handleFileRemove}
               minWidth={360}
               minHeight={400}
               padding={0}
             />
           </Motion>
 
-          {hasFile && (
+          {hasOriginalFile && (
             <Motion
               preset={zoomIn}
               as="div"
@@ -179,9 +185,9 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps) {
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
               <DimensionInput
-                initialWidth={cropData.rawWidth}
-                initialHeight={cropData.rawHeight}
-                onSizeChange={handleSizeChange}
+                initialWidth={cropConfiguration.rawWidth}
+                initialHeight={cropConfiguration.rawHeight}
+                onSizeChange={handleDimensionChange}
                 minWidth={360}
                 minHeight={240}
                 padding={0}
@@ -189,7 +195,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps) {
             </Motion>
           )}
 
-          {hasFile && (
+          {hasOriginalFile && (
             <Motion
               preset={zoomIn}
               as="div"
@@ -198,12 +204,12 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps) {
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
               <Cropper
-                file={currentFile}
-                aspectRatio={aspectRatio}
-                targetWidthPx={cropData.widthPx}
-                targetHeightPx={cropData.heightPx}
-                inputDpi={cropData.dpi}
-                onCrop={handleCrop}
+                fileReference={activeOriginalFile}
+                aspectRatio={calculatedAspectRatio}
+                targetWidthPixels={cropConfiguration.widthPixels}
+                targetHeightPixels={cropConfiguration.heightPixels}
+                inputDpi={cropConfiguration.dpi}
+                handleCropConfirm={handleCropConfirm}
                 minWidth={360}
                 minHeight={500}
                 padding={0}
@@ -211,7 +217,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps) {
             </Motion>
           )}
 
-          {hasProcessed && (
+          {hasProcessedOutput && (
             <Motion
               preset={zoomIn}
               as="div"
@@ -220,8 +226,8 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps) {
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
               <FileCard
-                file={latestProcessed}
-                variant="process"
+                fileReference={latestProcessedFile}
+                displayVariant="process"
                 minWidth={360}
                 minHeight={350}
                 padding={0}
@@ -229,7 +235,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps) {
             </Motion>
           )}
 
-          {hasProcessed && (
+          {hasProcessedOutput && (
             <Motion
               preset={zoomIn}
               as="div"
@@ -238,12 +244,12 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps) {
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
               <ExportPanel
-                file={latestProcessed}
-                variant="single"
-                initialFileName={`${cropData.rawWidth}x${cropData.rawHeight}`}
-                onClear={clear}
-                toolId={toolId}
-                onToolSelect={handleAction}
+                fileReference={latestProcessedFile}
+                actionVariant="single"
+                defaultFileName={`${cropConfiguration.rawWidth}x${cropConfiguration.rawHeight}`}
+                handleClearFiles={clearToolFiles}
+                currentToolSlug={toolId}
+                handleToolSelection={handleToolSelection}
                 minWidth={360}
                 minHeight={200}
                 padding={0}

@@ -1,4 +1,4 @@
-// src/shared/hooks/useAction.ts (or wherever your hooks folder is)
+// src/shared/hooks/useAction.ts
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { tools as allTools, type ToolConfig } from '@/config/tools';
 
@@ -7,171 +7,193 @@ interface UseActionOptions {
 }
 
 interface UseActionReturn {
-  isOpen: boolean;
-  open: () => void;
-  close: () => void;
-  toggle: () => void;
-  dragOffset: number;
-  isDragging: boolean;
-  filter: { category: string; inputType: string } | undefined;
-  handleTouchStart: (e: React.TouchEvent) => void;
-  handleTouchMove: (e: React.TouchEvent) => void;
+  isActionMenuOpen: boolean;
+  handleOpenActionMenu: () => void;
+  handleCloseActionMenu: () => void;
+  handleToggleActionMenu: () => void;
+  dragOffsetY: number;
+  isCurrentlyDragging: boolean;
+  compatibilityFilter: { category: string; inputType: string } | undefined;
+  handleTouchStart: (event: React.TouchEvent) => void;
+  handleTouchMove: (event: React.TouchEvent) => void;
   handleTouchEnd: () => void;
-  handleMouseDown: (e: React.MouseEvent) => void;
-  handleMouseMove: (e: React.MouseEvent) => void;
+  handleMouseDown: (event: React.MouseEvent) => void;
+  handleMouseMove: (event: React.MouseEvent) => void;
   handleMouseUp: () => void;
   handleMouseLeave: () => void;
 }
 
 export const useAction = ({ toolId }: UseActionOptions): UseActionReturn => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentTool, setCurrentTool] = useState<ToolConfig | null>(null);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const startY = useRef<number | null>(null);
-  const currentY = useRef<number | null>(null);
-  const velocity = useRef<number>(0);
-  const lastMoveTime = useRef<number>(0);
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+  const [activeToolConfig, setActiveToolConfig] = useState<ToolConfig | null>(null);
+  const [dragOffsetY, setDragOffsetY] = useState(0);
+  const [isCurrentlyDragging, setIsCurrentlyDragging] = useState(false);
+  
+  const initialPointerY = useRef<number | null>(null);
+  const currentPointerY = useRef<number | null>(null);
+  const pointerVelocity = useRef<number>(0);
+  const lastPointerMoveTime = useRef<number>(0);
 
   useEffect(() => {
     if (toolId) {
-      const found = allTools.find(t => t.slug === toolId);
-      if (found) setCurrentTool(found);
-      else setCurrentTool(null);
+      const matchingToolConfig = allTools.find((registeredTool) => registeredTool.slug === toolId);
+      if (matchingToolConfig) {
+        setActiveToolConfig(matchingToolConfig);
+      } else {
+        setActiveToolConfig(null);
+      }
     }
   }, [toolId]);
 
-  const open = useCallback(() => {
-    setIsOpen(true);
-    setDragOffset(0);
+  const handleOpenActionMenu = useCallback(() => {
+    setIsActionMenuOpen(true);
+    setDragOffsetY(0);
   }, []);
 
-  const close = useCallback(() => {
-    setIsOpen(false);
-    setDragOffset(0);
-    setIsDragging(false);
-    startY.current = null;
-    currentY.current = null;
-    velocity.current = 0;
+  const handleCloseActionMenu = useCallback(() => {
+    setIsActionMenuOpen(false);
+    setDragOffsetY(0);
+    setIsCurrentlyDragging(false);
+    initialPointerY.current = null;
+    currentPointerY.current = null;
+    pointerVelocity.current = 0;
   }, []);
 
-  const toggle = useCallback(() => {
-    if (isOpen) close();
-    else open();
-  }, [isOpen, open, close]);
+  const handleToggleActionMenu = useCallback(() => {
+    if (isActionMenuOpen) {
+      handleCloseActionMenu();
+    } else {
+      handleOpenActionMenu();
+    }
+  }, [isActionMenuOpen, handleOpenActionMenu, handleCloseActionMenu]);
 
-  const filter = currentTool
+  const compatibilityFilter = activeToolConfig
     ? {
-        category: currentTool.category,
+        category: activeToolConfig.category,
         inputType: 'single',
       }
     : undefined;
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    startY.current = touch.clientY;
-    currentY.current = touch.clientY;
-    setIsDragging(true);
-    lastMoveTime.current = Date.now();
-    velocity.current = 0;
+  const handleTouchStart = useCallback((touchEvent: React.TouchEvent) => {
+    const primaryTouch = touchEvent.touches[0];
+    initialPointerY.current = primaryTouch.clientY;
+    currentPointerY.current = primaryTouch.clientY;
+    setIsCurrentlyDragging(true);
+    lastPointerMoveTime.current = Date.now();
+    pointerVelocity.current = 0;
   }, []);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isDragging || startY.current === null) return;
-    const touch = e.touches[0];
-    const deltaY = touch.clientY - startY.current;
-    const now = Date.now();
-    const timeDelta = now - lastMoveTime.current;
+  const handleTouchMove = useCallback((touchEvent: React.TouchEvent) => {
+    if (!isCurrentlyDragging || initialPointerY.current === null) return;
+    
+    const primaryTouch = touchEvent.touches[0];
+    const deltaY = primaryTouch.clientY - initialPointerY.current;
+    const currentTime = Date.now();
+    const timeDelta = currentTime - lastPointerMoveTime.current;
+    
     if (timeDelta > 0) {
-      velocity.current = (touch.clientY - (currentY.current || startY.current)) / timeDelta;
+      pointerVelocity.current = (primaryTouch.clientY - (currentPointerY.current || initialPointerY.current)) / timeDelta;
     }
-    currentY.current = touch.clientY;
-    lastMoveTime.current = now;
+    
+    currentPointerY.current = primaryTouch.clientY;
+    lastPointerMoveTime.current = currentTime;
+    
     if (deltaY > 0) {
-      const dampened = deltaY * 0.6;
-      setDragOffset(Math.min(dampened, 250));
+      const dampenedDeltaY = deltaY * 0.6;
+      setDragOffsetY(Math.min(dampenedDeltaY, 250));
     }
-  }, [isDragging]);
+  }, [isCurrentlyDragging]);
 
   const handleTouchEnd = useCallback(() => {
-    const closeThreshold = 80;
+    const dismissalThresholdY = 80;
     const velocityThreshold = 0.5;
-    if (dragOffset > closeThreshold || velocity.current > velocityThreshold) {
-      close();
+    
+    if (dragOffsetY > dismissalThresholdY || pointerVelocity.current > velocityThreshold) {
+      handleCloseActionMenu();
     } else {
-      setDragOffset(0);
+      setDragOffsetY(0);
     }
-    setIsDragging(false);
-    startY.current = null;
-    currentY.current = null;
-    velocity.current = 0;
-  }, [dragOffset, close]);
+    
+    setIsCurrentlyDragging(false);
+    initialPointerY.current = null;
+    currentPointerY.current = null;
+    pointerVelocity.current = 0;
+  }, [dragOffsetY, handleCloseActionMenu]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (e.button !== 0) return;
-    startY.current = e.clientY;
-    currentY.current = e.clientY;
-    setIsDragging(true);
-    lastMoveTime.current = Date.now();
-    velocity.current = 0;
+  const handleMouseDown = useCallback((mouseEvent: React.MouseEvent) => {
+    if (mouseEvent.button !== 0) return;
+    initialPointerY.current = mouseEvent.clientY;
+    currentPointerY.current = mouseEvent.clientY;
+    setIsCurrentlyDragging(true);
+    lastPointerMoveTime.current = Date.now();
+    pointerVelocity.current = 0;
   }, []);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging || startY.current === null) return;
-    const deltaY = e.clientY - startY.current;
-    const now = Date.now();
-    const timeDelta = now - lastMoveTime.current;
+  const handleMouseMove = useCallback((mouseEvent: React.MouseEvent) => {
+    if (!isCurrentlyDragging || initialPointerY.current === null) return;
+    
+    const deltaY = mouseEvent.clientY - initialPointerY.current;
+    const currentTime = Date.now();
+    const timeDelta = currentTime - lastPointerMoveTime.current;
+    
     if (timeDelta > 0) {
-      velocity.current = (e.clientY - (currentY.current || startY.current)) / timeDelta;
+      pointerVelocity.current = (mouseEvent.clientY - (currentPointerY.current || initialPointerY.current)) / timeDelta;
     }
-    currentY.current = e.clientY;
-    lastMoveTime.current = now;
+    
+    currentPointerY.current = mouseEvent.clientY;
+    lastPointerMoveTime.current = currentTime;
+    
     if (deltaY > 0) {
-      const dampened = deltaY * 0.6;
-      setDragOffset(Math.min(dampened, 250));
+      const dampenedDeltaY = deltaY * 0.6;
+      setDragOffsetY(Math.min(dampenedDeltaY, 250));
     }
-  }, [isDragging]);
+  }, [isCurrentlyDragging]);
 
   const handleMouseUp = useCallback(() => {
-    const closeThreshold = 80;
+    const dismissalThresholdY = 80;
     const velocityThreshold = 0.5;
-    if (dragOffset > closeThreshold || velocity.current > velocityThreshold) {
-      close();
+    
+    if (dragOffsetY > dismissalThresholdY || pointerVelocity.current > velocityThreshold) {
+      handleCloseActionMenu();
     } else {
-      setDragOffset(0);
+      setDragOffsetY(0);
     }
-    setIsDragging(false);
-    startY.current = null;
-    currentY.current = null;
-    velocity.current = 0;
-  }, [dragOffset, close]);
+    
+    setIsCurrentlyDragging(false);
+    initialPointerY.current = null;
+    currentPointerY.current = null;
+    pointerVelocity.current = 0;
+  }, [dragOffsetY, handleCloseActionMenu]);
 
   const handleMouseLeave = useCallback(() => {
-    if (isDragging) {
-      if (dragOffset > 80) close();
-      else setDragOffset(0);
-      setIsDragging(false);
-      startY.current = null;
-      currentY.current = null;
-      velocity.current = 0;
+    if (isCurrentlyDragging) {
+      if (dragOffsetY > 80) {
+        handleCloseActionMenu();
+      } else {
+        setDragOffsetY(0);
+      }
+      setIsCurrentlyDragging(false);
+      initialPointerY.current = null;
+      currentPointerY.current = null;
+      pointerVelocity.current = 0;
     }
-  }, [isDragging, dragOffset, close]);
+  }, [isCurrentlyDragging, dragOffsetY, handleCloseActionMenu]);
 
   useEffect(() => {
-    if (!isOpen) {
-      setDragOffset(0);
-      setIsDragging(false);
+    if (!isActionMenuOpen) {
+      setDragOffsetY(0);
+      setIsCurrentlyDragging(false);
     }
-  }, [isOpen]);
+  }, [isActionMenuOpen]);
 
   return {
-    isOpen,
-    open,
-    close,
-    toggle,
-    dragOffset,
-    isDragging,
-    filter,
+    isActionMenuOpen,
+    handleOpenActionMenu,
+    handleCloseActionMenu,
+    handleToggleActionMenu,
+    dragOffsetY,
+    isCurrentlyDragging,
+    compatibilityFilter,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,

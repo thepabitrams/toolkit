@@ -1,32 +1,32 @@
 // src/shared/hooks/useFileUpload.ts
 import { useState, useCallback } from 'react';
-import { useFileStore } from '@/core/store/fileStore';
+import { useFileStore } from '@/shared/store/file-store';
 
 export function useFileUpload() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadErrorMessage, setUploadErrorMessage] = useState<string | null>(null);
   const { upload } = useFileStore();
 
-  const uploadSingle = useCallback(
-    async (files: File[]) => {
-      if (!files.length) return;
-      setIsLoading(true);
-      setError(null);
+  const uploadSingleFile = useCallback(
+    async (fileCollection: File[]) => {
+      if (!fileCollection.length) return;
+      setIsUploading(true);
+      setUploadErrorMessage(null);
 
       try {
-        await upload(files);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Upload failed');
+        await upload(fileCollection);
+      } catch (error) {
+        setUploadErrorMessage(error instanceof Error ? error.message : 'Upload failed');
       } finally {
-        setIsLoading(false);
+        setIsUploading(false);
       }
     },
     [upload]
   );
 
   return {
-    isLoading,
-    error,
-    uploadSingle,
+    isUploading,
+    uploadErrorMessage,
+    uploadSingleFile,
   };
 }

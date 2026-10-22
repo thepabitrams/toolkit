@@ -1,39 +1,40 @@
+// src/shared/components/ActionButton.tsx
 import React from 'react';
 import { Button } from '@/core/components/ui/Button';
-import { ToolHub } from '@/core/components/tool-hub/ToolHub';
+import { ToolHub } from '@/core/components/tool-hub';
 import { useAction } from '@/shared/hooks/useAction';
 import { Overlay } from '@/core/components/ui/Overlay';
 
-interface ActionButtonProps {
-  toolId: string;
-  variant: 'single' | 'multiple';
+interface ActionButtonProperties {
+  currentToolSlug: string;
+  actionVariant: 'single' | 'multiple';
   className?: string;
-  onToolSelect: (selectedToolId: string, variant: 'single' | 'multiple') => Promise<void>;
+  handleToolSelection: (selectedToolSlug: string, variant: 'single' | 'multiple') => Promise<void>;
 }
 
-export const ActionButton: React.FC<ActionButtonProps> = ({
-  toolId,
-  variant,
+export const ActionButton: React.FC<ActionButtonProperties> = ({
+  currentToolSlug,
+  actionVariant,
   className = '',
-  onToolSelect,
+  handleToolSelection,
 }) => {
   const {
-    isOpen,
-    open,
-    close,
-    filter,
-  } = useAction({ toolId });
+    isActionMenuOpen,
+    handleOpenActionMenu,
+    handleCloseActionMenu,
+    compatibilityFilter,
+  } = useAction({ toolId: currentToolSlug });
 
-  const handleSelect = async (selectedToolId: string) => {
-    if (!selectedToolId) return;
-    await onToolSelect(selectedToolId, variant);
-    close();
+  const handleSelection = async (selectedToolSlug: string) => {
+    if (!selectedToolSlug) return;
+    await handleToolSelection(selectedToolSlug, actionVariant);
+    handleCloseActionMenu();
   };
 
   return (
     <>
       <Button
-        onClick={open}
+        onClick={handleOpenActionMenu}
         variant="ghost"
         className={`
           relative flex items-center justify-center gap-1.5 px-3 py-2 
@@ -41,15 +42,19 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
           hover:text-blue-600 dark:hover:text-blue-400 
           rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 
           active:scale-[0.97]
-          min-w-[80px]
+          min-w-20
           ${className}
         `}
       >
-        <span>{variant === 'single' ? 'Action' : 'Action (All)'}</span>
+        <span>{actionVariant === 'single' ? 'Action' : 'Action (All)'}</span>
       </Button>
 
-      <Overlay isOpen={isOpen} onClose={close}>
-        <ToolHub variant="grid" filter={filter} onToolSelect={handleSelect} />
+      <Overlay isOpen={isActionMenuOpen} onClose={handleCloseActionMenu}>
+        <ToolHub 
+          displayVariant="grid" 
+          actionFilter={compatibilityFilter} 
+          handleToolSelect={handleSelection} 
+        />
       </Overlay>
     </>
   );
