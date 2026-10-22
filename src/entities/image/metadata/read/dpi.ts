@@ -1,43 +1,44 @@
 // src/entities/image/metadata/read/dpi.ts
-
 import { readExif } from './readExif';
 import type { ExifTags } from '../types';
 
-export function extractDpi(tags: ExifTags): { dpi?: number; unit?: string } {
-  let dpi: number | undefined = undefined;
-  let unit = 'px';
+export function extractDpi(metadataTags: ExifTags): { dpi?: number; unit?: string } {
+  let calculatedDpi: number | undefined = undefined;
+  let resolvedUnit = 'px';
 
-  const xResolution = toNumber(tags.XResolution);
-  const yResolution = toNumber(tags.YResolution);
-  if (xResolution != null && yResolution != null) {
-    dpi = Math.round((xResolution + yResolution) / 2);
+  const horizontalResolution = parseNumericMetadataValue(metadataTags.XResolution);
+  const verticalResolution = parseNumericMetadataValue(metadataTags.YResolution);
+  
+  if (horizontalResolution != null && verticalResolution != null) {
+    calculatedDpi = Math.round((horizontalResolution + verticalResolution) / 2);
   }
 
-  if (!dpi) {
-    const pixelsPerUnitX = toNumber(tags.PixelsPerUnitX);
-    const pixelsPerUnitY = toNumber(tags.PixelsPerUnitY);
-    if (pixelsPerUnitX != null && pixelsPerUnitY != null) {
-      const averagePixelsPerUnit = (pixelsPerUnitX + pixelsPerUnitY) / 2;
-      dpi = Math.round(averagePixelsPerUnit * 0.0254);
+  if (!calculatedDpi) {
+    const horizontalPixelsPerUnit = parseNumericMetadataValue(metadataTags.PixelsPerUnitX);
+    const verticalPixelsPerUnit = parseNumericMetadataValue(metadataTags.PixelsPerUnitY);
+    
+    if (horizontalPixelsPerUnit != null && verticalPixelsPerUnit != null) {
+      const averagePixelsPerUnit = (horizontalPixelsPerUnit + verticalPixelsPerUnit) / 2;
+      calculatedDpi = Math.round(averagePixelsPerUnit * 0.0254);
     }
   }
 
-  const resolutionUnit = toNumber(tags.ResolutionUnit);
-  if (resolutionUnit === 2) unit = 'inch';
-  else if (resolutionUnit === 3) unit = 'cm';
+  const rawResolutionUnit = parseNumericMetadataValue(metadataTags.ResolutionUnit);
+  if (rawResolutionUnit === 2) resolvedUnit = 'inch';
+  else if (rawResolutionUnit === 3) resolvedUnit = 'cm';
 
-  return { dpi, unit };
+  return { dpi: calculatedDpi, unit: resolvedUnit };
 }
 
 export async function readDpi(
-  file: File
+  targetFile: File
 ): Promise<{ dpi?: number; unit?: string }> {
-  const tags = await readExif(file);
-  return extractDpi(tags);
+  const metadataTags = await readExif(targetFile);
+  return extractDpi(metadataTags);
 }
 
-function toNumber(value: unknown): number | undefined {
-  if (value == null) return undefined;
-  const numeric = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(numeric) ? numeric : undefined;
+function parseNumericMetadataValue(rawMetadataValue: unknown): number | undefined {
+  if (rawMetadataValue == null) return undefined;
+  const parsedNumericValue = typeof rawMetadataValue === 'number' ? rawMetadataValue : Number(rawMetadataValue);
+  return Number.isFinite(parsedNumericValue) ? parsedNumericValue : undefined;
 }

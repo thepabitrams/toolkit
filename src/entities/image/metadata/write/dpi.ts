@@ -1,9 +1,8 @@
 // src/entities/image/metadata/write/dpi.ts
-
 import { writeExif } from './writeExif';
 import type { ExifTags } from '../types';
 
-const DPI_WRITABLE_MIME_TYPES = new Set([
+const SUPPORTED_DPI_MIME_TYPES = new Set([
   'image/jpeg',
   'image/jpg',
   'image/png',
@@ -16,27 +15,28 @@ const DPI_WRITABLE_MIME_TYPES = new Set([
   'image/j2c',
 ]);
 
-export function buildDpiTags(dpi: number, mimeType: string): ExifTags {
-  const tags: ExifTags = {
-    XResolution: Math.round(dpi),
-    YResolution: Math.round(dpi),
+export function constructDpiMetadataTags(targetDpi: number, fileMimeType: string): ExifTags {
+  const metadataTags: ExifTags = {
+    XResolution: Math.round(targetDpi),
+    YResolution: Math.round(targetDpi),
     ResolutionUnit: 'inches',
   };
 
-  if (mimeType === 'image/png') {
-    const pixelsPerMeter = Math.round((dpi * 10000) / 254);
-    tags.PixelsPerUnitX = pixelsPerMeter;
-    tags.PixelsPerUnitY = pixelsPerMeter;
-    tags.PixelUnits = 'meters';
+  if (fileMimeType === 'image/png') {
+    const calculatedPixelsPerMeter = Math.round((targetDpi * 10000) / 254);
+    metadataTags.PixelsPerUnitX = calculatedPixelsPerMeter;
+    metadataTags.PixelsPerUnitY = calculatedPixelsPerMeter;
+    metadataTags.PixelUnits = 'meters';
   }
 
-  return tags;
+  return metadataTags;
 }
 
-export async function writeDpi(file: File, dpi: number): Promise<Blob> {
-  if (!DPI_WRITABLE_MIME_TYPES.has(file.type)) {
-    return file;
+export async function writeDpi(targetFile: File, targetDpi: number): Promise<Blob> {
+  if (!SUPPORTED_DPI_MIME_TYPES.has(targetFile.type)) {
+    return targetFile;
   }
-  const tags = buildDpiTags(dpi, file.type);
-  return writeExif(file, tags);
+  
+  const metadataTags = constructDpiMetadataTags(targetDpi, targetFile.type);
+  return writeExif(targetFile, metadataTags);
 }

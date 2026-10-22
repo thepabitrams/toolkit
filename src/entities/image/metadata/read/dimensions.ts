@@ -1,55 +1,57 @@
 // src/entities/image/metadata/read/dimensions.ts
-
 import { readExif } from './readExif';
 import type { ExifTags } from '../types';
 
-export function extractDimensions(tags: ExifTags): {
+export function extractDimensions(metadataTags: ExifTags): {
   width?: number;
   height?: number;
   unit?: string;
 } {
-  const width = toNumber(tags.ImageWidth);
-  const height = toNumber(tags.ImageHeight);
-  let unit = 'px';
+  const parsedWidth = parseNumericMetadataValue(metadataTags.ImageWidth);
+  const parsedHeight = parseNumericMetadataValue(metadataTags.ImageHeight);
+  let resolvedUnit = 'px';
 
-  const resolutionUnit = toNumber(tags.ResolutionUnit);
-  if (resolutionUnit === 2) unit = 'inch';
-  else if (resolutionUnit === 3) unit = 'cm';
+  const rawResolutionUnit = parseNumericMetadataValue(metadataTags.ResolutionUnit);
+  if (rawResolutionUnit === 2) resolvedUnit = 'inch';
+  else if (rawResolutionUnit === 3) resolvedUnit = 'cm';
 
-  return { width, height, unit };
+  return { width: parsedWidth, height: parsedHeight, unit: resolvedUnit };
 }
 
 export async function readDimensions(
-  file: File
+  targetFile: File
 ): Promise<{ width?: number; height?: number; unit?: string }> {
-  const tags = await readExif(file);
-  const dimensions = extractDimensions(tags);
+  const metadataTags = await readExif(targetFile);
+  const extractedDimensions = extractDimensions(metadataTags);
 
-  if (dimensions.width != null && dimensions.height != null) {
-    return dimensions;
+  if (extractedDimensions.width != null && extractedDimensions.height != null) {
+    return extractedDimensions;
   }
 
-  return getDimensionsFromBlob(file);
+  return calculateDimensionsFromBlob(targetFile);
 }
 
-function getDimensionsFromBlob(blob: Blob): Promise<{ width?: number; height?: number; unit?: string }> {
+function calculateDimensionsFromBlob(fileBlob: Blob): Promise<{ width?: number; height?: number; unit?: string }> {
   return new Promise((resolve) => {
-    const objectUrl = URL.createObjectURL(blob);
-    const image = new Image();
-    image.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      resolve({ width: image.naturalWidth, height: image.naturalHeight, unit: 'px' });
+    const imageObjectUrl = URL.createObjectURL(fileBlob);
+    const temporaryImageElement = new Image();
+    
+    temporaryImageElement.onload = () => {
+      URL.revokeObjectURL(imageObjectUrl);
+      resolve({ width: temporaryImageElement.naturalWidth, height: temporaryImageElement.naturalHeight, unit: 'px' });
     };
-    image.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
+    
+    temporaryImageElement.onerror = () => {
+      URL.revokeObjectURL(imageObjectUrl);
       resolve({});
     };
-    image.src = objectUrl;
+    
+    temporaryImageElement.src = imageObjectUrl;
   });
 }
 
-function toNumber(value: unknown): number | undefined {
-  if (value == null) return undefined;
-  const numeric = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(numeric) ? numeric : undefined;
+function parseNumericMetadataValue(rawMetadataValue: unknown): number | undefined {
+  if (rawMetadataValue == null) return undefined;
+  const parsedNumericValue = typeof rawMetadataValue === 'number' ? rawMetadataValue : Number(rawMetadataValue);
+  return Number.isFinite(parsedNumericValue) ? parsedNumericValue : undefined;
 }

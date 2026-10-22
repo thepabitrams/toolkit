@@ -1,35 +1,35 @@
 // src/entities/image/metadata/read/readExif.ts
-
 import { parseMetadata } from '@uswriting/exiftool';
 import type { ExifTags } from '../types';
 
-let inFlightRead: { file: File; promise: Promise<ExifTags> } | null = null;
+let cachedInFlightRequest: { targetFile: File; promise: Promise<ExifTags> } | null = null;
 
-export async function readExif(file: File): Promise<ExifTags> {
-  if (inFlightRead && inFlightRead.file === file) {
-    return inFlightRead.promise;
+export async function readExif(targetFile: File): Promise<ExifTags> {
+  if (cachedInFlightRequest && cachedInFlightRequest.targetFile === targetFile) {
+    return cachedInFlightRequest.promise;
   }
 
-  const promise = performRead(file);
-  inFlightRead = { file, promise };
+  const metadataPromise = executeMetadataExtraction(targetFile);
+  cachedInFlightRequest = { targetFile, promise: metadataPromise };
 
   try {
-    return await promise;
+    return await metadataPromise;
   } finally {
-    if (inFlightRead && inFlightRead.promise === promise) {
-      inFlightRead = null;
+    if (cachedInFlightRequest && cachedInFlightRequest.promise === metadataPromise) {
+      cachedInFlightRequest = null;
     }
   }
 }
 
-async function performRead(file: File): Promise<ExifTags> {
+async function executeMetadataExtraction(targetFile: File): Promise<ExifTags> {
   try {
-    const result = await parseMetadata(file, {
+    const extractionResult = await parseMetadata(targetFile, {
       args: ['-json', '-n'],
-      transform: (data: string) => JSON.parse(data),
+      transform: (rawStringifiedData: string) => JSON.parse(rawStringifiedData),
     });
-    if (result.success && result.data) {
-      return (result.data[0] as ExifTags) || {};
+    
+    if (extractionResult.success && extractionResult.data) {
+      return (extractionResult.data[0] as ExifTags) || {};
     }
   } catch (error) {
     console.debug('[readExif] Failed:', error);

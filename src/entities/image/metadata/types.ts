@@ -1,3 +1,3 @@
 // src/entities/image/metadata/types.ts
-
-export type ExifTags = Record<string, unknown>;
+export type ExifTagValue = string | number | boolean | (string | number | boolean)[];
+export type ExifTags = Record<string, ExifTagValue>;
