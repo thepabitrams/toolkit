@@ -3,16 +3,16 @@ import { useState, useCallback } from 'react';
 import { useFileStore } from '@/shared/store/file-store';
 import { syncCatalogToDatabase } from '@/shared/store/file-store/file-utils';
 import { FileUpload } from '@/shared/components/file-upload';
-import { FileCard } from '@/shared/components/FileCard';
+import { FileCard } from '@/shared/components/file-card';
 import { Motion } from '@/core/motion/motion';
 import { Stagger } from '@/core/motion/core/Stagger';
 import { zoomIn } from '@/core/motion/presets/zoomIn';
 import { DimensionInput } from './DimensionInput';
 import { Cropper } from './Cropper';
 import { ExportPanel } from '@/shared/components/export-panel';
-import type { Unit } from './DimensionInput';
 import { Grid } from '@/core/components/ui/Grid';
 import { IMAGE_CONFIG } from '@/shared/entities/image';
+import type { Unit } from './DimensionInput';
 import type { FileReference } from '@/shared/store/file-store';
 
 interface PrecisionCropProperties {
@@ -20,7 +20,7 @@ interface PrecisionCropProperties {
   toolId: string;
 }
 
-export function PrecisionCrop({ toolId }: PrecisionCropProperties) {
+export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.Element {
   const { 
     list: listToolFiles, 
     upload: uploadFiles, 
