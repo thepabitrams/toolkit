@@ -1,7 +1,7 @@
 // src/shared/components/FileUpload.tsx
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { FileCard } from './FileCard';
+import { FileCard } from '../FileCard';
 import { Container } from '@/core/components/ui/Container';
 import { Card } from '@/core/components/ui/Card';
 import type { FileReference } from '@/shared/store/file-store';

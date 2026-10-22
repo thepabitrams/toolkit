@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/core/components/ui/Button';
 import { ToolHub } from '@/core/components/tool-hub';
-import { useAction } from '@/shared/hooks/useAction';
+import { useAction } from '@/shared/components/action-button/useAction';
 import { Overlay } from '@/core/components/ui/Overlay';
 
 interface ActionButtonProperties {

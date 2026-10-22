@@ -21,7 +21,6 @@ export interface SocialMediaLinks {
 
 export interface SponsorLinksConfig {
   readonly page: string;
-  readonly buyMeACoffee: string;
 }
 
 export const site: SiteDetails = {
@@ -45,5 +44,4 @@ export const social: SocialMediaLinks = {
 
 export const sponsor: SponsorLinksConfig = {
   page: 'https://pabitramohansingh.com/sponsor',
-  buyMeACoffee: 'https://buymeacoffee.com/pabitramohansingh',
 } as const;

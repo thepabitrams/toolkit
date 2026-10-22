@@ -1,7 +1,7 @@
 // src/shared/components/ExportPanel.tsx
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/core/components/ui/Button';
-import { ActionButton } from '@/shared/components/ActionButton';
+import { ActionButton } from '@/shared/components/action-button';
 import { useFileStore } from '@/shared/store/file-store';
 import { Container } from '@/core/components/ui/Container';
 import { Card } from '@/core/components/ui/Card';
