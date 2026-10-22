@@ -12,7 +12,7 @@ import { Cropper } from './Cropper';
 import { ExportPanel } from '@/shared/components/ExportPanel';
 import type { Unit } from './DimensionInput';
 import { Grid } from '@/core/components/ui/Grid';
-import { IMAGE_CONFIG } from '@/entities/image';
+import { IMAGE_CONFIG } from '@/shared/entities/image';
 import type { FileReference } from '@/shared/store/file-store';
 
 interface PrecisionCropProperties {

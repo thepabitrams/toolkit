@@ -8,8 +8,8 @@ import { useFileStore } from '@/shared/store/file-store';
 import { Container } from '@/core/components/ui/Container';
 import { Card } from '@/core/components/ui/Card';
 import type { FileReference } from '@/shared/store/file-store';
-import { loadImage, exportCanvas, prepareCanvas } from '@/lib/browser';
-import { writeDpi } from '@/entities/image';
+import { loadImage, exportCanvas, prepareCanvas } from '@/shared/lib/browser';
+import { writeDpi } from '@/shared/entities/image';
 
 interface CropperProperties {
   fileReference: FileReference | null;

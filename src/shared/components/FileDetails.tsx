@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useFileStore } from '@/shared/store/file-store';
 import { Card } from '@/core/components/ui/Card';
 import { Container } from '@/core/components/ui/Container';
-import { readDimensions, readDpi } from '@/entities/image/metadata';
+import { readDimensions, readDpi } from '@/shared/entities/image/metadata';
 import type { FileReference } from '@/shared/store/file-store';
 
 interface FileDetailsProperties {
