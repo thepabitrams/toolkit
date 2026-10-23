@@ -38,7 +38,6 @@ export const buttonHoverTapEffect = {
   transition: { type: 'spring', stiffness: 400, damping: 17 }
 };
 
-// 🚨 ZOOM CONFIGURATION FOR THE CROPPER
 export const cropperZoomConfig = {
   maximumZoomLevel: 5,
   zoomIncrementStep: 0.1,

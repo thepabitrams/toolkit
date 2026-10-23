@@ -1,6 +1,6 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Reorder, motion } from 'motion/react';
+import { Reorder } from 'motion/react';
 import { useFileStore } from '@/shared/store/file-store';
 import type { FileReference } from '@/shared/store/file-store';
 import { GalleryThumbnail } from './GalleryThumbnail';
@@ -21,114 +21,131 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
   acceptedMimeTypes,
   isUploading,
   handleFileUpload,
-}): React.JSX.Element => {
+}) => {
   const { setActiveFile, reorderBucket } = useFileStore();
-  
   const [items, setItems] = useState<FileReference[]>(files);
-  const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
+  const draggedItemIdReference = useRef<string | null>(null);
 
   useEffect(() => {
     setItems(files);
   }, [files]);
 
-  const handleDropFiles = useCallback((droppedFiles: File[]): void => {
-    handleFileUpload(droppedFiles);
-  }, [handleFileUpload]);
+  const handleDropFiles = useCallback(
+    (droppedFiles: File[]) => {
+      handleFileUpload(droppedFiles);
+    },
+    [handleFileUpload]
+  );
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop: handleDropFiles,
     accept: acceptedMimeTypes,
-    maxFiles: undefined,
     disabled: isUploading,
     noClick: true,
   });
 
-  const handleMouseWheel = (event: React.WheelEvent<HTMLDivElement>): void => {
-    event.currentTarget.scrollLeft += event.deltaY;
-  };
+  const handleMouseWheel = useCallback(
+    (event: React.WheelEvent<HTMLDivElement>) => {
+      if (draggedItemIdReference.current) return;
+      event.currentTarget.scrollLeft += event.deltaY;
+    },
+    []
+  );
 
-  const handleReorder = (newOrder: FileReference[]): void => {
-    setItems(newOrder);
-  };
+  const handleReorder = useCallback((nextOrder: FileReference[]) => {
+    setItems(nextOrder);
+  }, []);
 
-  const handleDragEnd = (): void => {
-    if (draggedItemId) {
-      const oldIndex = files.findIndex((fileReference) => fileReference.id === draggedItemId);
-      const newIndex = items.findIndex((fileReference) => fileReference.id === draggedItemId);
-      
-      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        reorderBucket('original', oldIndex, newIndex);
-      }
-      setDraggedItemId(null);
+  const handleThumbnailDragStart = useCallback((id: string) => {
+    draggedItemIdReference.current = id;
+  }, []);
+
+  const handleThumbnailDragEnd = useCallback(() => {
+    const draggedId = draggedItemIdReference.current;
+    if (!draggedId) return;
+
+    const originalIndex = files.findIndex((file) => file.id === draggedId);
+    const newIndex = items.findIndex((file) => file.id === draggedId);
+
+    if (originalIndex !== -1 && newIndex !== -1 && originalIndex !== newIndex) {
+      reorderBucket('original', originalIndex, newIndex);
     }
-  };
+    
+    draggedItemIdReference.current = null;
+  }, [files, items, reorderBucket]);
+
+  const handleThumbnailClick = useCallback(
+    (id: string) => {
+      setActiveFile(id);
+    },
+    [setActiveFile]
+  );
 
   return (
-    <section 
+    <section
       {...getRootProps()}
-      className={`
-        relative bg-white/60 dark:bg-gray-900/60 border border-slate-200/80 dark:border-gray-800 rounded-2xl shadow-sm flex flex-col overflow-hidden
-        ${isDragActive ? 'ring-2 ring-blue-500/50 bg-blue-50/20 dark:bg-blue-900/10' : ''}
-      `}
+      className={`relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white/60 shadow-sm dark:border-gray-800 dark:bg-gray-900/60 ${
+        isDragActive ? 'bg-blue-50/20 ring-2 ring-blue-500/50 dark:bg-blue-900/10' : ''
+      }`}
     >
       <input {...getInputProps()} />
-      
+
       {isDragActive && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl pointer-events-none">
-          <FiUploadCloud className="w-10 h-10 text-blue-500 mb-2 animate-bounce" />
+        <div className="pointer-events-none absolute inset-0 z-50 flex flex-col items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm dark:bg-gray-900/80">
+          <FiUploadCloud className="mb-2 h-10 w-10 animate-bounce text-blue-500" />
           <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">Drop images here</p>
         </div>
       )}
 
-      <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-slate-100 dark:border-gray-800/50">
+      <div className="flex items-center justify-between border-b border-slate-100 px-4 pb-2 pt-4 dark:border-gray-800/50">
         <h3 className="text-sm font-semibold text-slate-700 dark:text-gray-300">
           {items.length} {items.length === 1 ? 'Image' : 'Images'}
         </h3>
-        
         <Button
           onClick={open}
           variant="primary"
           disabled={isUploading}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs h-auto rounded-lg"
+          className="flex h-auto items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs"
         >
-          <FiPlus className="w-3.5 h-3.5" />
+          <FiPlus className="h-3.5 w-3.5" />
           <span>{isUploading ? 'Uploading...' : 'Add Image'}</span>
         </Button>
       </div>
 
-      <motion.div
-        layoutScroll
+      <div
         onWheel={handleMouseWheel}
-        className="w-full flex flex-nowrap items-center overflow-x-auto overflow-y-hidden py-4 px-4 scrollbar-hide overscroll-x-contain"
+        className="scrollbar-hide flex w-full flex-nowrap items-center overflow-x-auto overflow-y-hidden overscroll-x-contain px-4 py-4"
       >
         {items.length === 0 && (
-          <div className="w-full py-8 text-center flex flex-col items-center justify-center pointer-events-none">
+          <div className="pointer-events-none flex w-full flex-col items-center justify-center py-8 text-center">
             <p className="text-sm text-slate-500 dark:text-gray-400">No images yet.</p>
-            <p className="text-xs text-slate-400 dark:text-gray-500 mt-1">Click "Add Image" or drag & drop files here.</p>
+            <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
+              Click "Add Image" or drag & drop files here.
+            </p>
           </div>
         )}
 
-        <Reorder.Group 
-          axis="x" 
-          values={items} 
+        <Reorder.Group
+          axis="x"
+          values={items}
           onReorder={handleReorder}
-          className="flex items-center gap-4 w-max" 
+          className="flex w-max items-center gap-4"
+          layoutScroll
         >
-          {items.map((fileReference, index) => (
+          {items.map((fileReference) => (
             <GalleryThumbnail
               key={fileReference.id}
               file={fileReference}
-              index={index}
               isActive={activeFileId === fileReference.id}
-              onClick={() => setActiveFile(fileReference.id)}
-              onDragStart={() => setDraggedItemId(fileReference.id)}
-              onDragEnd={handleDragEnd}
+              onClick={handleThumbnailClick}
+              onDragStart={handleThumbnailDragStart}
+              onDragEnd={handleThumbnailDragEnd}
             />
           ))}
         </Reorder.Group>
 
-        {items.length > 0 && <div className="w-8 shrink-0 h-24 pointer-events-none" />}
-      </motion.div>
+        {items.length > 0 && <div className="pointer-events-none h-24 w-8 shrink-0" />}
+      </div>
     </section>
   );
 };
