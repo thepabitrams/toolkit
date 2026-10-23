@@ -1,5 +1,6 @@
 import { ToolGridItem } from './ToolGridItem';
 import { Grid } from '@/core/components/ui/Grid';
+import { Card } from '@/core/components/ui';
 import type { ToolConfig } from '@/config/tools';
 
 interface ToolGridProps {
@@ -13,12 +14,12 @@ interface ToolGridProps {
 
 function ToolGridSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xs border border-gray-200/50 dark:border-gray-800/50 animate-pulse w-full max-w-70 mx-auto">
+    <Card className="p-6 animate-pulse w-full max-w-70 mx-auto">
       <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 ml-auto mb-4" />
       <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-1" />
       <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-1" />
       <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
-    </div>
+    </Card>
   );
 }
 

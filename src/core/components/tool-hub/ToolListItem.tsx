@@ -1,11 +1,8 @@
 import { memo, useRef, useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { useToolStore } from './toolStore';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import type { ToolConfig } from '@/config/tools';
-import { Motion } from '@/core/motion/motion';
-import { toolCardListMotion } from '@/core/motion/compositions/toolCardMotion';
-import { marqueeSwing } from '@/core/motion/presets/marqueeSwing';
-import { injectKeyframes } from '@/core/motion/core/injection/keyframes';
 
 interface ToolListItemProps {
   tool: ToolConfig;
@@ -39,20 +36,13 @@ export const ToolListItem = memo(function ToolListItem({
     toggleFavorite(tool.slug);
   };
 
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const [isTitleOverflowing, setIsTitleOverflowing] = useState(false);
-  const hasInjectedKeyframes = useRef(false);
-
-  useEffect(() => {
-    if (!hasInjectedKeyframes.current) {
-      injectKeyframes(marqueeSwing.name, marqueeSwing.keyframes);
-      hasInjectedKeyframes.current = true;
-    }
-  }, []);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const [overflowDistance, setOverflowDistance] = useState(0);
 
   useEffect(() => {
     if (titleRef.current) {
-      setIsTitleOverflowing(titleRef.current.scrollWidth > titleRef.current.clientWidth);
+      const maxScroll = titleRef.current.scrollWidth - titleRef.current.clientWidth;
+      setOverflowDistance(maxScroll > 0 ? maxScroll : 0);
     }
   }, [tool.displayName]);
 
@@ -62,29 +52,24 @@ export const ToolListItem = memo(function ToolListItem({
     : "hover:bg-gray-50 dark:hover:bg-gray-800/50";
 
   return (
-    <Motion
-      preset={toolCardListMotion}
-      as="div"
+    <div
       className={`${baseClasses} ${activeClasses} ${isLoading ? 'opacity-50 cursor-wait' : ''}`}
       onClick={handleToolClick}
       onMouseEnter={() => onToolHover?.(tool.slug)}
     >
       <div className="flex-1 min-w-0 overflow-hidden">
-        {isTitleOverflowing ? (
-          <div
-            className={`text-sm font-medium whitespace-nowrap inline-block ${isTopActive ? 'text-blue-700 dark:text-blue-300' : 'text-gray-800 dark:text-gray-200'}`}
-            style={{ animation: 'marquee-swing 4s ease-in-out infinite' }}
-          >
-            {tool.displayName}
-          </div>
-        ) : (
-          <div
-            ref={titleRef}
-            className={`text-sm font-medium whitespace-nowrap ${isTopActive ? 'text-blue-700 dark:text-blue-300' : 'text-gray-800 dark:text-gray-200'}`}
-          >
-            {tool.displayName}
-          </div>
-        )}
+        <motion.div
+          ref={titleRef}
+          animate={overflowDistance > 0 ? { x: [0, -overflowDistance, 0] } : {}}
+          transition={
+            overflowDistance > 0 
+              ? { duration: Math.max(3, overflowDistance / 15), repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 } 
+              : {}
+          }
+          className={`text-sm font-medium whitespace-nowrap ${isTopActive ? 'text-blue-700 dark:text-blue-300' : 'text-gray-800 dark:text-gray-200'}`}
+        >
+          {tool.displayName}
+        </motion.div>
       </div>
       <button
         onClick={handleFavoriteToggle}
@@ -97,7 +82,7 @@ export const ToolListItem = memo(function ToolListItem({
           <FaRegHeart className="w-3.5 h-3.5" />
         )}
       </button>
-    </Motion>
+    </div>
   );
 });
 

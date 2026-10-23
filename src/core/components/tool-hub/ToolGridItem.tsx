@@ -1,11 +1,9 @@
 import { memo, useRef, useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { useToolStore } from './toolStore';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import type { ToolConfig } from '@/config/tools';
-import { Motion } from '@/core/motion/motion';
-import { toolCardGridMotion } from '@/core/motion/compositions/toolCardMotion';
-import { marqueeSwing } from '@/core/motion/presets/marqueeSwing';
-import { injectKeyframes } from '@/core/motion/core/injection/keyframes';
+import { Card } from '@/core/components/ui';
 
 interface ToolGridItemProps {
   tool: ToolConfig;
@@ -38,34 +36,21 @@ export const ToolGridItem = memo(function ToolGridItem({
   };
 
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const [isTitleOverflowing, setIsTitleOverflowing] = useState(false);
-  const hasInjectedKeyframes = useRef(false);
-
-  useEffect(() => {
-    if (!hasInjectedKeyframes.current) {
-      injectKeyframes(marqueeSwing.name, marqueeSwing.keyframes);
-      hasInjectedKeyframes.current = true;
-    }
-  }, []);
+  const [overflowDistance, setOverflowDistance] = useState(0);
 
   useEffect(() => {
     if (titleRef.current) {
-      setIsTitleOverflowing(titleRef.current.scrollWidth > titleRef.current.clientWidth);
+      const maxScroll = titleRef.current.scrollWidth - titleRef.current.clientWidth;
+      setOverflowDistance(maxScroll > 0 ? maxScroll : 0);
     }
   }, [tool.displayName]);
 
   return (
-    <Motion
-      preset={toolCardGridMotion}
-      as="div"
+    <Card
       className={`
         w-full max-w-70 mx-auto 
-        cursor-pointer select-none
-        bg-white dark:bg-gray-900
-        rounded-2xl 
-        border border-gray-200/50 dark:border-gray-800/50
+        cursor-pointer select-none 
         overflow-hidden
-        transition-opacity
         ${isLoading ? 'opacity-50 cursor-wait' : ''}
       `}
       onClick={handleToolClick}
@@ -85,25 +70,25 @@ export const ToolGridItem = memo(function ToolGridItem({
         </button>
 
         <div className="pr-8 overflow-hidden">
-          {isTitleOverflowing ? (
-            <div
-              className="tool-title mb-1 whitespace-nowrap inline-block"
-              style={{ animation: 'marquee-swing 4s ease-in-out infinite' }}
-            >
-              {tool.displayName}
-            </div>
-          ) : (
-            <h3 ref={titleRef} className="tool-title mb-1 whitespace-nowrap">
-              {tool.displayName}
-            </h3>
-          )}
+          <motion.div
+            ref={titleRef}
+            animate={overflowDistance > 0 ? { x: [0, -overflowDistance, 0] } : {}}
+            transition={
+              overflowDistance > 0 
+                ? { duration: Math.max(3, overflowDistance / 15), repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 } 
+                : {}
+            }
+            className="tool-title mb-1 whitespace-nowrap"
+          >
+            {tool.displayName}
+          </motion.div>
         </div>
 
         <p className="tool-description line-clamp-2">
           {tool.displayDescription}
         </p>
       </div>
-    </Motion>
+    </Card>
   );
 });
 
