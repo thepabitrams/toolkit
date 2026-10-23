@@ -3,7 +3,7 @@ import { FiZoomIn, FiZoomOut, FiRefreshCw } from "react-icons/fi";
 import { Button } from "@/core/components/ui/Button";
 import { IconButton } from "@/core/components/ui/IconButton";
 
-interface CropControlsProperties {
+interface CropControlsProps {
   currentZoom: number;
   isAtMinZoom: boolean;
   isAtMaxZoom: boolean;
@@ -13,7 +13,7 @@ interface CropControlsProperties {
   handleApplyCrop: () => void;
 }
 
-export const CropControls: React.FC<CropControlsProperties> = ({
+export const CropControls: React.FC<CropControlsProps> = ({
   currentZoom,
   isAtMinZoom,
   isAtMaxZoom,

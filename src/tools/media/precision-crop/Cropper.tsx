@@ -8,7 +8,7 @@ import type { FileReference } from '@/shared/store/file-store';
 import { loadImage, exportCanvas, prepareCanvas } from '@/shared/lib/browser';
 import { writeDpi } from '@/shared/entities/image';
 
-interface CropperProperties {
+interface CropperProps {
   fileReference: FileReference | null;
   aspectRatio: number;
   targetWidthPixels: number;
@@ -17,7 +17,7 @@ interface CropperProperties {
   handleCropConfirm: (croppedBlob: Blob, generatedFileName: string) => Promise<void>;
 }
 
-export const Cropper: React.FC<CropperProperties> = ({
+export const Cropper: React.FC<CropperProps> = ({
   fileReference,
   aspectRatio,
   targetWidthPixels,
@@ -45,7 +45,7 @@ export const Cropper: React.FC<CropperProperties> = ({
     let isComponentMounted = true;
     let objectUrlInstance: string | null = null;
 
-    const fetchImageFile = async () => {
+    const fetchImageFile = async (): Promise<void> => {
       if (!fileReference) {
         setImageObjectUrl(null);
         return;
@@ -72,11 +72,11 @@ export const Cropper: React.FC<CropperProperties> = ({
     };
   }, [fileReference, getRawFile]);
 
-  const onCropAreaComplete = useCallback((_: Area, completedCroppedAreaPixels: Area) => {
+  const onCropAreaComplete = useCallback((_: Area, completedCroppedAreaPixels: Area): void => {
     setCroppedAreaPixels(completedCroppedAreaPixels);
   }, []);
 
-  const handleCropExecution = useCallback(async () => {
+  const handleCropExecution = useCallback(async (): Promise<void> => {
     if (!fileReference || !croppedAreaPixels || !imageObjectUrl) return;
 
     try {

@@ -7,7 +7,7 @@ export type Unit = 'px' | 'mm' | 'cm' | 'inch';
 
 const SUPPORTED_UNITS: Unit[] = ['px', 'mm', 'cm', 'inch'];
 
-interface DimensionInputProperties {
+interface DimensionInputProps {
   initialWidth?: number;
   initialHeight?: number;
   onSizeChange?: (
@@ -30,7 +30,7 @@ const convertToPixels = (value: number, fromUnit: Unit, dpiValue: number): numbe
   }
 };
 
-export const DimensionInput: React.FC<DimensionInputProperties> = ({
+export const DimensionInput: React.FC<DimensionInputProps> = ({
   initialWidth = 1,
   initialHeight = 1,
   onSizeChange,
@@ -41,7 +41,7 @@ export const DimensionInput: React.FC<DimensionInputProperties> = ({
   const [dpiValue, setDpiValue] = useState(96);
 
   const notifySizeChange = useCallback(
-    (currentRawWidth: number, currentRawHeight: number, currentUnit: Unit, currentDpi: number) => {
+    (currentRawWidth: number, currentRawHeight: number, currentUnit: Unit, currentDpi: number): void => {
       if (!onSizeChange) return;
       const calculatedWidthPx = convertToPixels(currentRawWidth, currentUnit, currentDpi);
       const calculatedHeightPx = convertToPixels(currentRawHeight, currentUnit, currentDpi);
@@ -50,12 +50,12 @@ export const DimensionInput: React.FC<DimensionInputProperties> = ({
     [onSizeChange]
   );
 
-  const handleUnitChange = (newUnit: Unit) => {
+  const handleUnitChange = (newUnit: Unit): void => {
     setSelectedUnit(newUnit);
     notifySizeChange(rawWidthValue, rawHeightValue, newUnit, dpiValue);
   };
 
-  const handleWidthChange = (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWidthChange = (changeEvent: React.ChangeEvent<HTMLInputElement>): void => {
     const numericValue = parseFloat(changeEvent.target.value);
     if (changeEvent.target.value === '' || isNaN(numericValue)) return;
     if (numericValue <= 0) {
@@ -68,7 +68,7 @@ export const DimensionInput: React.FC<DimensionInputProperties> = ({
     notifySizeChange(numericValue, rawHeightValue, selectedUnit, dpiValue);
   };
 
-  const handleHeightChange = (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHeightChange = (changeEvent: React.ChangeEvent<HTMLInputElement>): void => {
     const numericValue = parseFloat(changeEvent.target.value);
     if (changeEvent.target.value === '' || isNaN(numericValue)) return;
     if (numericValue <= 0) {
@@ -81,7 +81,7 @@ export const DimensionInput: React.FC<DimensionInputProperties> = ({
     notifySizeChange(rawWidthValue, numericValue, selectedUnit, dpiValue);
   };
 
-  const handleDpiChange = (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDpiChange = (changeEvent: React.ChangeEvent<HTMLInputElement>): void => {
     const numericValue = parseInt(changeEvent.target.value, 10);
     if (!isNaN(numericValue) && numericValue > 0) {
       setDpiValue(numericValue);
@@ -89,7 +89,7 @@ export const DimensionInput: React.FC<DimensionInputProperties> = ({
     }
   };
 
-  const handleFocus = (focusEvent: React.FocusEvent<HTMLInputElement>) => focusEvent.target.select();
+  const handleFocus = (focusEvent: React.FocusEvent<HTMLInputElement>): void => focusEvent.target.select();
 
   return (
     <div className="flex flex-col h-full w-full p-4">
