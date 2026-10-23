@@ -19,35 +19,35 @@ export const GalleryThumbnail: React.FC<GalleryThumbnailProperties> = ({
   onClick, 
   onDragStart, 
   onDragEnd, 
-}) => {
+}): React.JSX.Element => {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const { getRawFile, deleteFile } = useFileStore();
   
   const dragControls = useDragControls();
 
   useEffect(() => {
-    let isMounted = true;
-    let objectUrl: string | null = null;
+    let isComponentMounted = true;
+    let objectUrlInstance: string | null = null;
 
-    const loadThumbnail = async () => {
+    const loadThumbnail = async (): Promise<void> => {
       const rawFile = await getRawFile(file.storageKey);
-      if (rawFile && isMounted) {
-        objectUrl = URL.createObjectURL(rawFile);
-        setThumbnailUrl(objectUrl);
+      if (rawFile && isComponentMounted) {
+        objectUrlInstance = URL.createObjectURL(rawFile);
+        setThumbnailUrl(objectUrlInstance);
       }
     };
 
     loadThumbnail();
 
     return () => {
-      isMounted = false;
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
+      isComponentMounted = false;
+      if (objectUrlInstance) {
+        URL.revokeObjectURL(objectUrlInstance);
       }
     };
   }, [file.storageKey, getRawFile]);
 
-  const handleDelete = (event: React.MouseEvent) => {
+  const handleDelete = (event: React.MouseEvent): void => {
     event.stopPropagation();
     const userConfirmed = window.confirm(`Delete ${file.name}? This will also delete any processed images.`);
     if (userConfirmed) {
@@ -60,7 +60,7 @@ export const GalleryThumbnail: React.FC<GalleryThumbnailProperties> = ({
       value={file}
       dragListener={false} 
       dragControls={dragControls}
-      layout // <--- 'layout' makes the other items slide out of the way smoothly
+      layout
       onClick={onClick}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
@@ -73,9 +73,9 @@ export const GalleryThumbnail: React.FC<GalleryThumbnailProperties> = ({
       `}
     >
       <div
-        onPointerDown={(e) => {
-          e.preventDefault(); 
-          dragControls.start(e);
+        onPointerDown={(event) => {
+          event.preventDefault(); 
+          dragControls.start(event);
         }}
         style={{ touchAction: 'none' }} 
         className="absolute inset-0 z-10 cursor-grab active:cursor-grabbing"

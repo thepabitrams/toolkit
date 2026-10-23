@@ -21,7 +21,7 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
   acceptedMimeTypes,
   isUploading,
   handleFileUpload,
-}) => {
+}): React.JSX.Element => {
   const { setActiveFile, reorderBucket } = useFileStore();
   
   const [items, setItems] = useState<FileReference[]>(files);
@@ -31,30 +31,30 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
     setItems(files);
   }, [files]);
 
-  const onDropFiles = useCallback((droppedFiles: File[]) => {
+  const handleDropFiles = useCallback((droppedFiles: File[]): void => {
     handleFileUpload(droppedFiles);
   }, [handleFileUpload]);
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
-    onDrop: onDropFiles,
+    onDrop: handleDropFiles,
     accept: acceptedMimeTypes,
     maxFiles: undefined,
     disabled: isUploading,
     noClick: true,
   });
 
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.currentTarget.scrollLeft += e.deltaY;
+  const handleMouseWheel = (event: React.WheelEvent<HTMLDivElement>): void => {
+    event.currentTarget.scrollLeft += event.deltaY;
   };
 
-  const handleReorder = (newOrder: FileReference[]) => {
+  const handleReorder = (newOrder: FileReference[]): void => {
     setItems(newOrder);
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (): void => {
     if (draggedItemId) {
-      const oldIndex = files.findIndex(f => f.id === draggedItemId);
-      const newIndex = items.findIndex(f => f.id === draggedItemId);
+      const oldIndex = files.findIndex((fileReference) => fileReference.id === draggedItemId);
+      const newIndex = items.findIndex((fileReference) => fileReference.id === draggedItemId);
       
       if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
         reorderBucket('original', oldIndex, newIndex);
@@ -67,7 +67,7 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
     <section 
       {...getRootProps()}
       className={`
-        relative bg-white/60 dark:bg-gray-900/60 border border-slate-200/80 dark:border-gray-800 rounded-2xl shadow-sm flex flex-col
+        relative bg-white/60 dark:bg-gray-900/60 border border-slate-200/80 dark:border-gray-800 rounded-2xl shadow-sm flex flex-col overflow-hidden
         ${isDragActive ? 'ring-2 ring-blue-500/50 bg-blue-50/20 dark:bg-blue-900/10' : ''}
       `}
     >
@@ -96,15 +96,10 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
         </Button>
       </div>
 
-      {/* 
-        The magic is here: 
-        layoutScroll allows the Reorder to auto-scroll perfectly.
-        We removed all our custom math to let Framer Motion do the heavy lifting.
-      */}
       <motion.div
         layoutScroll
-        onWheel={handleWheel}
-        className="w-full flex flex-nowrap items-center overflow-x-auto overflow-y-hidden py-6 px-6 scrollbar-hide"
+        onWheel={handleMouseWheel}
+        className="w-full flex flex-nowrap items-center overflow-x-auto overflow-y-hidden py-4 px-4 scrollbar-hide"
       >
         {items.length === 0 && (
           <div className="w-full py-8 text-center flex flex-col items-center justify-center pointer-events-none">
@@ -117,20 +112,22 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
           axis="x" 
           values={items} 
           onReorder={handleReorder}
-          className="flex items-center gap-4 w-max pr-12" 
+          className="flex items-center gap-4 w-max" 
         >
-          {items.map((file, index) => (
+          {items.map((fileReference, index) => (
             <GalleryThumbnail
-              key={file.id}
-              file={file}
+              key={fileReference.id}
+              file={fileReference}
               index={index}
-              isActive={activeFileId === file.id}
-              onClick={() => setActiveFile(file.id)}
-              onDragStart={() => setDraggedItemId(file.id)}
+              isActive={activeFileId === fileReference.id}
+              onClick={() => setActiveFile(fileReference.id)}
+              onDragStart={() => setDraggedItemId(fileReference.id)}
               onDragEnd={handleDragEnd}
             />
           ))}
         </Reorder.Group>
+
+        {items.length > 0 && <div className="w-8 shrink-0 h-24 pointer-events-none" />}
       </motion.div>
     </section>
   );
