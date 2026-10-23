@@ -141,7 +141,6 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           animate="visible"
           className="-mx-4 sm:mx-0 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start"
         >
-          {/* 🚨 FIXED: Removed sticky and the extra wrapper div */}
           <motion.div 
             variants={cardSpringItem}
             className="lg:col-span-4 w-full"
@@ -159,7 +158,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
             variants={cardSpringItem}
             className="lg:col-span-8 w-full"
           >
-            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900 overflow-hidden">
               <Cropper
                 fileReference={activeOriginal}
                 aspectRatio={aspectRatio}
@@ -181,7 +180,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           className="-mx-4 sm:mx-0 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 items-start"
         >
           <motion.div variants={cardSpringItem} className="col-span-1 w-full">
-            <Card className="w-full h-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900 flex flex-col">
+            <Card className="w-full h-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
               <FileCard
                 fileReference={activeProcessed}
                 displayVariant="process"
@@ -190,7 +189,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           </motion.div>
 
           <motion.div variants={cardSpringItem} className="col-span-1 w-full">
-            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900 overflow-hidden">
               <ExportPanel
                 fileReference={activeProcessed}
                 actionVariant="single"
