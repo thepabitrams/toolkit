@@ -1,7 +1,7 @@
-// src/shared/store/file-store/types.ts
 export interface FileReference {
   id: string;
   toolId: string;
+  bucket: string;
   name: string;
   storageKey: string;
   size: number;
@@ -11,21 +11,20 @@ export interface FileReference {
 }
 
 export interface FileStore {
-  original: FileReference[];
-  process: FileReference[];
+  fileDetailMap: Record<string, FileReference>;
+  bucketIndex: Record<string, Record<string, string[]>>;
+  activeFileId: string | null;
 
-  init: () => Promise<void>;
-  upload: (files: File[]) => Promise<void>;
-  save: (files: File[], parentId?: string) => Promise<void>;
-  get: (name: string) => FileReference | undefined;
-  list: (type: 'original' | 'process') => FileReference[];
-  read: (name: string) => Promise<Blob | null>;
-  readRawFile: (storageKey: string) => Promise<File | null>;
-  remove: (name: string) => Promise<void>;
-  clear: () => Promise<void>;
-  promote: (fileName?: string, targetToolId?: string) => Promise<void>;
-  findChildFiles: (parentId: string) => FileReference[];
-  cleanupStorage: () => Promise<void>;
+  upload: (files: File[], bucketName?: string, specificIndex?: number) => Promise<void>;
+  save: (files: File[], bucketName?: string, parentId?: string, specificIndex?: number) => Promise<void>;
+  selectAll: (bucketName: string) => FileReference[];
+  getFile: (bucketName: string, identifier: string | number) => FileReference | undefined;
+  getRawFile: (storageKey: string) => Promise<File | null>;
+  deleteFile: (bucketName: string, identifier: string | number) => Promise<void>;
+  deleteBucket: (bucketName: string) => Promise<void>;
+  deleteTool: () => Promise<void>;
+  moveToTool: (fileName?: string, targetToolId?: string) => Promise<void>;
+  setActiveFile: (id: string | null) => void;
 }
 
 export type StoreSet = (partial: FileStore | Partial<FileStore> | ((state: FileStore) => FileStore | Partial<FileStore>)) => void;
