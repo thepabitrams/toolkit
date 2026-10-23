@@ -12,12 +12,12 @@ import { zoomIn } from '@/core/motion/presets/zoomIn';
 import { Card } from '@/core/components/ui/Card';
 import type { Unit } from './DimensionInput';
 
-interface PrecisionCropProperties {
+interface PrecisionCropProps {
   category: string;
   toolId: string;
 }
 
-export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.Element {
+export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element {
   const { 
     upload, 
     save, 
@@ -33,9 +33,8 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
   const MASTER_BUCKET = 'original';
 
   const originals = selectAll(MASTER_BUCKET);
-  const activeOriginal = originals.find((f) => f.id === activeFileId) || originals[0] || null;
+  const activeOriginal = originals.find((file) => file.id === activeFileId) || originals[0] || null;
 
-  // 🚨 THE MAGIC: Create locker name based on the image name (e.g., image1 -> locker1)
   const activeLocker = activeOriginal ? activeOriginal.name.replace('image', 'locker') : '';
   const activeProcessed = activeOriginal ? selectAll(activeLocker)[0] || null : null;
 
@@ -45,7 +44,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     }
   }, [activeFileId, originals, setActiveFile]);
 
-  const [config, setConfig] = useState({
+  const [cropConfig, setCropConfig] = useState({
     rawWidth: 1,
     rawHeight: 1,
     unit: 'px' as Unit,
@@ -54,7 +53,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     heightPixels: 1,
   });
 
-  const onFileUpload = useCallback(async (files: File[]) => {
+  const onFileUpload = useCallback(async (files: File[]): Promise<void> => {
     setIsProcessing(true);
     try {
       await upload(files, MASTER_BUCKET, undefined, 'image');
@@ -65,16 +64,13 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     }
   }, [upload]);
 
-  const onCropConfirm = useCallback(async (blob: Blob, fileName: string) => {
+  const onCropConfirm = useCallback(async (blob: Blob, fileName: string): Promise<void> => {
     if (!activeOriginal) return;
     
     setIsProcessing(true);
     try {
       const file = new File([blob], fileName, { type: blob.type });
-      
-      // Save to the isolated locker at index 0, named 'process1'
       await save([file], activeLocker, activeOriginal.id, 0, 'process1');
-      
     } catch (error) {
       console.warn('Save failed:', error);
     } finally {
@@ -82,26 +78,22 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     }
   }, [save, activeOriginal, activeLocker]);
 
-  const onClearAll = async () => {
+  const onClearAll = useCallback(async (): Promise<void> => {
     await deleteBucket(MASTER_BUCKET);
     
-    // Clean up all the custom lockers
     originals.forEach((original) => {
       const lockerName = original.name.replace('image', 'locker');
       deleteBucket(lockerName);
     });
     
     setActiveFile(null);
-  };
+  }, [deleteBucket, originals, setActiveFile]);
 
-  const onToolSelect = useCallback(
-    async (targetSlug: string) => {
-      if (!targetSlug || !activeProcessed) return;
-      await moveToTool(activeProcessed.name, targetSlug);
-      window.location.href = `/${targetSlug}`;
-    },
-    [moveToTool, activeProcessed]
-  );
+  const onToolSelect = useCallback(async (targetSlug: string): Promise<void> => {
+    if (!targetSlug || !activeProcessed) return;
+    await moveToTool(activeProcessed.name, targetSlug);
+    window.location.href = `/${targetSlug}`;
+  }, [moveToTool, activeProcessed]);
 
   const onDimensionChange = (
     widthPixels: number,
@@ -110,8 +102,8 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     rawHeight: number,
     unit: Unit,
     dpi: number
-  ) => {
-    setConfig({
+  ): void => {
+    setCropConfig({
       rawWidth,
       rawHeight,
       unit,
@@ -121,13 +113,12 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     });
   };
 
-  const aspectRatio = config.widthPixels / config.heightPixels;
+  const aspectRatio = cropConfig.widthPixels / cropConfig.heightPixels;
   const hasOriginal = !!activeOriginal;
   const hasProcessed = !!activeProcessed;
 
   return (
     <div className="w-full max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
-      
       <GalleryUploader
         files={originals}
         activeFileId={activeFileId}
@@ -139,7 +130,6 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
       {hasOriginal && (
         <Stagger delay={100}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-            
             <Motion
               preset={zoomIn}
               as="div"
@@ -149,8 +139,8 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
             >
               <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
                 <DimensionInput
-                  initialWidth={config.rawWidth}
-                  initialHeight={config.rawHeight}
+                  initialWidth={cropConfig.rawWidth}
+                  initialHeight={cropConfig.rawHeight}
                   onSizeChange={onDimensionChange}
                 />
               </Card>
@@ -167,14 +157,13 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
                 <Cropper
                   fileReference={activeOriginal}
                   aspectRatio={aspectRatio}
-                  targetWidthPixels={config.widthPixels}
-                  targetHeightPixels={config.heightPixels}
-                  inputDpi={config.dpi}
+                  targetWidthPixels={cropConfig.widthPixels}
+                  targetHeightPixels={cropConfig.heightPixels}
+                  inputDpi={cropConfig.dpi}
                   handleCropConfirm={onCropConfirm}
                 />
               </Card>
             </Motion>
-
           </div>
         </Stagger>
       )}
@@ -182,7 +171,6 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
       {hasProcessed && (
         <Stagger delay={100}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 items-start">
-            
             <Motion
               preset={zoomIn}
               as="div"
@@ -209,14 +197,13 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
                 <ExportPanel
                   fileReference={activeProcessed}
                   actionVariant="single"
-                  defaultFileName={`${config.rawWidth}x${config.rawHeight}`}
+                  defaultFileName={`${cropConfig.rawWidth}x${cropConfig.rawHeight}`}
                   handleClearFiles={onClearAll}
                   currentToolSlug={toolId}
                   handleToolSelection={onToolSelect}
                 />
               </Card>
             </Motion>
-
           </div>
         </Stagger>
       )}
