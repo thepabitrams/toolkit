@@ -1,0 +1,70 @@
+---
+import { Card, AccordionCard } from '@/core/components/ui';
+---
+
+<div class="flex flex-col gap-2">
+  
+  <!-- 1. HOW IT WORKS (Action First) -->
+  <AccordionCard title="How to use this tool" defaultOpen={true} client:load>
+    <div class="flex flex-col gap-4 mt-2">
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">1</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Upload Images</h4>
+          <p class="text-slate-500 text-sm">Click the "+" button in the toolbar to select images from your device.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">2</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Select & Crop</h4>
+          <p class="text-slate-500 text-sm">Click a thumbnail to load it. Drag the corners to select your exact crop area.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">3</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Download</h4>
+          <p class="text-slate-500 text-sm">Click the save button to download your perfectly cropped, high-res image.</p>
+        </div>
+      </div>
+    </div>
+  </AccordionCard>
+
+  <!-- 2. PROJECT OVERVIEW -->
+  <AccordionCard title="Project Overview" client:load>
+    <p class="mb-4">
+      Precision Crop is a fully client-side image manipulation tool. It allows you to crop JPG, PNG, and WebP images with exact pixel dimensions, completely bypassing the need for server uploads. 
+    </p>
+    <p>
+      Because everything runs locally in your browser, it operates at native speeds and guarantees 100% privacy. Your images never leave your device.
+    </p>
+  </AccordionCard>
+
+  <!-- 3. WHY THIS TOOL EXISTS -->
+  <AccordionCard title="Why this tool exists" client:load>
+    <p class="mb-4">
+      Most online image croppers require you to upload your files to a server, process them, and download them back. This is slow, costly, and a massive privacy risk.
+    </p>
+    <p>
+      I built Precision Crop because I needed a way to crop images for web development and print without worrying about data leaks or compression artifacts. By leveraging modern browser APIs, we can do everything locally.
+    </p>
+  </AccordionCard>
+
+  <!-- 4. ARCHITECTURE -->
+  <AccordionCard title="Under the hood (Architecture)" client:load>
+    <p class="mb-4">
+      This tool is built using an incredibly modern, lightweight stack designed for maximum performance:
+    </p>
+    <ul class="list-disc pl-5 space-y-2 mb-4 text-sm">
+      <li><strong class="text-slate-900 dark:text-white">Framework:</strong> Astro & React (Hydrated only where necessary).</li>
+      <li><strong class="text-slate-900 dark:text-white">State Management:</strong> Zustand (for a highly optimized, normalized file store).</li>
+      <li><strong class="text-slate-900 dark:text-white">Storage:</strong> OPFS (Origin Private File System) and IndexedDB. This allows the browser to read and write multi-megabyte files directly to the hard drive without choking the RAM.</li>
+      <li><strong class="text-slate-900 dark:text-white">Image Processing:</strong> HTML5 Canvas API and WebAssembly (WASM) for EXIF data manipulation.</li>
+    </ul>
+    <p>
+      No backend. No API keys. No cloud storage bills. Just pure, local computation.
+    </p>
+  </AccordionCard>
+
+</div>

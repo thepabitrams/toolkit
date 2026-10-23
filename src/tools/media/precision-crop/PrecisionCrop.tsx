@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { useFileStore } from '@/shared/store/file-store';
 import { GalleryUploader } from '@/shared/components/uploaders';
 import { FileCard } from '@/shared/components/file-card';
@@ -6,10 +7,8 @@ import { DimensionInput } from './DimensionInput';
 import { Cropper } from './Cropper';
 import { ExportPanel } from '@/shared/components/export-panel';
 import { IMAGE_CONFIG } from '@/shared/entities/image';
-import { Motion } from '@/core/motion/motion';
-import { Stagger } from '@/core/motion/core/Stagger';
-import { zoomIn } from '@/core/motion/presets/zoomIn';
-import { Card } from '@/core/components/ui/Card';
+import { Card } from '@/core/components/ui';
+import { pageStaggerContainer, cardSpringItem } from '@/config/motion';
 import type { Unit } from './DimensionInput';
 
 interface PrecisionCropProps {
@@ -123,7 +122,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
   const hasProcessed = !!activeProcessed;
 
   return (
-    <div className="w-full max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
+    <div className="w-full max-w-[1400px] mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
       <GalleryUploader
         files={originals}
         activeFileId={activeFileId}
@@ -133,84 +132,72 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
       />
 
       {hasOriginal && (
-        <Stagger delay={100}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-            <Motion
-              preset={zoomIn}
-              as="div"
-              className="md:col-span-1 w-full"
-              delay={0}
-              style={{ opacity: 0, transform: 'scale(0.5)' }}
-            >
-              <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
-                <DimensionInput
-                  initialWidth={cropConfig.rawWidth}
-                  initialHeight={cropConfig.rawHeight}
-                  onSizeChange={onDimensionChange}
-                />
-              </Card>
-            </Motion>
+        <motion.div 
+          variants={pageStaggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start"
+        >
+          <motion.div 
+            variants={cardSpringItem}
+            className="lg:col-span-3 w-full lg:sticky lg:top-24"
+          >
+            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+              <DimensionInput
+                initialWidth={cropConfig.rawWidth}
+                initialHeight={cropConfig.rawHeight}
+                onSizeChange={onDimensionChange}
+              />
+            </Card>
+          </motion.div>
 
-            <Motion
-              preset={zoomIn}
-              as="div"
-              className="md:col-span-2 w-full"
-              delay={100}
-              style={{ opacity: 0, transform: 'scale(0.5)' }}
-            >
-              <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
-                <Cropper
-                  fileReference={activeOriginal}
-                  aspectRatio={aspectRatio}
-                  targetWidthPixels={cropConfig.widthPixels}
-                  targetHeightPixels={cropConfig.heightPixels}
-                  inputDpi={cropConfig.dpi}
-                  handleCropConfirm={onCropConfirm}
-                />
-              </Card>
-            </Motion>
-          </div>
-        </Stagger>
+          <motion.div 
+            variants={cardSpringItem}
+            className="lg:col-span-7 w-full flex justify-center"
+          >
+            <Card className="w-full max-w-xl p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+              <Cropper
+                fileReference={activeOriginal}
+                aspectRatio={aspectRatio}
+                targetWidthPixels={cropConfig.widthPixels}
+                targetHeightPixels={cropConfig.heightPixels}
+                inputDpi={cropConfig.dpi}
+                handleCropConfirm={onCropConfirm}
+              />
+            </Card>
+          </motion.div>
+        </motion.div>
       )}
 
       {hasProcessed && (
-        <Stagger delay={100}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 items-start">
-            <Motion
-              preset={zoomIn}
-              as="div"
-              className="col-span-1 w-full"
-              delay={0}
-              style={{ opacity: 0, transform: 'scale(0.5)' }}
-            >
-              <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
-                <FileCard
-                  fileReference={activeProcessed}
-                  displayVariant="process"
-                />
-              </Card>
-            </Motion>
+        <motion.div 
+          variants={pageStaggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 items-start"
+        >
+          <motion.div variants={cardSpringItem} className="col-span-1 w-full">
+            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+              <FileCard
+                fileReference={activeProcessed}
+                displayVariant="process"
+              />
+            </Card>
+          </motion.div>
 
-            <Motion
-              preset={zoomIn}
-              as="div"
-              className="col-span-1 w-full"
-              delay={100}
-              style={{ opacity: 0, transform: 'scale(0.5)' }}
-            >
-              <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
-                <ExportPanel
-                  fileReference={activeProcessed}
-                  actionVariant="single"
-                  defaultFileName={`${cropConfig.rawWidth}x${cropConfig.rawHeight}`}
-                  handleClearFiles={onClearAll}
-                  currentToolSlug={toolId}
-                  handleToolSelection={onToolSelect}
-                />
-              </Card>
-            </Motion>
-          </div>
-        </Stagger>
+          <motion.div variants={cardSpringItem} className="col-span-1 w-full">
+            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+              <ExportPanel
+                fileReference={activeProcessed}
+                actionVariant="single"
+                defaultFileName={`${cropConfig.rawWidth}x${cropConfig.rawHeight}`}
+                handleClearFiles={onClearAll}
+                currentToolSlug={toolId}
+                handleToolSelection={onToolSelect}
+              />
+            </Card>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );

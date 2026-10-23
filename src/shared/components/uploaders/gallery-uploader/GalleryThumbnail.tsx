@@ -61,6 +61,7 @@ export const GalleryThumbnail: React.FC<GalleryThumbnailProperties> = ({
       dragListener={false} 
       dragControls={dragControls}
       layout
+      dragMomentum={false}
       onClick={onClick}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
@@ -74,7 +75,6 @@ export const GalleryThumbnail: React.FC<GalleryThumbnailProperties> = ({
     >
       <div
         onPointerDown={(event) => {
-          event.preventDefault(); 
           dragControls.start(event);
         }}
         style={{ touchAction: 'none' }} 
@@ -100,8 +100,10 @@ export const GalleryThumbnail: React.FC<GalleryThumbnailProperties> = ({
         className="
           absolute -top-2 -right-2 z-30
           bg-white dark:bg-gray-800 text-slate-500 hover:text-red-500 
-          border border-slate-200 dark:border-gray-700 shadow-md rounded-full p-1
-          transition-all opacity-0 group-hover:opacity-100
+          border border-slate-200 dark:border-gray-700 rounded-full p-1
+          transition-all duration-200
+          opacity-100 md:opacity-0 md:group-hover:opacity-100
+          group-data-[dragging=true]:opacity-0 group-data-[dragging=true]:pointer-events-none
         "
         aria-label="Remove image"
       >

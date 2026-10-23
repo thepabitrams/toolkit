@@ -1,18 +1,13 @@
-// src/core/components/ui/IconButton.tsx
 import React from 'react';
-import { Motion } from '@/core/motion/motion';
-import { iconButtonMotion } from '@/core/motion/compositions/iconButtonMotion';
+import { motion, type HTMLMotionProps } from 'motion/react';
 
 export type IconButtonVariant = 'standard' | 'filled' | 'tonal' | 'outlined';
 export type IconButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
-interface IconButtonProps {
-  onClick: () => void;
+interface IconButtonProps extends Omit<HTMLMotionProps<"button">, "ref"> {
   children: React.ReactNode;
   variant?: IconButtonVariant;
   size?: IconButtonSize;
-  disabled?: boolean;
-  className?: string;
   ariaLabel: string;
 }
 
@@ -30,15 +25,15 @@ const iconSizeMap = {
   lg: 'w-6 h-6',
 };
 
-export const IconButton: React.FC<IconButtonProps> = ({
-  onClick,
+export const IconButton = ({
   children,
   variant = 'standard',
   size = 'md',
   disabled = false,
   className = '',
   ariaLabel,
-}) => {
+  ...remainingProps
+}: IconButtonProps): React.JSX.Element => {
   const variantStyles = {
     standard: `
       bg-transparent
@@ -78,11 +73,11 @@ export const IconButton: React.FC<IconButtonProps> = ({
   const iconSizeClass = iconSizeMap[size];
 
   return (
-    <Motion
-      preset={iconButtonMotion}
-      as="button"
+    <motion.button
+      whileHover={{ scale: disabled ? 1 : 1.05 }}
+      whileTap={{ scale: disabled ? 1 : 0.95 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       type="button"
-      onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
       className={`
@@ -96,10 +91,11 @@ export const IconButton: React.FC<IconButtonProps> = ({
         ${sizeClass}
         ${className}
       `}
+      {...remainingProps}
     >
       <span className={iconSizeClass}>
         {children}
       </span>
-    </Motion>
+    </motion.button>
   );
 };

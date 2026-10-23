@@ -1,7 +1,5 @@
 import { useState, useCallback } from "react";
-
-const MAXIMUM_ZOOM_LEVEL = 5;
-const ZOOM_INCREMENT_STEP = 0.1;
+import { cropperZoomConfig } from "@/config/motion";
 
 interface UsePrecisionCropReturn {
   cropPosition: { x: number; y: number };
@@ -17,23 +15,23 @@ interface UsePrecisionCropReturn {
 
 export function usePrecisionCrop(): UsePrecisionCropReturn {
   const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
-  const [zoomLevel, setZoomLevel] = useState(1);
+  const [zoomLevel, setZoomLevel] = useState(cropperZoomConfig.minimumZoomLevel);
 
   const handleZoomIn = useCallback((): void => {
-    setZoomLevel((previousZoom) => Math.min(MAXIMUM_ZOOM_LEVEL, previousZoom + ZOOM_INCREMENT_STEP));
+    setZoomLevel((previousZoom) => Math.min(cropperZoomConfig.maximumZoomLevel, previousZoom + cropperZoomConfig.zoomIncrementStep));
   }, []);
 
   const handleZoomOut = useCallback((): void => {
-    setZoomLevel((previousZoom) => Math.max(1, previousZoom - ZOOM_INCREMENT_STEP));
+    setZoomLevel((previousZoom) => Math.max(cropperZoomConfig.minimumZoomLevel, previousZoom - cropperZoomConfig.zoomIncrementStep));
   }, []);
 
   const handleReset = useCallback((): void => {
     setCropPosition({ x: 0, y: 0 });
-    setZoomLevel(1);
+    setZoomLevel(cropperZoomConfig.minimumZoomLevel);
   }, []);
 
-  const isAtMinZoom = zoomLevel <= 1;
-  const isAtMaxZoom = zoomLevel >= MAXIMUM_ZOOM_LEVEL;
+  const isAtMinZoom = zoomLevel <= cropperZoomConfig.minimumZoomLevel;
+  const isAtMaxZoom = zoomLevel >= cropperZoomConfig.maximumZoomLevel;
 
   return {
     cropPosition,

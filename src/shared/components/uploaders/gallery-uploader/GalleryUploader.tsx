@@ -99,7 +99,7 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
       <motion.div
         layoutScroll
         onWheel={handleMouseWheel}
-        className="w-full flex flex-nowrap items-center overflow-x-auto overflow-y-hidden py-4 px-4 scrollbar-hide"
+        className="w-full flex flex-nowrap items-center overflow-x-auto overflow-y-hidden py-4 px-4 scrollbar-hide overscroll-x-contain"
       >
         {items.length === 0 && (
           <div className="w-full py-8 text-center flex flex-col items-center justify-center pointer-events-none">

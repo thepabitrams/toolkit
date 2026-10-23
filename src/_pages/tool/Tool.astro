@@ -7,9 +7,10 @@ import type { ToolConfig } from '@/config/tools';
 interface Props {
   tool: ToolConfig;
   slug: string;
+  AboutComponent: any;
 }
 
-const { tool: activeToolConfig, slug: activeToolSlug } = Astro.props;
+const { tool: activeToolConfig, slug: activeToolSlug, AboutComponent } = Astro.props;
 ---
 <ToolLayout 
   title={activeToolConfig.seoTitle} 
@@ -17,14 +18,64 @@ const { tool: activeToolConfig, slug: activeToolSlug } = Astro.props;
   canonicalPath={`/${activeToolConfig.slug}`} 
   toolName={activeToolConfig.displayName}
 >
-  <div class="max-w-7xl mx-auto px-4 py-8 relative">
+  <div class="max-w-5xl mx-auto px-4 py-8 relative flex flex-col gap-6">
+    
     <ToolHero tool={activeToolConfig} />
-    <div class="w-full mt-8">
+
+    <div class="flex border-b border-slate-200 dark:border-slate-800 gap-6 mt-2">
+      <button 
+        id="tool-tab-button" 
+        class="pb-3 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 transition-colors"
+      >
+        Tool Workspace
+      </button>
+      <button 
+        id="about-tab-button" 
+        class="pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent transition-colors"
+      >
+        How to Use
+      </button>
+    </div>
+
+    <div id="tool-workspace-section" class="w-full">
       <ToolView toolSlug={activeToolSlug} client:only="react" />
     </div>
-    <section class="prose dark:prose-invert mt-16 max-w-none">
-      <h2>About {activeToolConfig.displayName}</h2>
-      <p>{activeToolConfig.seoDescription}</p>
-    </section>
+
+    <div id="about-content-section" class="hidden w-full mt-2">
+      {AboutComponent ? (
+        <AboutComponent />
+      ) : (
+        <div class="text-center py-8">
+          <p class="text-slate-500 text-sm">No instructions provided for this tool yet.</p>
+        </div>
+      )}
+    </div>
+
   </div>
+
+  <script>
+    const toolTabButton = document.getElementById('tool-tab-button');
+    const aboutTabButton = document.getElementById('about-tab-button');
+    const toolWorkspaceSection = document.getElementById('tool-workspace-section');
+    const aboutContentSection = document.getElementById('about-content-section');
+
+    if (toolTabButton && aboutTabButton && toolWorkspaceSection && aboutContentSection) {
+      const activeTabClasses = "pb-3 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 transition-colors";
+      const inactiveTabClasses = "pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent transition-colors";
+
+      toolTabButton.addEventListener('click', () => {
+        toolWorkspaceSection.classList.remove('hidden');
+        aboutContentSection.classList.add('hidden');
+        toolTabButton.className = activeTabClasses;
+        aboutTabButton.className = inactiveTabClasses;
+      });
+
+      aboutTabButton.addEventListener('click', () => {
+        aboutContentSection.classList.remove('hidden');
+        toolWorkspaceSection.classList.add('hidden');
+        aboutTabButton.className = activeTabClasses;
+        toolTabButton.className = inactiveTabClasses;
+      });
+    }
+  </script>
 </ToolLayout>

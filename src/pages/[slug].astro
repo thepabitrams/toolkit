@@ -12,5 +12,13 @@ const tool = getTool(slug as string);
 if (!tool) {
   return Astro.redirect('/404');
 }
+
+let ToolAboutComponent = null;
+try {
+  const aboutModule = await import(`../tools/${tool.category}/${slug}/About.astro`);
+  ToolAboutComponent = aboutModule.default;
+} catch {
+  ToolAboutComponent = null; 
+}
 ---
-<Tool tool={tool} slug={slug as string} />
+<Tool tool={tool} slug={slug as string} AboutComponent={ToolAboutComponent} />
