@@ -8,6 +8,7 @@ export const handleInsert = async (
   bucketName: string, 
   specificIndex: number | undefined, 
   parentId: string | undefined,
+  customName: string | undefined,
   set: StoreSet, 
   get: StoreGet
 ) => {
@@ -19,15 +20,19 @@ export const handleInsert = async (
   const newFileReferences: FileReference[] = [];
   const idsToDelete: string[] = [];
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+  for (let index = 0; index < files.length; index++) {
+    const file = files[index];
     const fileId = crypto.randomUUID();
     const storageKey = `${bucketName}-${fileId}`;
     
     await write(storageKey, await file.arrayBuffer());
 
-    const targetIndex = specificIndex !== undefined ? specificIndex + i : currentBucketIds.length + i;
-    const displayName = `${bucketName}${targetIndex}`;
+    const targetIndex = specificIndex !== undefined ? specificIndex + index : currentBucketIds.length + index;
+    
+    let displayName = `${bucketName}${targetIndex + 1}`;
+    if (customName) {
+      displayName = files.length > 1 ? `${customName}${index + 1}` : customName;
+    }
 
     if (currentBucketIds[targetIndex]) {
       idsToDelete.push(currentBucketIds[targetIndex]);
@@ -58,7 +63,7 @@ export const handleInsert = async (
 
   set((state) => {
     const nextDetailMap = { ...state.fileDetailMap };
-    newFileReferences.forEach((ref) => { nextDetailMap[ref.id] = ref; });
+    newFileReferences.forEach((reference) => { nextDetailMap[reference.id] = reference; });
     idsToDelete.forEach((id) => { delete nextDetailMap[id]; });
 
     return {
@@ -67,7 +72,7 @@ export const handleInsert = async (
         ...state.bucketIndex,
         [activeToolId]: {
           ...toolBuckets,
-          [bucketName]: currentBucketIds.filter(id => id !== undefined),
+          [bucketName]: currentBucketIds.filter((id) => id !== undefined),
         },
       },
     };

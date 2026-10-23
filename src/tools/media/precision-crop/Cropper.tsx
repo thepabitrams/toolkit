@@ -4,7 +4,6 @@ import type { Area } from "react-easy-crop";
 import { usePrecisionCrop } from "./usePrecisionCrop";
 import { CropControls } from "./Controls";
 import { useFileStore } from '@/shared/store/file-store';
-import { Card } from '@/core/components/ui/Card';
 import type { FileReference } from '@/shared/store/file-store';
 import { loadImage, exportCanvas, prepareCanvas } from '@/shared/lib/browser';
 import { writeDpi } from '@/shared/entities/image';
@@ -16,10 +15,6 @@ interface CropperProperties {
   targetHeightPixels: number;
   inputDpi?: number;
   handleCropConfirm: (croppedBlob: Blob, generatedFileName: string) => Promise<void>;
-  className?: string;
-  minWidth?: number;
-  minHeight?: number;
-  padding?: number;
 }
 
 export const Cropper: React.FC<CropperProperties> = ({
@@ -29,11 +24,7 @@ export const Cropper: React.FC<CropperProperties> = ({
   targetHeightPixels,
   inputDpi = 96,
   handleCropConfirm,
-  className = '',
-  minWidth = 0,
-  minHeight = 0,
-  padding = 0,
-}) => {
+}): React.JSX.Element => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [imageObjectUrl, setImageObjectUrl] = useState<string | null>(null);
   const { getRawFile } = useFileStore();
@@ -141,71 +132,65 @@ export const Cropper: React.FC<CropperProperties> = ({
 
   if (!fileReference) {
     return (
-      <div style={{ minWidth, minHeight, padding }} className={`flex-1 ${className}`}>
-        <Card className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px] border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-slate-50/30 dark:bg-gray-900/50">
-          <div className="w-full h-full flex flex-col items-center justify-center bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiNlNWU3ZWIiLz48L3N2Zz4=')] bg-slate-50/30">
-            <p className="text-slate-400 text-sm">Select an image to begin</p>
-          </div>
-        </Card>
+      <div className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px] bg-slate-50/30 dark:bg-gray-900/50">
+        <div className="w-full h-full flex flex-col items-center justify-center bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiNlNWU3ZWIiLz48L3N2Zz4=')] bg-slate-50/30">
+          <p className="text-slate-400 text-sm">Select an image to begin</p>
+        </div>
       </div>
     );
   }
 
   if (!imageObjectUrl) {
     return (
-      <div style={{ minWidth, minHeight, padding }} className={`flex-1 ${className}`}>
-        <Card className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px] border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm">
-           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        </Card>
+      <div className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px]">
+         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div style={{ minWidth, minHeight, padding }} className={`flex-1 ${className}`}>
-      <Card className="w-full flex-1 overflow-hidden p-0 rounded-3xl border border-slate-200/80 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900">
-        <div
-          className="relative w-full h-[400px] md:h-[500px] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiNlNWU3ZWIiLz48L3N2Zz4=')] bg-slate-50/30 dark:bg-slate-800/20"
-          style={{ touchAction: 'none' }}
-        >
-          <ReactEasyCrop
-            image={imageObjectUrl}
-            crop={cropPosition}
-            zoom={zoomLevel}
-            rotation={0}
-            aspect={aspectRatio}
-            minZoom={1}
-            maxZoom={5}
-            restrictPosition={true}
-            zoomWithScroll={true}
-            onCropChange={setCropPosition}
-            onZoomChange={setZoomLevel}
-            onCropComplete={onCropAreaComplete}
-            style={{
-              containerStyle: { width: "100%", height: "100%", position: "relative" },
-              cropAreaStyle: {
-                border: "2px solid rgba(59, 130, 246, 0.8)",
-                borderRadius: "8px",
-                boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
-              },
-              mediaStyle: {
-                transition: "transform 0.15s ease-out",
-                willChange: "transform",
-              },
-            }}
-          />
-        </div>
-
-        <CropControls
-          currentZoom={zoomLevel}
-          isAtMinZoom={isAtMinZoom}
-          isAtMaxZoom={isAtMaxZoom}
-          handleZoomIn={handleZoomIn}
-          handleZoomOut={handleZoomOut}
-          handleReset={handleReset}
-          handleApplyCrop={handleCropExecution}
+    <div className="w-full h-full flex flex-col">
+      <div
+        className="relative w-full h-[400px] md:h-[500px] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiNlNWU3ZWIiLz48L3N2Zz4=')] bg-slate-50/30 dark:bg-slate-800/20"
+        style={{ touchAction: 'none' }}
+      >
+        <ReactEasyCrop
+          image={imageObjectUrl}
+          crop={cropPosition}
+          zoom={zoomLevel}
+          rotation={0}
+          aspect={aspectRatio}
+          minZoom={1}
+          maxZoom={5}
+          restrictPosition={true}
+          zoomWithScroll={true}
+          onCropChange={setCropPosition}
+          onZoomChange={setZoomLevel}
+          onCropComplete={onCropAreaComplete}
+          style={{
+            containerStyle: { width: "100%", height: "100%", position: "relative" },
+            cropAreaStyle: {
+              border: "2px solid rgba(59, 130, 246, 0.8)",
+              borderRadius: "8px",
+              boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
+            },
+            mediaStyle: {
+              transition: "transform 0.15s ease-out",
+              willChange: "transform",
+            },
+          }}
         />
-      </Card>
+      </div>
+
+      <CropControls
+        currentZoom={zoomLevel}
+        isAtMinZoom={isAtMinZoom}
+        isAtMaxZoom={isAtMaxZoom}
+        handleZoomIn={handleZoomIn}
+        handleZoomOut={handleZoomOut}
+        handleReset={handleReset}
+        handleApplyCrop={handleCropExecution}
+      />
     </div>
   );
 };

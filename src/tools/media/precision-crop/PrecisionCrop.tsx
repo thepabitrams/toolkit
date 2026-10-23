@@ -9,7 +9,7 @@ import { IMAGE_CONFIG } from '@/shared/entities/image';
 import { Motion } from '@/core/motion/motion';
 import { Stagger } from '@/core/motion/core/Stagger';
 import { zoomIn } from '@/core/motion/presets/zoomIn';
-import { Grid } from '@/core/components/ui/Grid';
+import { Card } from '@/core/components/ui/Card';
 import type { Unit } from './DimensionInput';
 
 interface PrecisionCropProperties {
@@ -28,24 +28,24 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     setActiveFile
   } = useFileStore();
   
-  const [isProcessingImage, setIsProcessingImage] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const originalFiles = selectAll('original');
-  const processedFiles = selectAll('process');
+  const MASTER_BUCKET = 'original';
 
-  const activeOriginalFile = originalFiles.find((f) => f.id === activeFileId) || originalFiles[0] || null;
+  const originals = selectAll(MASTER_BUCKET);
+  const activeOriginal = originals.find((f) => f.id === activeFileId) || originals[0] || null;
 
-  const latestProcessedFile = processedFiles.length > 0 
-    ? processedFiles[processedFiles.length - 1] 
-    : null;
+  // 🚨 THE MAGIC: Create locker name based on the image name (e.g., image1 -> locker1)
+  const activeLocker = activeOriginal ? activeOriginal.name.replace('image', 'locker') : '';
+  const activeProcessed = activeOriginal ? selectAll(activeLocker)[0] || null : null;
 
   useEffect(() => {
-    if (!activeFileId && originalFiles.length > 0) {
-      setActiveFile(originalFiles[0].id);
+    if (!activeFileId && originals.length > 0) {
+      setActiveFile(originals[0].id);
     }
-  }, [activeFileId, originalFiles, setActiveFile]);
+  }, [activeFileId, originals, setActiveFile]);
 
-  const [cropConfiguration, setCropConfiguration] = useState({
+  const [config, setConfig] = useState({
     rawWidth: 1,
     rawHeight: 1,
     unit: 'px' as Unit,
@@ -54,47 +54,56 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     heightPixels: 1,
   });
 
-  const handleFileUpload = useCallback(async (selectedFiles: File[]) => {
-    setIsProcessingImage(true);
+  const onFileUpload = useCallback(async (files: File[]) => {
+    setIsProcessing(true);
     try {
-      await upload(selectedFiles, 'original');
+      await upload(files, MASTER_BUCKET, undefined, 'image');
     } catch (error) {
       console.warn('Upload failed:', error);
     } finally {
-      setIsProcessingImage(false);
+      setIsProcessing(false);
     }
   }, [upload]);
 
-  const handleCropConfirm = useCallback(async (croppedBlob: Blob, generatedFileName: string) => {
-    if (!activeOriginalFile) return;
+  const onCropConfirm = useCallback(async (blob: Blob, fileName: string) => {
+    if (!activeOriginal) return;
     
-    setIsProcessingImage(true);
+    setIsProcessing(true);
     try {
-      const processedFileObject = new File([croppedBlob], generatedFileName, { type: croppedBlob.type });
-      await save([processedFileObject], 'process', activeOriginalFile.id);
+      const file = new File([blob], fileName, { type: blob.type });
+      
+      // Save to the isolated locker at index 0, named 'process1'
+      await save([file], activeLocker, activeOriginal.id, 0, 'process1');
+      
     } catch (error) {
       console.warn('Save failed:', error);
     } finally {
-      setIsProcessingImage(false);
+      setIsProcessing(false);
     }
-  }, [save, activeOriginalFile]);
+  }, [save, activeOriginal, activeLocker]);
 
-  const handleClearAll = async () => {
-    await deleteBucket('original');
-    await deleteBucket('process');
+  const onClearAll = async () => {
+    await deleteBucket(MASTER_BUCKET);
+    
+    // Clean up all the custom lockers
+    originals.forEach((original) => {
+      const lockerName = original.name.replace('image', 'locker');
+      deleteBucket(lockerName);
+    });
+    
     setActiveFile(null);
   };
 
-  const handleToolSelection = useCallback(
-    async (targetToolSlug: string) => {
-      if (!targetToolSlug || !latestProcessedFile) return;
-      await moveToTool(latestProcessedFile.name, targetToolSlug);
-      window.location.href = `/${targetToolSlug}`;
+  const onToolSelect = useCallback(
+    async (targetSlug: string) => {
+      if (!targetSlug || !activeProcessed) return;
+      await moveToTool(activeProcessed.name, targetSlug);
+      window.location.href = `/${targetSlug}`;
     },
-    [moveToTool, latestProcessedFile]
+    [moveToTool, activeProcessed]
   );
 
-  const handleDimensionChange = (
+  const onDimensionChange = (
     widthPixels: number,
     heightPixels: number,
     rawWidth: number,
@@ -102,7 +111,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     unit: Unit,
     dpi: number
   ) => {
-    setCropConfiguration({
+    setConfig({
       rawWidth,
       rawHeight,
       unit,
@@ -112,110 +121,105 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
     });
   };
 
-  const calculatedAspectRatio = cropConfiguration.widthPixels / cropConfiguration.heightPixels;
-  const hasOriginalFile = !!activeOriginalFile;
-  const hasProcessedOutput = !!latestProcessedFile;
+  const aspectRatio = config.widthPixels / config.heightPixels;
+  const hasOriginal = !!activeOriginal;
+  const hasProcessed = !!activeProcessed;
 
   return (
-    <div className="w-full py-6 px-4 sm:px-6 lg:px-8">
-      {/* GALLERY UPLOADER - OUTSIDE THE GRID */}
-      <div className="w-full max-w-5xl mx-auto mb-6">
-        <GalleryUploader
-          files={originalFiles}
-          activeFileId={activeFileId}
-          acceptedMimeTypes={IMAGE_CONFIG.accept}
-          isUploading={isProcessingImage}
-          handleFileUpload={handleFileUpload}
-        />
-      </div>
+    <div className="w-full max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
+      
+      <GalleryUploader
+        files={originals}
+        activeFileId={activeFileId}
+        acceptedMimeTypes={IMAGE_CONFIG.accept}
+        isUploading={isProcessing}
+        handleFileUpload={onFileUpload}
+      />
 
-      {/* TOOL CARDS GRID - RESTORED TO ORIGINAL LAYOUT */}
-      <Grid minCardWidth={360} gap={16}>
+      {hasOriginal && (
         <Stagger delay={100}>
-          
-          {hasOriginalFile && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+            
             <Motion
               preset={zoomIn}
               as="div"
-              className="col-span-1"
+              className="md:col-span-1 w-full"
               delay={0}
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
-              <DimensionInput
-                initialWidth={cropConfiguration.rawWidth}
-                initialHeight={cropConfiguration.rawHeight}
-                onSizeChange={handleDimensionChange}
-                minWidth={360}
-                minHeight={240}
-                padding={0}
-              />
+              <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+                <DimensionInput
+                  initialWidth={config.rawWidth}
+                  initialHeight={config.rawHeight}
+                  onSizeChange={onDimensionChange}
+                />
+              </Card>
             </Motion>
-          )}
 
-          {hasOriginalFile && (
             <Motion
               preset={zoomIn}
               as="div"
-              className="col-span-1"
+              className="md:col-span-2 w-full"
               delay={100}
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
-              <Cropper
-                fileReference={activeOriginalFile}
-                aspectRatio={calculatedAspectRatio}
-                targetWidthPixels={cropConfiguration.widthPixels}
-                targetHeightPixels={cropConfiguration.heightPixels}
-                inputDpi={cropConfiguration.dpi}
-                handleCropConfirm={handleCropConfirm}
-                minWidth={360}
-                minHeight={500}
-                padding={0}
-              />
+              <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+                <Cropper
+                  fileReference={activeOriginal}
+                  aspectRatio={aspectRatio}
+                  targetWidthPixels={config.widthPixels}
+                  targetHeightPixels={config.heightPixels}
+                  inputDpi={config.dpi}
+                  handleCropConfirm={onCropConfirm}
+                />
+              </Card>
             </Motion>
-          )}
 
-          {hasProcessedOutput && (
-            <Motion
-              preset={zoomIn}
-              as="div"
-              className="col-span-1"
-              delay={200}
-              style={{ opacity: 0, transform: 'scale(0.5)' }}
-            >
-              <FileCard
-                fileReference={latestProcessedFile}
-                displayVariant="process"
-                minWidth={360}
-                minHeight={350}
-                padding={0}
-              />
-            </Motion>
-          )}
-
-          {hasProcessedOutput && (
-            <Motion
-              preset={zoomIn}
-              as="div"
-              className="col-span-1"
-              delay={300}
-              style={{ opacity: 0, transform: 'scale(0.5)' }}
-            >
-              <ExportPanel
-                fileReference={latestProcessedFile}
-                actionVariant="single"
-                defaultFileName={`${cropConfiguration.rawWidth}x${cropConfiguration.rawHeight}`}
-                handleClearFiles={handleClearAll}
-                currentToolSlug={toolId}
-                handleToolSelection={handleToolSelection}
-                minWidth={360}
-                minHeight={200}
-                padding={0}
-              />
-            </Motion>
-          )}
-
+          </div>
         </Stagger>
-      </Grid>
+      )}
+
+      {hasProcessed && (
+        <Stagger delay={100}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 items-start">
+            
+            <Motion
+              preset={zoomIn}
+              as="div"
+              className="col-span-1 w-full"
+              delay={0}
+              style={{ opacity: 0, transform: 'scale(0.5)' }}
+            >
+              <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+                <FileCard
+                  fileReference={activeProcessed}
+                  displayVariant="process"
+                />
+              </Card>
+            </Motion>
+
+            <Motion
+              preset={zoomIn}
+              as="div"
+              className="col-span-1 w-full"
+              delay={100}
+              style={{ opacity: 0, transform: 'scale(0.5)' }}
+            >
+              <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+                <ExportPanel
+                  fileReference={activeProcessed}
+                  actionVariant="single"
+                  defaultFileName={`${config.rawWidth}x${config.rawHeight}`}
+                  handleClearFiles={onClearAll}
+                  currentToolSlug={toolId}
+                  handleToolSelection={onToolSelect}
+                />
+              </Card>
+            </Motion>
+
+          </div>
+        </Stagger>
+      )}
     </div>
   );
 }

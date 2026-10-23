@@ -16,8 +16,8 @@ export const useFileStore = create<FileStore>((set, get) => ({
   bucketIndex: {},
   activeFileId: null,
 
-  upload: (files, bucketName = 'original', specificIndex) => handleUpload(files, bucketName, specificIndex, set, get),
-  save: (files, bucketName = 'process', parentId, specificIndex) => handleSave(files, bucketName, parentId, specificIndex, set, get),
+  upload: (files, bucketName = 'original', specificIndex, customName) => handleUpload(files, bucketName, specificIndex, customName, set, get),
+  save: (files, bucketName = 'process', parentId, specificIndex, customName) => handleSave(files, bucketName, parentId, specificIndex, customName, set, get),
   selectAll: (bucketName) => handleSelectAll(bucketName, get),
   getFile: (bucketName, identifier) => handleGetFile(bucketName, identifier, get),
   getRawFile: (storageKey) => handleGetRawFile(storageKey),

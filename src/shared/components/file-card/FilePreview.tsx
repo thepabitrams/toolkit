@@ -1,31 +1,23 @@
 import React from 'react';
-import { Card } from '@/core/components/ui/Card';
-import { Container } from '@/core/components/ui/Container';
 import { useFilePreview } from './useFilePreview';
 import type { FileReference } from '@/shared/store/file-store';
 
 interface FilePreviewProperties {
   fileReference: FileReference | null;
   className?: string;
-  minWidth?: number;
-  minHeight?: number;
-  padding?: number;
 }
 
 export const FilePreview: React.FC<FilePreviewProperties> = ({
   fileReference,
   className = '',
-  minWidth = 260,
-  minHeight = 200,
-  padding = 0,
-}) => {
+}): React.JSX.Element => {
   const { previewUrl, isLoading } = useFilePreview(fileReference);
 
   const renderPreviewContent = () => {
     if (!fileReference) {
       return (
-        <div className={`w-full aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center ${className}`}>
-          <span className="text-gray-400 dark:text-gray-500 text-sm">No file</span>
+        <div className={`w-full aspect-square bg-slate-50 dark:bg-gray-800 flex items-center justify-center ${className}`}>
+          <span className="text-slate-400 text-sm">No file</span>
         </div>
       );
     }
@@ -35,7 +27,7 @@ export const FilePreview: React.FC<FilePreviewProperties> = ({
 
     if (isLoading) {
       return (
-        <div className={`w-full aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center ${className}`}>
+        <div className={`w-full aspect-square bg-slate-50 dark:bg-gray-800 flex items-center justify-center ${className}`}>
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
         </div>
       );
@@ -43,14 +35,14 @@ export const FilePreview: React.FC<FilePreviewProperties> = ({
 
     if (!previewUrl) {
       return (
-        <div className={`w-full aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center ${className}`}>
-          <span className="text-gray-400 dark:text-gray-500 text-sm">Loading...</span>
+        <div className={`w-full aspect-square bg-slate-50 dark:bg-gray-800 flex items-center justify-center ${className}`}>
+          <span className="text-slate-400 text-sm">Loading...</span>
         </div>
       );
     }
 
     return (
-      <div className={`w-full aspect-square bg-gray-100 dark:bg-gray-700 overflow-hidden rounded-lg ${className}`}>
+      <div className={`w-full aspect-square bg-slate-50 dark:bg-gray-800 overflow-hidden ${className}`}>
         {isImageFile ? (
           <img src={previewUrl} alt={fileReference.name} className="w-full h-full object-contain" />
         ) : isPdfFile ? (
@@ -68,16 +60,5 @@ export const FilePreview: React.FC<FilePreviewProperties> = ({
     );
   };
 
-  return (
-    <Card className="overflow-hidden p-0 flex-1">
-      <div
-        style={{ minWidth: `${minWidth}px`, minHeight: `${minHeight}px`, padding: `${padding}px` }}
-        className={`flex-1 ${className}`}
-      >
-        <Container className="px-0 h-full">
-          {renderPreviewContent()}
-        </Container>
-      </div>
-    </Card>
-  );
+  return renderPreviewContent();
 };
