@@ -1,7 +1,5 @@
-// src/core/components/tool-hub/useFilteredTools.ts
-
 import { useMemo, useDeferredValue } from 'react';
-import { useToolStore } from '@/core/components/tool-hub/toolStore';
+import { useToolStore } from './toolStore';
 import type { ToolConfig } from '@/config/tools';
 
 export interface ToolCatalogItem extends ToolConfig {

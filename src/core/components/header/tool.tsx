@@ -6,7 +6,7 @@ import { Motion } from '@/core/motion/motion';
 import { drawerMotion } from '@/core/motion/compositions/drawerMotion';
 import { site } from '@/config/site';
 import { ThemeToggle } from '@/core/components/ui/ThemeToggle';
-import { ToolHub } from '@/core/components/tool-hub/ToolHub';
+import { ToolHub } from '@/core/components/tool-hub';
 
 export default function ToolHeader() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);

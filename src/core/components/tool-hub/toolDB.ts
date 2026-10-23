@@ -1,5 +1,3 @@
-// src/core/components/tool-hub/toolDB.ts
-
 import { openDB, type IDBPDatabase } from 'idb';
 
 const DB_NAME = 'ToolKit_ToolDB';

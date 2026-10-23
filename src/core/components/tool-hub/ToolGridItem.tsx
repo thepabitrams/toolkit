@@ -1,35 +1,30 @@
-// src/core/components/tool-hub/ToolCard.tsx
-
 import { memo, useRef, useState, useEffect } from 'react';
-import { useToolStore } from '@/core/components/tool-hub/toolStore';
+import { useToolStore } from './toolStore';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import type { ToolConfig } from '@/config/tools';
 import { Motion } from '@/core/motion/motion';
-import { toolCardGridMotion, toolCardListMotion } from '@/core/motion/compositions/toolCardMotion';
+import { toolCardGridMotion } from '@/core/motion/compositions/toolCardMotion';
 import { marqueeSwing } from '@/core/motion/presets/marqueeSwing';
 import { injectKeyframes } from '@/core/motion/core/injection/keyframes';
 
-interface ToolCardProps {
+interface ToolGridItemProps {
   tool: ToolConfig;
-  variant?: 'grid' | 'list';
   onToolSelect?: (toolSlug: string) => void;
   onToolHover?: (toolSlug: string) => void;
   isLoading?: boolean;
 }
 
-export const ToolCard = memo(function ToolCard({
+export const ToolGridItem = memo(function ToolGridItem({
   tool,
-  variant = 'grid',
   onToolSelect,
   onToolHover,
   isLoading,
-}: ToolCardProps) {
+}: ToolGridItemProps) {
   const { favorites, toggleFavorite, incrementUsage } = useToolStore();
   const isFavorite = favorites.includes(tool.slug);
 
   const handleToolClick = () => {
     incrementUsage(tool.slug);
-    
     if (onToolSelect) {
       onToolSelect(tool.slug);
     } else {
@@ -44,8 +39,8 @@ export const ToolCard = memo(function ToolCard({
 
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [isTitleOverflowing, setIsTitleOverflowing] = useState(false);
-
   const hasInjectedKeyframes = useRef(false);
+
   useEffect(() => {
     if (!hasInjectedKeyframes.current) {
       injectKeyframes(marqueeSwing.name, marqueeSwing.keyframes);
@@ -58,51 +53,6 @@ export const ToolCard = memo(function ToolCard({
       setIsTitleOverflowing(titleRef.current.scrollWidth > titleRef.current.clientWidth);
     }
   }, [tool.displayName]);
-
-  if (variant === 'list') {
-    return (
-      <Motion
-        preset={toolCardListMotion}
-        as="div"
-        className={`flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer select-none transition-opacity ${
-          isLoading ? 'opacity-50 cursor-wait' : ''
-        }`}
-        onClick={handleToolClick}
-        onMouseEnter={() => onToolHover?.(tool.slug)}
-      >
-        <div className="flex-1 min-w-0 overflow-hidden">
-          {isTitleOverflowing ? (
-            <div
-              className="text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap inline-block"
-              style={{
-                animation: 'marquee-swing 4s ease-in-out infinite',
-              }}
-            >
-              {tool.displayName}
-            </div>
-          ) : (
-            <div
-              ref={titleRef}
-              className="text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap"
-            >
-              {tool.displayName}
-            </div>
-          )}
-        </div>
-        <button
-          onClick={handleFavoriteToggle}
-          className="text-gray-400 hover:text-red-500 transition-colors shrink-0"
-          aria-label="Toggle favorite"
-        >
-          {isFavorite ? (
-            <FaHeart className="text-red-500 w-3.5 h-3.5" />
-          ) : (
-            <FaRegHeart className="w-3.5 h-3.5" />
-          )}
-        </button>
-      </Motion>
-    );
-  }
 
   return (
     <Motion
@@ -138,9 +88,7 @@ export const ToolCard = memo(function ToolCard({
           {isTitleOverflowing ? (
             <div
               className="tool-title mb-1 whitespace-nowrap inline-block"
-              style={{
-                animation: 'marquee-swing 4s ease-in-out infinite',
-              }}
+              style={{ animation: 'marquee-swing 4s ease-in-out infinite' }}
             >
               {tool.displayName}
             </div>
@@ -159,4 +107,4 @@ export const ToolCard = memo(function ToolCard({
   );
 });
 
-ToolCard.displayName = 'ToolCard';
+ToolGridItem.displayName = 'ToolGridItem';

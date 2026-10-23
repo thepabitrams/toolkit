@@ -1,5 +1,3 @@
-// src/core/components/tool-hub/toolStore.ts
-
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { ToolConfig } from '@/config/tools';
@@ -8,7 +6,7 @@ import {
   loadToolData,
   clearToolData,
   type ToolData,
-} from '@/core/components/tool-hub/toolDB';
+} from './toolDB';
 
 const toolIndexedDBStorage = {
   getItem: async (name: string): Promise<string | null> => {

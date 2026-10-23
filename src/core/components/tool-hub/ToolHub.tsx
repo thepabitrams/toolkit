@@ -1,15 +1,14 @@
-// src/core/components/tool-hub/ToolHub.tsx
-
 import { useState } from 'react';
 import { Search } from '@/core/components/ui/Search';
-import { ToolCatalog } from './ToolCatalog';
 import { Container } from '@/core/components/ui/Container';
 import { tools } from '@/config/tools';
 import { useFilteredTools } from './useFilteredTools';
 import { useToolStore } from './toolStore';
+import { ToolGrid } from './ToolGrid';
+import { ToolList } from './ToolList';
 
 interface ToolHubProps {
-  displayVariant?: 'grid' | 'list';
+  displayVariant: 'grid' | 'list';
   categoryFilter?: string | null;
   inputFilter?: string | null;
   actionFilter?: { category: string; inputType: string } | undefined;
@@ -17,16 +16,14 @@ interface ToolHubProps {
 }
 
 export function ToolHub({
-  displayVariant = 'grid',
+  displayVariant,
   categoryFilter = null,
   inputFilter = null,
   actionFilter,
   handleToolSelect,
 }: ToolHubProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  
   const { currentToolSlug } = useToolStore();
-  
   const activeCategory = actionFilter?.category || categoryFilter;
 
   const mappedTools = tools.map((toolItem) => ({ 
@@ -35,7 +32,10 @@ export function ToolHub({
     name: toolItem.displayName 
   }));
 
-  const filteredTools = useFilteredTools(mappedTools, searchQuery, { category: activeCategory, input: inputFilter });
+  const filteredTools = useFilteredTools(mappedTools, searchQuery, { 
+    category: activeCategory, 
+    input: inputFilter 
+  });
 
   const handleSelect = (toolSlug: string) => {
     if (handleToolSelect) {
@@ -50,20 +50,25 @@ export function ToolHub({
     if (matchedTool) matchedTool.component();
   };
 
+  const catalogProps = {
+    toolItems: filteredTools,
+    isLoadingCatalog: false,
+    activeToolSlug: currentToolSlug,
+    handleToolSelect: handleSelect,
+    handleToolHover: handleHover,
+  };
+
   return (
     <div className="w-full bg-gray-50 dark:bg-gray-950">
       <Container className="px-0">
         <Search value={searchQuery} onChange={setSearchQuery} />
       </Container>
       <Container className="px-0">
-        <ToolCatalog
-          toolItems={filteredTools}
-          displayVariant={displayVariant}
-          isLoadingCatalog={false}
-          activeToolSlug={currentToolSlug}
-          handleToolSelect={handleSelect}
-          handleToolHover={handleHover}
-        />
+        {displayVariant === 'grid' ? (
+          <ToolGrid {...catalogProps} />
+        ) : (
+          <ToolList {...catalogProps} />
+        )}
       </Container>
     </div>
   );
