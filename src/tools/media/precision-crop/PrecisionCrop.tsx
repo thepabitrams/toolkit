@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useFileStore } from '@/shared/store/file-store';
-import { GalleryUploader } from '@/shared/components/gallery-uploader';
+import { GalleryUploader } from '@/shared/components/uploaders';
 import { FileCard } from '@/shared/components/file-card';
 import { DimensionInput } from './DimensionInput';
 import { Cropper } from './Cropper';
