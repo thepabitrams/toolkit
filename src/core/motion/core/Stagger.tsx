@@ -23,7 +23,6 @@ export const Stagger: React.FC<StaggerProps> = ({
 
         return cloneElement(child, {
           delay: delayValue,
-          show: show,
         } as any);
       })}
     </>
