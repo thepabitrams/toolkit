@@ -5,7 +5,7 @@ import { Input } from '@/core/components/ui/Input';
 import { useExportPanel } from './useExportPanel';
 import type { FileReference } from '@/shared/store/file-store';
 
-interface ExportPanelProperties {
+interface ExportPanelProps {
   fileReference: FileReference | null;
   actionVariant: 'single' | 'multiple';
   defaultFileName?: string;
@@ -32,7 +32,7 @@ function getFileExtensionFromMimeType(mimeType: string): string {
   return mimeTypeExtensionMap[mimeType] || '';
 }
 
-export const ExportPanel: React.FC<ExportPanelProperties> = ({
+export const ExportPanel: React.FC<ExportPanelProps> = ({
   fileReference,
   actionVariant,
   defaultFileName = 'download',
@@ -52,7 +52,7 @@ export const ExportPanel: React.FC<ExportPanelProperties> = ({
     }
   }, [fileReference, defaultFileName]);
 
-  const onDownloadClick = async () => {
+  const onDownloadClick = async (): Promise<void> => {
     await handleDownload(fileNameInput);
     await handleClearFiles();
   };
@@ -62,12 +62,12 @@ export const ExportPanel: React.FC<ExportPanelProperties> = ({
   if (!fileReference) return null;
 
   return (
-    <div className="flex flex-col h-full w-full p-4">
+    <div className="flex flex-col w-full p-4 sm:p-6">
       <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
         Download
       </h3>
 
-      <div className="mb-3">
+      <div className="mb-4">
         <Input
           type="text"
           value={fileNameInput}
@@ -79,23 +79,23 @@ export const ExportPanel: React.FC<ExportPanelProperties> = ({
         />
       </div>
 
-      <div className="border-t border-gray-200/60 dark:border-gray-700/60 my-2" />
-
-      <div className="flex items-center justify-between gap-3 mt-auto pt-1">
-        <ActionButton
-          currentToolSlug={currentToolSlug}
-          actionVariant={actionVariant}
-          handleToolSelection={handleToolSelection}
-          className="flex-1"
-        />
-        <Button
-          onClick={onDownloadClick}
-          variant="primary"
-          disabled={!fileReference || isDownloadingFile}
-          className="flex-1 px-5 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isDownloadingFile ? 'Downloading...' : 'Download'}
-        </Button>
+      <div className="border-t border-gray-200/60 dark:border-gray-700/60 pt-4 mt-2">
+        <div className="flex items-center justify-between gap-3">
+          <ActionButton
+            currentToolSlug={currentToolSlug}
+            actionVariant={actionVariant}
+            handleToolSelection={handleToolSelection}
+            className="flex-1"
+          />
+          <Button
+            onClick={onDownloadClick}
+            variant="primary"
+            disabled={!fileReference || isDownloadingFile}
+            className="flex-1 px-5 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isDownloadingFile ? 'Downloading...' : 'Download'}
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -122,27 +122,31 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
   const hasProcessed = !!activeProcessed;
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
-      <GalleryUploader
-        files={originals}
-        activeFileId={activeFileId}
-        acceptedMimeTypes={IMAGE_CONFIG.accept}
-        isUploading={isProcessing}
-        handleFileUpload={onFileUpload}
-      />
+    <div className="w-full flex flex-col gap-6 py-2">
+      
+      <div className="-mx-4 sm:mx-0">
+        <GalleryUploader
+          files={originals}
+          activeFileId={activeFileId}
+          acceptedMimeTypes={IMAGE_CONFIG.accept}
+          isUploading={isProcessing}
+          handleFileUpload={onFileUpload}
+        />
+      </div>
 
       {hasOriginal && (
         <motion.div 
           variants={pageStaggerContainer}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start"
+          className="-mx-4 sm:mx-0 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start"
         >
+          {/* 🚨 FIXED: Removed sticky and the extra wrapper div */}
           <motion.div 
             variants={cardSpringItem}
-            className="lg:col-span-3 w-full lg:sticky lg:top-24"
+            className="lg:col-span-4 w-full"
           >
-            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900">
               <DimensionInput
                 initialWidth={cropConfig.rawWidth}
                 initialHeight={cropConfig.rawHeight}
@@ -153,9 +157,9 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
 
           <motion.div 
             variants={cardSpringItem}
-            className="lg:col-span-7 w-full flex justify-center"
+            className="lg:col-span-8 w-full"
           >
-            <Card className="w-full max-w-xl p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900">
               <Cropper
                 fileReference={activeOriginal}
                 aspectRatio={aspectRatio}
@@ -174,10 +178,10 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           variants={pageStaggerContainer}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 items-start"
+          className="-mx-4 sm:mx-0 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 items-start"
         >
           <motion.div variants={cardSpringItem} className="col-span-1 w-full">
-            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+            <Card className="w-full h-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900 flex flex-col">
               <FileCard
                 fileReference={activeProcessed}
                 displayVariant="process"
@@ -186,7 +190,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           </motion.div>
 
           <motion.div variants={cardSpringItem} className="col-span-1 w-full">
-            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-3xl shadow-sm bg-white dark:bg-gray-900">
+            <Card className="w-full p-0 border-slate-200/80 dark:border-gray-800 rounded-none sm:rounded-3xl shadow-sm bg-white dark:bg-gray-900">
               <ExportPanel
                 fileReference={activeProcessed}
                 actionVariant="single"
