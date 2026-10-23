@@ -11,7 +11,7 @@ export const useFileDetails = (fileReference: FileReference | null) => {
     unit: 'px',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { readRawFile } = useFileStore();
+  const { getRawFile } = useFileStore();
 
   useEffect(() => {
     if (!fileReference) {
@@ -25,15 +25,15 @@ export const useFileDetails = (fileReference: FileReference | null) => {
     const loadMetadata = async () => {
       setIsLoading(true);
       try {
-        const fileObject = await readRawFile(fileReference.storageKey);
-        if (!fileObject || !isMounted) {
+        const file = await getRawFile(fileReference.storageKey);
+        if (!file || !isMounted) {
           setIsLoading(false);
           return;
         }
 
         const [dimensions, resolution] = await Promise.all([
-          readDimensions(fileObject),
-          readDpi(fileObject),
+          readDimensions(file),
+          readDpi(file),
         ]);
 
         if (isMounted) {
@@ -56,7 +56,7 @@ export const useFileDetails = (fileReference: FileReference | null) => {
     return () => {
       isMounted = false;
     };
-  }, [fileReference, readRawFile]);
+  }, [fileReference, getRawFile]);
 
   return { imageMetadata, isLoading };
 };

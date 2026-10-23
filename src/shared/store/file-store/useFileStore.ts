@@ -9,6 +9,7 @@ import { handleDeleteFile } from './actions/deleteFile';
 import { handleDeleteBucket } from './actions/deleteBucket';
 import { handleDeleteTool } from './actions/deleteTool';
 import { handleMoveToTool } from './actions/moveToTool';
+import { handleReorderBucket } from './actions/reorderBucket';
 
 export const useFileStore = create<FileStore>((set, get) => ({
   fileDetailMap: {},
@@ -25,4 +26,5 @@ export const useFileStore = create<FileStore>((set, get) => ({
   deleteTool: () => handleDeleteTool(set, get),
   moveToTool: (fileName, targetToolId) => handleMoveToTool(fileName, targetToolId, set, get),
   setActiveFile: (id) => set({ activeFileId: id }),
+  reorderBucket: (bucketName, startIndex, endIndex) => handleReorderBucket(bucketName, startIndex, endIndex, set, get),
 }));

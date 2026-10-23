@@ -1,19 +1,16 @@
-// src/tools/media/precision-crop/PrecisionCrop.tsx
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useFileStore } from '@/shared/store/file-store';
-import { syncCatalogToDatabase } from '@/shared/store/file-store/file-utils';
-import { FileUpload } from '@/shared/components/file-upload';
+import { GalleryUploader } from '@/shared/components/gallery-uploader';
 import { FileCard } from '@/shared/components/file-card';
-import { Motion } from '@/core/motion/motion';
-import { Stagger } from '@/core/motion/core/Stagger';
-import { zoomIn } from '@/core/motion/presets/zoomIn';
 import { DimensionInput } from './DimensionInput';
 import { Cropper } from './Cropper';
 import { ExportPanel } from '@/shared/components/export-panel';
-import { Grid } from '@/core/components/ui/Grid';
 import { IMAGE_CONFIG } from '@/shared/entities/image';
+import { Motion } from '@/core/motion/motion';
+import { Stagger } from '@/core/motion/core/Stagger';
+import { zoomIn } from '@/core/motion/presets/zoomIn';
+import { Grid } from '@/core/components/ui/Grid';
 import type { Unit } from './DimensionInput';
-import type { FileReference } from '@/shared/store/file-store';
 
 interface PrecisionCropProperties {
   category: string;
@@ -22,21 +19,31 @@ interface PrecisionCropProperties {
 
 export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.Element {
   const { 
-    list: listToolFiles, 
-    upload: uploadFiles, 
-    save: saveProcessedFiles, 
-    clear: clearToolFiles, 
-    promote: promoteFile, 
-    remove: removeFile 
+    upload, 
+    save, 
+    selectAll, 
+    deleteBucket, 
+    moveToTool, 
+    activeFileId, 
+    setActiveFile
   } = useFileStore();
   
   const [isProcessingImage, setIsProcessingImage] = useState(false);
 
-  const originalFileList = listToolFiles('original');
-  const activeOriginalFile = originalFileList.length > 0 ? originalFileList[0] : null;
+  const originalFiles = selectAll('original');
+  const processedFiles = selectAll('process');
 
-  const processedFileList = listToolFiles('process');
-  const latestProcessedFile = processedFileList.length > 0 ? processedFileList[processedFileList.length - 1] : null;
+  const activeOriginalFile = originalFiles.find((f) => f.id === activeFileId) || originalFiles[0] || null;
+
+  const latestProcessedFile = processedFiles.length > 0 
+    ? processedFiles[processedFiles.length - 1] 
+    : null;
+
+  useEffect(() => {
+    if (!activeFileId && originalFiles.length > 0) {
+      setActiveFile(originalFiles[0].id);
+    }
+  }, [activeFileId, originalFiles, setActiveFile]);
 
   const [cropConfiguration, setCropConfiguration] = useState({
     rawWidth: 1,
@@ -50,82 +57,41 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
   const handleFileUpload = useCallback(async (selectedFiles: File[]) => {
     setIsProcessingImage(true);
     try {
-      await uploadFiles(selectedFiles);
+      await upload(selectedFiles, 'original');
     } catch (error) {
       console.warn('Upload failed:', error);
     } finally {
       setIsProcessingImage(false);
     }
-  }, [uploadFiles]);
-
-  const handleFileRemove = useCallback(async () => {
-    if (activeOriginalFile) {
-      await clearToolFiles();
-    }
-  }, [activeOriginalFile, clearToolFiles]);
+  }, [upload]);
 
   const handleCropConfirm = useCallback(async (croppedBlob: Blob, generatedFileName: string) => {
+    if (!activeOriginalFile) return;
+    
     setIsProcessingImage(true);
     try {
       const processedFileObject = new File([croppedBlob], generatedFileName, { type: croppedBlob.type });
-      await saveProcessedFiles([processedFileObject]);
+      await save([processedFileObject], 'process', activeOriginalFile.id);
     } catch (error) {
       console.warn('Save failed:', error);
     } finally {
       setIsProcessingImage(false);
     }
-  }, [saveProcessedFiles]);
+  }, [save, activeOriginalFile]);
+
+  const handleClearAll = async () => {
+    await deleteBucket('original');
+    await deleteBucket('process');
+    setActiveFile(null);
+  };
 
   const handleToolSelection = useCallback(
-    async (targetToolSlug: string, promotionVariant: 'single' | 'multiple') => {
-      if (!targetToolSlug) {
-        alert('Error: No tool selected.');
-        return;
-      }
-
-      const currentProcessedList = listToolFiles('process');
-      if (currentProcessedList.length === 0) {
-        alert('No processed files to promote');
-        return;
-      }
-
-      const latestFileName = currentProcessedList[currentProcessedList.length - 1]?.name;
-
-      const currentState = useFileStore.getState();
-      const targetToolOriginals = currentState.original.filter((ref: FileReference) => ref.toolId === targetToolSlug);
-
-      if (targetToolOriginals.length > 0) {
-        const userConfirmed = window.confirm(
-          `The target tool already has ${targetToolOriginals.length} file(s).\n\n` +
-          `• Click "OK" → REPLACE (delete old files, use new ones)\n` +
-          `• Click "CANCEL" → Stay in current tool`
-        );
-
-        if (userConfirmed) {
-          for (const fileReference of targetToolOriginals) {
-            await removeFile(fileReference.name);
-          }
-          useFileStore.setState((previousState) => ({
-            original: previousState.original.filter((ref: FileReference) => ref.toolId !== targetToolSlug),
-          }));
-          await syncCatalogToDatabase(
-            useFileStore.getState().original,
-            useFileStore.getState().process
-          );
-        } else {
-          return;
-        }
-      }
-
-      if (promotionVariant === 'single' && latestFileName) {
-        await promoteFile(latestFileName, targetToolSlug);
-      } else {
-        await promoteFile(undefined, targetToolSlug);
-      }
-
+    async (targetToolSlug: string) => {
+      if (!targetToolSlug || !latestProcessedFile) return;
+      await moveToTool(latestProcessedFile.name, targetToolSlug);
       window.location.href = `/${targetToolSlug}`;
     },
-    [listToolFiles, promoteFile, removeFile]
+    [moveToTool, latestProcessedFile]
   );
 
   const handleDimensionChange = (
@@ -152,36 +118,27 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
 
   return (
     <div className="w-full py-6 px-4 sm:px-6 lg:px-8">
+      {/* GALLERY UPLOADER - OUTSIDE THE GRID */}
+      <div className="w-full max-w-5xl mx-auto mb-6">
+        <GalleryUploader
+          files={originalFiles}
+          activeFileId={activeFileId}
+          acceptedMimeTypes={IMAGE_CONFIG.accept}
+          isUploading={isProcessingImage}
+          handleFileUpload={handleFileUpload}
+        />
+      </div>
+
+      {/* TOOL CARDS GRID - RESTORED TO ORIGINAL LAYOUT */}
       <Grid minCardWidth={360} gap={16}>
         <Stagger delay={100}>
-          <Motion
-            preset={zoomIn}
-            as="div"
-            className="col-span-1"
-            delay={0}
-            style={{ opacity: 0, transform: 'scale(0.5)' }}
-          >
-            <FileUpload
-              fileReference={activeOriginalFile}
-              uploadVariant="single"
-              acceptedMimeTypes={IMAGE_CONFIG.accept}
-              uploadLabel={IMAGE_CONFIG.label}
-              fileExtensions={IMAGE_CONFIG.extensions}
-              isUploading={isProcessingImage}
-              handleFileUpload={handleFileUpload}
-              handleFileRemove={handleFileRemove}
-              minWidth={360}
-              minHeight={400}
-              padding={0}
-            />
-          </Motion>
-
+          
           {hasOriginalFile && (
             <Motion
               preset={zoomIn}
               as="div"
               className="col-span-1"
-              delay={100}
+              delay={0}
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
               <DimensionInput
@@ -200,7 +157,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
               preset={zoomIn}
               as="div"
               className="col-span-1"
-              delay={200}
+              delay={100}
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
               <Cropper
@@ -222,7 +179,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
               preset={zoomIn}
               as="div"
               className="col-span-1"
-              delay={300}
+              delay={200}
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
               <FileCard
@@ -240,14 +197,14 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
               preset={zoomIn}
               as="div"
               className="col-span-1"
-              delay={400}
+              delay={300}
               style={{ opacity: 0, transform: 'scale(0.5)' }}
             >
               <ExportPanel
                 fileReference={latestProcessedFile}
                 actionVariant="single"
                 defaultFileName={`${cropConfiguration.rawWidth}x${cropConfiguration.rawHeight}`}
-                handleClearFiles={clearToolFiles}
+                handleClearFiles={handleClearAll}
                 currentToolSlug={toolId}
                 handleToolSelection={handleToolSelection}
                 minWidth={360}
@@ -256,6 +213,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProperties): React.JSX.El
               />
             </Motion>
           )}
+
         </Stagger>
       </Grid>
     </div>

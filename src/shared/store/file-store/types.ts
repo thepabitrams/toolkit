@@ -25,6 +25,7 @@ export interface FileStore {
   deleteTool: () => Promise<void>;
   moveToTool: (fileName?: string, targetToolId?: string) => Promise<void>;
   setActiveFile: (id: string | null) => void;
+  reorderBucket: (bucketName: string, startIndex: number, endIndex: number) => Promise<void>;
 }
 
 export type StoreSet = (partial: FileStore | Partial<FileStore> | ((state: FileStore) => FileStore | Partial<FileStore>)) => void;

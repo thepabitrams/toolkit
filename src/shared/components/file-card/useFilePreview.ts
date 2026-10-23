@@ -5,7 +5,7 @@ import type { FileReference } from '@/shared/store/file-store';
 export const useFilePreview = (fileReference: FileReference | null) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { read } = useFileStore();
+  const { getRawFile } = useFileStore();
 
   useEffect(() => {
     if (!fileReference) {
@@ -19,9 +19,9 @@ export const useFilePreview = (fileReference: FileReference | null) => {
     const generatePreview = async () => {
       setIsLoading(true);
       try {
-        const fileBlob = await read(fileReference.name);
-        if (fileBlob && isMounted) {
-          objectUrl = URL.createObjectURL(fileBlob);
+        const file = await getRawFile(fileReference.storageKey);
+        if (file && isMounted) {
+          objectUrl = URL.createObjectURL(file);
           setPreviewUrl(objectUrl);
         }
       } catch (error) {
@@ -39,7 +39,7 @@ export const useFilePreview = (fileReference: FileReference | null) => {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [fileReference, read]);
+  }, [fileReference, getRawFile]);
 
   return { previewUrl, isLoading };
 };
