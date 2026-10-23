@@ -19,6 +19,7 @@ interface PrecisionCropProps {
 
 export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element {
   const { 
+    init,
     upload, 
     save, 
     selectAll, 
@@ -31,6 +32,10 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
   const [isProcessing, setIsProcessing] = useState(false);
 
   const MASTER_BUCKET = 'original';
+
+  useEffect(() => {
+    init();
+  }, [init]);
 
   const originals = selectAll(MASTER_BUCKET);
   const activeOriginal = originals.find((file) => file.id === activeFileId) || originals[0] || null;

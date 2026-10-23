@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { FileStore } from './types';
+import { handleInit } from './actions/init';
 import { handleUpload } from './actions/upload';
 import { handleSave } from './actions/save';
 import { handleSelectAll } from './actions/selectAll';
@@ -16,6 +17,7 @@ export const useFileStore = create<FileStore>((set, get) => ({
   bucketIndex: {},
   activeFileId: null,
 
+  init: () => handleInit(set, get),
   upload: (files, bucketName = 'original', specificIndex, customName) => handleUpload(files, bucketName, specificIndex, customName, set, get),
   save: (files, bucketName = 'process', parentId, specificIndex, customName) => handleSave(files, bucketName, parentId, specificIndex, customName, set, get),
   selectAll: (bucketName) => handleSelectAll(bucketName, get),

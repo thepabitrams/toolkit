@@ -15,6 +15,7 @@ export interface FileStore {
   bucketIndex: Record<string, Record<string, string[]>>;
   activeFileId: string | null;
 
+  init: () => Promise<void>;
   upload: (files: File[], bucketName?: string, specificIndex?: number, customName?: string) => Promise<void>;
   save: (files: File[], bucketName?: string, parentId?: string, specificIndex?: number, customName?: string) => Promise<void>;
   selectAll: (bucketName: string) => FileReference[];
