@@ -17,14 +17,14 @@ export const Card = ({
 }: CardProps): React.JSX.Element => {
   return (
     <motion.div
-      whileHover={hover ? { y: -4, scale: 1.01 } : {}}
-      whileTap={onClick ? { scale: 0.98 } : {}}
       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       className={`
         bg-white dark:bg-gray-900 
         rounded-2xl 
-        border border-gray-200/50 dark:border-gray-800/50
+        border border-slate-300 dark:border-gray-700
         focus:outline-none
+        shadow-sm 
+        dark:shadow-white/30
         ${onClick ? 'cursor-pointer' : ''}
         ${className}
       `}

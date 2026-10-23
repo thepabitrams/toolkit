@@ -5,6 +5,7 @@ import { useFileStore } from '@/shared/store/file-store';
 import type { FileReference } from '@/shared/store/file-store';
 import { GalleryThumbnail } from './GalleryThumbnail';
 import { Button } from '@/core/components/ui/Button';
+import { Card } from '@/core/components/ui';
 import { FiPlus, FiUploadCloud } from 'react-icons/fi';
 
 interface GalleryUploaderProperties {
@@ -82,10 +83,11 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
   );
 
   return (
-    <section
+    // 🚨 THE FIX: Replaced <section> with the reusable <Card>
+    <Card
       {...getRootProps()}
-      className={`relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white/60 shadow-sm dark:border-gray-800 dark:bg-gray-900/60 ${
-        isDragActive ? 'bg-blue-50/20 ring-2 ring-blue-500/50 dark:bg-blue-900/10' : ''
+      className={`relative flex flex-col overflow-hidden ${
+        isDragActive ? 'ring-2 ring-blue-500/50 bg-blue-50/20 dark:bg-blue-900/10' : ''
       }`}
     >
       <input {...getInputProps()} />
@@ -146,6 +148,6 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
 
         {items.length > 0 && <div className="pointer-events-none h-24 w-8 shrink-0" />}
       </div>
-    </section>
+    </Card>
   );
 };
