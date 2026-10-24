@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { FiCornerDownRight } from 'react-icons/fi';
-import type { Comment } from '@/shared/store/comment-store';
+import type { Comment } from './types';
 import { ViewRepliesButton } from './ViewRepliesButton';
 import { getChildren, formatTimeAgo } from './commentTree';
 
@@ -76,7 +76,7 @@ export function CommentNode({
           <div
             className={`${avatarSizeClassName} rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold`}
           >
-            {comment.avatar}
+            {comment.authorAvatar}
           </div>
           {hasChildComments && <div className={`w-0.5 flex-1 -mb-px ${TRUNK_COLOR_CLASS_NAME}`} />}
         </div>
@@ -84,7 +84,7 @@ export function CommentNode({
         <div className="flex-1 min-w-0 pb-2">
           <div className="flex items-center gap-2 mb-1">
             <span className="font-semibold text-sm text-slate-900 dark:text-white">
-              {comment.author}
+              {comment.authorName}
             </span>
             <span className="text-xs text-slate-400">{formatTimeAgo(comment.createdAt)}</span>
           </div>
