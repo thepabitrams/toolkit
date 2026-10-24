@@ -1,4 +1,3 @@
-// src/features/comments/components/CommentNode.tsx
 import React, { useMemo, useState } from 'react';
 import { FiCornerDownRight } from 'react-icons/fi';
 import type { Comment } from '@/shared/store/comment-store';
@@ -13,6 +12,27 @@ interface CommentNodeProps {
   defaultExpanded?: boolean;
 }
 
+const INITIAL_VISIBLE_REPLIES = 3;
+const REPLIES_PAGE_SIZE = 5;
+const CONNECTOR_GUTTER_PX = 24;
+const TRUNK_COLOR_CLASS = 'bg-slate-300 dark:bg-slate-600';
+
+const ThreadCurve = ({ width }: { width: number }) => (
+  <svg
+    className="absolute left-[-25px] top-0 h-full pointer-events-none z-0"
+    style={{ width }}
+    overflow="visible"
+  >
+    <path
+      d={`M 1 0 L 1 8 Q 1 16 9 16 L ${width} 16`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="text-slate-300 dark:text-slate-600"
+    />
+  </svg>
+);
+
 export const CommentNode = ({
   comment,
   allComments,
@@ -21,29 +41,38 @@ export const CommentNode = ({
   defaultExpanded = false,
 }: CommentNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const [visibleCount, setVisibleCount] = useState(3);
+  const [visibleReplyCount, setVisibleReplyCount] = useState(INITIAL_VISIBLE_REPLIES);
 
-  const isRoot = depth === 0;
-  const avatarClass = isRoot ? 'w-10 h-10 text-sm' : 'w-8 h-8 text-xs';
+  const isRootComment = depth === 0;
+  const avatarClassName = isRootComment ? 'w-10 h-10 text-sm' : 'w-8 h-8 text-xs';
+  const avatarCenterX = isRootComment ? 20 : 16;
 
-  const children = useMemo(() => getChildren(comment.id, allComments), [comment.id, allComments]);
-  const hasChildren = children.length > 0;
+  const replies = useMemo(
+    () => getChildren(comment.id, allComments),
+    [comment.id, allComments],
+  );
+  const hasReplies = replies.length > 0;
 
-  const visible = children.slice(0, visibleCount);
-  const remaining = children.length - visibleCount;
+  const visibleReplies = replies.slice(0, visibleReplyCount);
+  const hiddenReplyCount = replies.length - visibleReplyCount;
 
   return (
     <div className="relative">
-      
-      {/* 1. PARENT ROW */}
       <div className="flex gap-3 relative z-20">
-        <div className={`${avatarClass} shrink-0 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold`}>
-          {comment.avatar}
+        <div className="flex flex-col items-center shrink-0">
+          <div
+            className={`${avatarClassName} rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold`}
+          >
+            {comment.avatar}
+          </div>
+          {hasReplies && <div className={`w-[2px] flex-1 -mb-px ${TRUNK_COLOR_CLASS}`} />}
         </div>
 
         <div className="flex-1 min-w-0 pb-2">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-semibold text-sm text-slate-900 dark:text-white">{comment.author}</span>
+            <span className="font-semibold text-sm text-slate-900 dark:text-white">
+              {comment.author}
+            </span>
             <span className="text-xs text-slate-400">{formatTimeAgo(comment.createdAt)}</span>
           </div>
           <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -61,88 +90,64 @@ export const CommentNode = ({
         </div>
       </div>
 
-      {/* 2. THE CONTINUOUS TRUNK LINE 
-          Starts exactly at the bottom of the parent avatar (top-[40px]) 
-          and stretches to the absolute bottom of the tree. */}
-      {hasChildren && (
-        <div className="absolute left-[19px] top-[40px] bottom-0 w-[2px] bg-slate-200 dark:bg-slate-700 z-0 pointer-events-none" />
-      )}
-
-      {/* 3. CHILDREN CONTAINER 
-          Indented exactly 44px so the text aligns under the parent text. */}
-      {hasChildren && (
-        <div className="flex flex-col pl-[44px] mt-2 relative">
-          
-          {/* --- COLLAPSED STATE --- */}
+      {hasReplies && (
+        <div
+          className="flex flex-col relative"
+          style={{ paddingLeft: avatarCenterX + CONNECTOR_GUTTER_PX }}
+        >
           {!isExpanded && (
             <div className="relative py-2">
-              {/* Elbow to Button: Starts at trunk (-25px) top-0. Height 16px hits the center. */}
-              <div className="absolute left-[-25px] top-0 w-[25px] h-[16px] border-l-2 border-b-2 border-slate-200 dark:border-slate-700 rounded-bl-xl z-10 pointer-events-none" />
-              {/* Mask: Stops the trunk exactly at the center (top-16px) */}
-              <div className="absolute left-[-26px] top-[16px] bottom-[-16px] w-[4px] bg-white dark:bg-[#171b22] z-10 pointer-events-none" />
-              
+              <ThreadCurve width={25} />
               <ViewRepliesButton
-                replyCount={children.length}
+                replyCount={replies.length}
                 isExpanded={false}
                 onClick={() => setIsExpanded(true)}
               />
             </div>
           )}
 
-          {/* --- EXPANDED STATE --- */}
           {isExpanded && (
-            <div className="flex flex-col gap-4">
-              {visible.map((child, index) => {
-                const isLastChild = index === visible.length - 1;
-                const isVeryLast = isLastChild && remaining === 0;
-                
-                return (
-                  <div key={child.id} className="relative">
-                    {/* Elbow to Child: Starts at trunk (-25px) top-0. Width 41px hits the avatar center (16px) */}
-                    <div className="absolute left-[-25px] top-0 w-[41px] h-[16px] border-l-2 border-b-2 border-slate-200 dark:border-slate-700 rounded-bl-xl z-10 pointer-events-none" />
-                    
-                    {/* Mask: Only if it's the very last element in the tree */}
-                    {isVeryLast && (
-                      <div className="absolute left-[-26px] top-[16px] bottom-[-20px] w-[4px] bg-white dark:bg-[#171b22] z-10 pointer-events-none" />
-                    )}
-                    
+            <>
+              <div className="relative flex flex-col">
+                <div
+                  className={`absolute w-[2px] -top-px -bottom-px pointer-events-none z-0 ${TRUNK_COLOR_CLASS}`}
+                  style={{ left: avatarCenterX - 1 - (avatarCenterX + CONNECTOR_GUTTER_PX) }}
+                />
+
+                {visibleReplies.map((reply) => (
+                  <div key={reply.id} className="relative pb-4">
+                    <ThreadCurve width={41} />
                     <CommentNode
-                      comment={child}
+                      comment={reply}
                       allComments={allComments}
                       onReplyClick={onReplyClick}
                       depth={depth + 1}
                     />
                   </div>
-                );
-              })}
+                ))}
 
-              {remaining > 0 && (
-                <div className="relative">
-                  {/* Elbow to Show More */}
-                  <div className="absolute left-[-25px] top-0 w-[25px] h-[16px] border-l-2 border-b-2 border-slate-200 dark:border-slate-700 rounded-bl-xl z-10 pointer-events-none" />
-                  <button
-                    onClick={() => setVisibleCount((c) => c + 5)}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors bg-transparent"
-                  >
-                    Show more replies ({remaining})
-                  </button>
-                </div>
-              )}
+                {hiddenReplyCount > 0 && (
+                  <div className="relative pb-4">
+                    <ThreadCurve width={25} />
+                    <button
+                      onClick={() => setVisibleReplyCount((count) => count + REPLIES_PAGE_SIZE)}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors bg-transparent"
+                    >
+                      Show more replies ({hiddenReplyCount})
+                    </button>
+                  </div>
+                )}
+              </div>
 
-              {/* Hide replies button */}
               <div className="relative py-2">
-                {/* Elbow to Hide Replies */}
-                <div className="absolute left-[-25px] top-0 w-[25px] h-[16px] border-l-2 border-b-2 border-slate-200 dark:border-slate-700 rounded-bl-xl z-10 pointer-events-none" />
-                {/* Mask: Stops the trunk exactly here */}
-                <div className="absolute left-[-26px] top-[16px] bottom-[-16px] w-[4px] bg-white dark:bg-[#171b22] z-10 pointer-events-none" />
-                
+                <ThreadCurve width={25} />
                 <ViewRepliesButton
-                  replyCount={children.length}
+                  replyCount={replies.length}
                   isExpanded={true}
                   onClick={() => setIsExpanded(false)}
                 />
               </div>
-            </div>
+            </>
           )}
         </div>
       )}

@@ -19,7 +19,7 @@ export const ViewRepliesButton = ({ replyCount, isExpanded = false, onClick }: V
       type="button"
       onClick={onClick}
       aria-expanded={isExpanded}
-      className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors z-20 relative"
+      className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors z-20 relative bg-transparent"
     >
       <Icon className="w-4 h-4" />
       <span>{label}</span>
