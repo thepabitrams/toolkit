@@ -1,7 +1,6 @@
-// src/core/components/toast/ToastContainer.tsx
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Stagger } from '@/core/motion/core/Stagger';
+import { AnimatePresence } from 'motion/react';
 import { Toast } from './Toast';
 import { useToast } from './useToast';
 
@@ -14,17 +13,13 @@ export function ToastContainer() {
     };
   }, [handleClearAllToasts]);
 
-  if (visibleToasts.length === 0) return null;
-
   return createPortal(
     <div
       className="fixed left-0 right-0 z-9999 flex justify-center pointer-events-none px-4 pt-2"
-      style={{
-        top: '72px',
-      }}
+      style={{ top: '72px' }}
     >
       <div className="w-full max-w-120 flex flex-col gap-1.5">
-        <Stagger delay={80}>
+        <AnimatePresence mode="popLayout">
           {visibleToasts.map((toastItem) => (
             <Toast
               key={toastItem.id}
@@ -36,7 +31,7 @@ export function ToastContainer() {
               onDismiss={handleDismissToast}
             />
           ))}
-        </Stagger>
+        </AnimatePresence>
       </div>
     </div>,
     document.body

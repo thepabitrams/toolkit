@@ -1,7 +1,7 @@
-// src/core/components/toast/Toast.tsx
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React from 'react';
+import { motion, useDragControls } from 'motion/react';
 import type { ToastType } from './useToast';
-import { toastMotion } from '@/core/motion/compositions/toastMotion';
+import { spring, duration, easing } from '@/config/motion';
 
 interface ToastProps {
   id: number;
@@ -12,6 +12,13 @@ interface ToastProps {
   onDismiss: (id: number) => void;
 }
 
+const typeStyles: Record<ToastType, string> = {
+  info: 'bg-blue-50 text-blue-500 dark:bg-blue-900/20 dark:text-blue-400',
+  success: 'bg-green-50 text-green-500 dark:bg-green-900/20 dark:text-green-400',
+  warning: 'bg-yellow-50 text-yellow-500 dark:bg-yellow-900/20 dark:text-yellow-400',
+  error: 'bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400',
+};
+
 export const Toast: React.FC<ToastProps> = ({
   id,
   type,
@@ -20,191 +27,55 @@ export const Toast: React.FC<ToastProps> = ({
   message,
   onDismiss,
 }) => {
-  const toastElementRef = useRef<HTMLDivElement>(null);
-  const [isDismissing, setIsDismissing] = useState(false);
+  const dragControls = useDragControls();
 
-  useEffect(() => {
-    const activeToastElement = toastElementRef.current;
-    if (!activeToastElement) return;
-    void activeToastElement.offsetWidth;
-    activeToastElement.classList.add('visible');
-  }, []);
-
-  const handleDismiss = useCallback((isImmediate = false) => {
-    if (isDismissing) return;
-    setIsDismissing(true);
-    if (isImmediate) {
+  const handleDragEnd = (event: any, info: any) => {
+    if (info.offset.y < -50 || Math.abs(info.offset.x) > 50) {
       onDismiss(id);
-      return;
     }
-    const activeToastElement = toastElementRef.current;
-    if (activeToastElement) {
-      activeToastElement.classList.remove('visible');
-      activeToastElement.classList.add('hiding');
-    }
-    setTimeout(() => {
-      onDismiss(id);
-    }, 350);
-  }, [isDismissing, onDismiss, id]);
-
-  useEffect(() => {
-    if (isDismissing) return;
-    const activeToastElement = toastElementRef.current;
-    if (!activeToastElement) return;
-
-    let initialX = 0, initialY = 0, offsetX = 0, offsetY = 0;
-    let hasStartedSwiping = false, swipeDirection: 'horizontal' | 'vertical' | null = null;
-    let isCurrentlyDragging = false;
-
-    const handleContextMenu = (pointerEvent: MouseEvent) => pointerEvent.preventDefault();
-
-    const handlePointerDown = (pointerEvent: TouchEvent | MouseEvent) => {
-      const pointer = 'touches' in pointerEvent ? pointerEvent.touches[0] : pointerEvent;
-      initialX = pointer.clientX;
-      initialY = pointer.clientY;
-      offsetX = 0; offsetY = 0;
-      hasStartedSwiping = false;
-      swipeDirection = null;
-      isCurrentlyDragging = true;
-      activeToastElement.style.transition = 'none';
-    };
-
-    const handlePointerMove = (pointerEvent: TouchEvent | MouseEvent) => {
-      if (!isCurrentlyDragging) return;
-      const pointer = 'touches' in pointerEvent ? pointerEvent.touches[0] : pointerEvent;
-      const deltaX = pointer.clientX - initialX;
-      const deltaY = pointer.clientY - initialY;
-
-      if (!hasStartedSwiping) {
-        const absoluteX = Math.abs(deltaX);
-        const absoluteY = Math.abs(deltaY);
-        if (absoluteX > 10 || absoluteY > 10) {
-          hasStartedSwiping = true;
-          swipeDirection = absoluteX > absoluteY ? 'horizontal' : 'vertical';
-        }
-        return;
-      }
-
-      pointerEvent.preventDefault();
-
-      if (swipeDirection === 'horizontal') {
-        offsetX = deltaX;
-        const swipeProgress = Math.min(Math.abs(deltaX) / 200, 1);
-        activeToastElement.style.transform = `translateX(${deltaX}px) scale(${0.92 + (1 - swipeProgress) * 0.08})`;
-        activeToastElement.style.opacity = String(1 - swipeProgress * 0.5);
-      } else if (swipeDirection === 'vertical' && deltaY < 0) {
-        offsetY = deltaY;
-        const swipeProgress = Math.min(Math.abs(deltaY) / 150, 1);
-        activeToastElement.style.transform = `translateY(${deltaY}px) scale(${1 - swipeProgress * 0.08})`;
-        activeToastElement.style.opacity = String(1 - swipeProgress * 0.5);
-      }
-    };
-
-    const handlePointerUp = () => {
-      isCurrentlyDragging = false;
-      if (!hasStartedSwiping) {
-        activeToastElement.style.transition = '';
-        return;
-      }
-
-      const dismissalThreshold = 100;
-
-      if (swipeDirection === 'horizontal') {
-        if (Math.abs(offsetX) > dismissalThreshold) {
-          handleDismiss(true);
-        } else {
-          activeToastElement.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-          activeToastElement.style.transform = 'translateX(0) scale(1)';
-          activeToastElement.style.opacity = '1';
-          setTimeout(() => {
-            activeToastElement.style.transition = '';
-            activeToastElement.style.transform = '';
-            activeToastElement.style.opacity = '';
-          }, 350);
-        }
-      } else if (swipeDirection === 'vertical') {
-        if (offsetY < -70) {
-          handleDismiss(true);
-        } else {
-          activeToastElement.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-          activeToastElement.style.transform = 'translateY(0) scale(1)';
-          activeToastElement.style.opacity = '1';
-          setTimeout(() => {
-            activeToastElement.style.transition = '';
-            activeToastElement.style.transform = '';
-            activeToastElement.style.opacity = '';
-          }, 350);
-        }
-      }
-
-      hasStartedSwiping = false;
-      swipeDirection = null;
-    };
-
-    activeToastElement.addEventListener('touchstart', handlePointerDown, { passive: true });
-    activeToastElement.addEventListener('touchmove', handlePointerMove, { passive: false });
-    activeToastElement.addEventListener('touchend', handlePointerUp, { passive: true });
-    activeToastElement.addEventListener('touchcancel', handlePointerUp, { passive: true });
-
-    let isMouseDown = false;
-    const handleMouseDown = (mouseEvent: MouseEvent) => {
-      isMouseDown = true;
-      handlePointerDown(mouseEvent);
-    };
-    const handleMouseMove = (mouseEvent: MouseEvent) => {
-      if (!isMouseDown) return;
-      handlePointerMove(mouseEvent);
-    };
-    const handleMouseUp = () => {
-      if (!isMouseDown) return;
-      isMouseDown = false;
-      handlePointerUp();
-    };
-
-    activeToastElement.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    activeToastElement.addEventListener('contextmenu', handleContextMenu);
-
-    return () => {
-      activeToastElement.removeEventListener('touchstart', handlePointerDown);
-      activeToastElement.removeEventListener('touchmove', handlePointerMove);
-      activeToastElement.removeEventListener('touchend', handlePointerUp);
-      activeToastElement.removeEventListener('touchcancel', handlePointerUp);
-      activeToastElement.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      activeToastElement.removeEventListener('contextmenu', handleContextMenu);
-    };
-  }, [handleDismiss, isDismissing]);
-
-  const appliedMotionClasses = toastMotion().className;
+  };
 
   return (
-    <div
-      ref={toastElementRef}
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: -20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9, transition: { duration: duration.fast } }}
+      transition={spring.standard}
+      drag="y"
+      dragControls={dragControls}
+      dragConstraints={{ top: 0, bottom: 0 }}
+      dragElastic={0.6}
+      onDragEnd={handleDragEnd}
       className={`
-        ${appliedMotionClasses} ${type}
-        bg-white dark:bg-gray-800 rounded-xl
-        border border-gray-100 dark:border-gray-700
-        flex items-start gap-3 px-4 py-3.5
+        relative flex items-start gap-3 px-4 py-3.5
+        bg-white dark:bg-[#171b22] rounded-xl
+        border border-gray-100 dark:border-[rgba(255,255,255,0.08)]
+        shadow-lg dark:shadow-[0_0_15px_rgba(186,230,253,0.10)]
         select-none cursor-grab active:cursor-grabbing
-        backdrop-blur-sm touch-none
-        pointer-events-auto
-        ${isDismissing ? 'hiding' : ''}
+        touch-none pointer-events-auto
+        transition-shadow duration-300
       `}
     >
-      <div className="toast-icon">{icon}</div>
+      <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-xl ${typeStyles[type]}`}>
+        {icon}
+      </div>
 
-      <div className="flex-1 min-w-0">
-        <div className="toast-title">{title}</div>
-        <div className="toast-message">{message}</div>
-        <span className="toast-time">
+      <div className="flex-1 min-w-0 pt-0.5">
+        <div className="text-[13px] font-semibold text-slate-900 dark:text-slate-100">
+          {title}
+        </div>
+        <div className="text-[12.5px] text-slate-600 dark:text-slate-400 leading-snug">
+          {message}
+        </div>
+        <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">
           {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
       </div>
 
-      <span className="toast-swipe-hint">↕</span>
-    </div>
+      <span className="text-xs text-slate-300 dark:text-slate-600 opacity-40 shrink-0 pointer-events-none select-none pt-1">
+        ↕
+      </span>
+    </motion.div>
   );
 };

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
+import { motion } from 'motion/react';
 import { Input } from '@/core/components/ui/Input';
-import { Motion } from '@/core/motion/motion';
-import { buttonMotion } from '@/core/motion/compositions/buttonMotion';
+import { spring } from '@/config/motion';
 
 export type Unit = 'px' | 'mm' | 'cm' | 'inch';
 
@@ -118,22 +118,22 @@ export const DimensionInput: React.FC<DimensionInputProps> = ({
         </label>
         <div className="grid grid-cols-2 gap-1.5">
           {SUPPORTED_UNITS.map((unitOption) => (
-            <Motion
+            <motion.button
               key={unitOption}
-              preset={buttonMotion}
-              as="button"
               onClick={() => handleUnitChange(unitOption)}
+              whileTap={{ scale: 0.96 }}
+              transition={spring.snappy}
               className={`
                 px-3 py-1.5 text-xs font-medium rounded-lg
-                transition-all duration-200
+                transition-colors duration-200
                 ${selectedUnit === unitOption
-                  ? 'bg-blue-500 text-white shadow-sm scale-[1.02]'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  ? 'bg-blue-500 text-white shadow-sm ring-1 ring-blue-600/50'
+                  : 'bg-gray-100 dark:bg-[#1e242d]/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#1e242d] border border-transparent dark:border-gray-700/50'
                 }
               `}
             >
               {unitOption.toUpperCase()}
-            </Motion>
+            </motion.button>
           ))}
         </div>
       </div>
