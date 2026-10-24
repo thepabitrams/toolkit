@@ -9,3 +9,7 @@ dist/
 
 # Editor Settings
 .vscode/
+
+# wrangler files
+.wrangler
+.dev.vars

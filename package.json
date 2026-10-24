@@ -8,15 +8,19 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "preview": "pnpm run build && wrangler dev",
+    "astro": "astro",
+    "generate-types": "wrangler types",
+    "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.4.2",
     "@astrojs/sitemap": "^3.7.4",
     "@huggingface/transformers": "^4.3.1",
     "@tailwindcss/vite": "^4.3.3",
     "@uswriting/exiftool": "^1.0.9",
     "astro": "^7.4.1",
+    "better-auth": "^1.7.12",
     "drizzle-orm": "^0.45.4",
     "idb": "^8.0.4",
     "motion": "^14.6.0",
@@ -34,6 +38,7 @@
     "@cloudflare/workers-types": "^5.20261023.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "drizzle-kit": "^0.31.11"
+    "drizzle-kit": "^0.31.11",
+    "wrangler": "^4.152.0"
   }
 }

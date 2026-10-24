@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "compatibility_date": "2026-10-19",
+  "compatibility_flags": [
+    "global_fetch_strictly_public",
+    "nodejs_compat"
+  ],
+  "name": "toolkit",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "toolkit.pabitramohansingh.com",
+      "custom_domain": true
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "toolkit-db",
+      "database_id": "70164331-f4dd-42e9-b68b-3400d01d1a3c",
+      "migrations_dir": "./migrations"
+    }
+  ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
