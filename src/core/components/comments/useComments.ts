@@ -10,7 +10,7 @@ export function useComments(toolId: string) {
     try {
       const response = await fetch(`/api/comments?toolId=${toolId}`);
       if (response.ok) {
-        const data = await response.json();
+        const data = (await response.json()) as Comment[];
         setComments(data);
       }
     } catch (error) {
@@ -33,8 +33,6 @@ export function useComments(toolId: string) {
           toolId,
           content,
           parentId,
-          authorName: 'Guest User',
-          authorAvatar: 'GU',
         }),
       });
 
