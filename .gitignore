@@ -6,6 +6,7 @@ dist/
 
 # Generated Types
 .astro/
+worker-configuration.d.ts
 
 # Editor Settings
 .vscode/
