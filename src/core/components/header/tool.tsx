@@ -3,7 +3,8 @@ import { motion, AnimatePresence, type Variants } from 'motion/react';
 import { IconButton } from '@/core/components/ui/IconButton';
 import { Container } from '@/core/components/ui/Container';
 import { LinkButton } from '@/core/components/ui/LinkButton';
-import { FiMenu, FiX, FiHeart } from 'react-icons/fi';
+import { FiMenu, FiX } from 'react-icons/fi';
+import { FaHeart } from 'react-icons/fa';
 import { site, sponsor } from '@/config/site';
 import { ThemeToggle } from '@/core/components/ui/ThemeToggle';
 import { ToolHub } from '@/core/components/tool-hub';
@@ -69,7 +70,7 @@ export default function ToolHeader(): React.JSX.Element {
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full"
           >
-            <FiHeart className="w-3.5 h-3.5" />
+            <FaHeart className="w-3.5 h-3.5" />
             <span>Sponsor</span>
           </LinkButton>
 
@@ -88,8 +89,10 @@ export default function ToolHeader(): React.JSX.Element {
             exit="exit"
             className="
               fixed top-16 left-0 w-80 max-w-[80vw] h-[calc(100vh-4rem)] z-40
-              bg-white dark:bg-gray-950 shadow-xl border-r border-gray-200 dark:border-gray-800
+              bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800
               overflow-hidden
+              shadow-[0_1px_2px_rgba(15,21,34,0.06),0_4px_12px_-4px_rgba(15,21,34,0.15),0_10px_24px_-8px_rgba(15,21,34,0.15)]
+              dark:shadow-[0_0_15px_rgba(186,230,253,0.10)]
             "
           >
             <div className="h-full w-full overflow-y-auto overflow-x-hidden">

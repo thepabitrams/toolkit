@@ -27,7 +27,7 @@ export function Search({
               hover:border-gray-300 dark:hover:border-[rgba(255,255,255,0.14)]
               focus-within:border-blue-500
               focus-within:ring-2 focus-within:ring-blue-500/20
-              transition-colors transition-shadow duration-300 ease-out
+              transition-all duration-300 ease-out
               
               shadow-md
               hover:shadow-lg

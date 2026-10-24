@@ -36,7 +36,7 @@ export function useFilteredTools(
     }
 
     if (activeFilters.input) {
-      filteredCatalog = filteredCatalog.filter((catalogTool: any) => catalogTool.input === activeFilters.input);
+      filteredCatalog = filteredCatalog.filter((catalogTool) => (catalogTool as any).input === activeFilters.input);
     }
 
     if (deferredSearchQuery.trim()) {

@@ -59,13 +59,13 @@ export const ToolGridItem = memo(function ToolGridItem({
       <div className="relative p-6">
         <button
           onClick={handleFavoriteToggle}
-          className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-10"
+          className="absolute top-4 right-4 z-10 cursor-pointer transition-transform hover:scale-110"
           aria-label="Toggle favorite"
         >
           {isFavorite ? (
-            <FaHeart className="text-red-500 w-4 h-4" />
+            <FaHeart className="text-black dark:text-white w-4 h-4" />
           ) : (
-            <FaRegHeart className="text-gray-400 group-hover:text-red-400 w-4 h-4 transition-colors" />
+            <FaRegHeart className="text-slate-400 dark:text-gray-500 hover:text-black dark:hover:text-white w-4 h-4 transition-colors" />
           )}
         </button>
 
@@ -78,13 +78,13 @@ export const ToolGridItem = memo(function ToolGridItem({
                 ? { duration: Math.max(3, overflowDistance / 15), repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 } 
                 : {}
             }
-            className="tool-title mb-1 whitespace-nowrap"
+            className="tool-title mb-1 whitespace-nowrap font-medium text-slate-900 dark:text-white"
           >
             {tool.displayName}
           </motion.div>
         </div>
 
-        <p className="tool-description line-clamp-2">
+        <p className="tool-description line-clamp-2 text-sm text-slate-500 dark:text-slate-400">
           {tool.displayDescription}
         </p>
       </div>

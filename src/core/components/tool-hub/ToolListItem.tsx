@@ -46,14 +46,15 @@ export const ToolListItem = memo(function ToolListItem({
     }
   }, [tool.displayName]);
 
-  const baseClasses = "flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer select-none transition-all";
-  const activeClasses = isTopActive 
-    ? "bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 shadow-sm" 
-    : "hover:bg-gray-50 dark:hover:bg-gray-800/50";
+  const baseClasses = "group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer select-none transition-all duration-200";
+  
+  const stateClasses = isTopActive 
+    ? "bg-gray-100 dark:bg-[#1e242d] text-gray-900 dark:text-white shadow-sm ring-1 ring-gray-200 dark:ring-gray-700/50" 
+    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1e242d]/50 hover:text-gray-900 dark:hover:text-gray-200";
 
   return (
     <div
-      className={`${baseClasses} ${activeClasses} ${isLoading ? 'opacity-50 cursor-wait' : ''}`}
+      className={`${baseClasses} ${stateClasses} ${isLoading ? 'opacity-50 cursor-wait' : ''}`}
       onClick={handleToolClick}
       onMouseEnter={() => onToolHover?.(tool.slug)}
     >
@@ -66,18 +67,23 @@ export const ToolListItem = memo(function ToolListItem({
               ? { duration: Math.max(3, overflowDistance / 15), repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 } 
               : {}
           }
-          className={`text-sm font-medium whitespace-nowrap ${isTopActive ? 'text-blue-700 dark:text-blue-300' : 'text-gray-800 dark:text-gray-200'}`}
+          className="text-sm font-medium whitespace-nowrap"
         >
           {tool.displayName}
         </motion.div>
       </div>
+
       <button
         onClick={handleFavoriteToggle}
-        className="text-gray-400 hover:text-red-500 transition-colors shrink-0"
+        className={`shrink-0 transition-all p-1 rounded-md ${
+          isFavorite 
+            ? 'text-black dark:text-white' 
+            : 'text-slate-400 dark:text-gray-500 hover:text-black dark:hover:text-white'
+        }`}
         aria-label="Toggle favorite"
       >
         {isFavorite ? (
-          <FaHeart className="text-red-500 w-3.5 h-3.5" />
+          <FaHeart className="w-3.5 h-3.5" />
         ) : (
           <FaRegHeart className="w-3.5 h-3.5" />
         )}
