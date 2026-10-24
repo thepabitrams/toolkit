@@ -12,19 +12,23 @@ interface CommentNodeProps {
   defaultExpanded?: boolean;
 }
 
-const INITIAL_VISIBLE_REPLIES = 3;
-const REPLIES_PAGE_SIZE = 5;
-const CONNECTOR_GUTTER_PX = 24;
-const TRUNK_COLOR_CLASS = 'bg-slate-300 dark:bg-slate-600';
+const INITIAL_VISIBLE_REPLY_COUNT = 3;
+const REPLIES_PAGINATION_SIZE = 5;
+const CONNECTOR_GUTTER_PIXELS = 24;
+const TRUNK_COLOR_CLASS_NAME = 'bg-slate-300 dark:bg-slate-600';
 
-const ThreadCurve = ({ width }: { width: number }) => (
+interface ThreadConnectorCurveProps {
+  curveWidth: number;
+}
+
+const ThreadConnectorCurve = ({ curveWidth }: ThreadConnectorCurveProps) => (
   <svg
-    className="absolute left-[-25px] top-0 h-full pointer-events-none z-0"
-    style={{ width }}
+    className="absolute -left-[25px] top-0 h-full pointer-events-none z-0"
+    style={{ width: curveWidth }}
     overflow="visible"
   >
     <path
-      d={`M 1 0 L 1 8 Q 1 16 9 16 L ${width} 16`}
+      d={`M 1 0 L 1 8 Q 1 16 9 16 L ${curveWidth} 16`}
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
@@ -33,39 +37,48 @@ const ThreadCurve = ({ width }: { width: number }) => (
   </svg>
 );
 
-export const CommentNode = ({
+export function CommentNode({
   comment,
   allComments,
   onReplyClick,
   depth = 0,
   defaultExpanded = false,
-}: CommentNodeProps) => {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const [visibleReplyCount, setVisibleReplyCount] = useState(INITIAL_VISIBLE_REPLIES);
+}: CommentNodeProps) {
+  const [isRepliesExpanded, setIsRepliesExpanded] = useState(defaultExpanded);
+  const [visibleReplyCount, setVisibleReplyCount] = useState(INITIAL_VISIBLE_REPLY_COUNT);
 
   const isRootComment = depth === 0;
-  const avatarClassName = isRootComment ? 'w-10 h-10 text-sm' : 'w-8 h-8 text-xs';
-  const avatarCenterX = isRootComment ? 20 : 16;
+  const avatarSizeClassName = isRootComment ? 'w-10 h-10 text-sm' : 'w-8 h-8 text-xs';
+  const avatarCenterXCoordinate = isRootComment ? 20 : 16;
 
-  const replies = useMemo(
+  const childComments = useMemo(
     () => getChildren(comment.id, allComments),
-    [comment.id, allComments],
+    [comment.id, allComments]
   );
-  const hasReplies = replies.length > 0;
+  
+  const hasChildComments = childComments.length > 0;
 
-  const visibleReplies = replies.slice(0, visibleReplyCount);
-  const hiddenReplyCount = replies.length - visibleReplyCount;
+  const visibleChildComments = childComments.slice(0, visibleReplyCount);
+  const hiddenCommentCount = childComments.length - visibleReplyCount;
+
+  const handleToggleReplies = () => {
+    setIsRepliesExpanded((previousState) => !previousState);
+  };
+
+  const handleShowMoreReplies = () => {
+    setVisibleReplyCount((previousCount) => previousCount + REPLIES_PAGINATION_SIZE);
+  };
 
   return (
     <div className="relative">
       <div className="flex gap-3 relative z-20">
         <div className="flex flex-col items-center shrink-0">
           <div
-            className={`${avatarClassName} rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold`}
+            className={`${avatarSizeClassName} rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold`}
           >
             {comment.avatar}
           </div>
-          {hasReplies && <div className={`w-[2px] flex-1 -mb-px ${TRUNK_COLOR_CLASS}`} />}
+          {hasChildComments && <div className={`w-0.5 flex-1 -mb-px ${TRUNK_COLOR_CLASS_NAME}`} />}
         </div>
 
         <div className="flex-1 min-w-0 pb-2">
@@ -81,8 +94,9 @@ export const CommentNode = ({
 
           <div className="flex items-center gap-4 mt-2">
             <button
+              type="button"
               onClick={() => onReplyClick(comment)}
-              className="text-xs font-medium text-slate-500 hover:text-blue-600 flex items-center gap-1 transition-colors"
+              className="text-xs font-medium text-slate-500 hover:text-blue-600 flex items-center gap-1 transition-colors bg-transparent"
             >
               <FiCornerDownRight /> Reply
             </button>
@@ -90,35 +104,35 @@ export const CommentNode = ({
         </div>
       </div>
 
-      {hasReplies && (
+      {hasChildComments && (
         <div
           className="flex flex-col relative"
-          style={{ paddingLeft: avatarCenterX + CONNECTOR_GUTTER_PX }}
+          style={{ paddingLeft: avatarCenterXCoordinate + CONNECTOR_GUTTER_PIXELS }}
         >
-          {!isExpanded && (
+          {!isRepliesExpanded && (
             <div className="relative py-2">
-              <ThreadCurve width={25} />
+              <ThreadConnectorCurve curveWidth={25} />
               <ViewRepliesButton
-                replyCount={replies.length}
-                isExpanded={false}
-                onClick={() => setIsExpanded(true)}
+                totalReplyCount={childComments.length}
+                isRepliesExpanded={false}
+                onToggleReplies={handleToggleReplies}
               />
             </div>
           )}
 
-          {isExpanded && (
+          {isRepliesExpanded && (
             <>
               <div className="relative flex flex-col">
                 <div
-                  className={`absolute w-[2px] -top-px -bottom-px pointer-events-none z-0 ${TRUNK_COLOR_CLASS}`}
-                  style={{ left: avatarCenterX - 1 - (avatarCenterX + CONNECTOR_GUTTER_PX) }}
+                  className={`absolute w-0.5 -top-px -bottom-px pointer-events-none z-0 ${TRUNK_COLOR_CLASS_NAME}`}
+                  style={{ left: avatarCenterXCoordinate - 1 - (avatarCenterXCoordinate + CONNECTOR_GUTTER_PIXELS) }}
                 />
 
-                {visibleReplies.map((reply) => (
-                  <div key={reply.id} className="relative pb-4">
-                    <ThreadCurve width={41} />
+                {visibleChildComments.map((childComment) => (
+                  <div key={childComment.id} className="relative pb-4">
+                    <ThreadConnectorCurve curveWidth={41} />
                     <CommentNode
-                      comment={reply}
+                      comment={childComment}
                       allComments={allComments}
                       onReplyClick={onReplyClick}
                       depth={depth + 1}
@@ -126,25 +140,26 @@ export const CommentNode = ({
                   </div>
                 ))}
 
-                {hiddenReplyCount > 0 && (
+                {hiddenCommentCount > 0 && (
                   <div className="relative pb-4">
-                    <ThreadCurve width={25} />
+                    <ThreadConnectorCurve curveWidth={25} />
                     <button
-                      onClick={() => setVisibleReplyCount((count) => count + REPLIES_PAGE_SIZE)}
+                      type="button"
+                      onClick={handleShowMoreReplies}
                       className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors bg-transparent"
                     >
-                      Show more replies ({hiddenReplyCount})
+                      Show more replies ({hiddenCommentCount})
                     </button>
                   </div>
                 )}
               </div>
 
               <div className="relative py-2">
-                <ThreadCurve width={25} />
+                <ThreadConnectorCurve curveWidth={25} />
                 <ViewRepliesButton
-                  replyCount={replies.length}
-                  isExpanded={true}
-                  onClick={() => setIsExpanded(false)}
+                  totalReplyCount={childComments.length}
+                  isRepliesExpanded={true}
+                  onToggleReplies={handleToggleReplies}
                 />
               </div>
             </>
@@ -153,4 +168,4 @@ export const CommentNode = ({
       )}
     </div>
   );
-};
+}

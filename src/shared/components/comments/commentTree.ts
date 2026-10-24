@@ -1,74 +1,99 @@
-// src/features/comments/components/commentTree.ts
-// Pure helpers that build the parent -> child structure from the flat store array.
 import type { Comment } from '@/shared/store/comment-store';
 
-/** Root comments = parentId is null, OR the parent no longer exists (orphan / deleted parent). Newest first. */
-export function getRootComments(comments: Comment[]): Comment[] {
-  const unique = new Map<Comment['id'], Comment>();
-  comments.forEach((c) => unique.set(c.id, c)); // drops duplicate ids
-  const list = Array.from(unique.values());
-  return list
-    .filter((c) => c.parentId == null || !unique.has(c.parentId))
-    .sort((a, b) => b.createdAt - a.createdAt);
-}
-
-/** Direct children of one comment, oldest first (deduped, never returns the comment itself). */
-export function getChildren(parentId: Comment['id'], comments: Comment[]): Comment[] {
-  const unique = new Map<Comment['id'], Comment>();
-  comments.forEach((c) => {
-    if (c.parentId === parentId && c.id !== parentId) unique.set(c.id, c);
-  });
-  return Array.from(unique.values()).sort((a, b) => a.createdAt - b.createdAt);
-}
-
-/**
- * Every descendant of `rootId`, flattened (YouTube shows replies-to-replies
- * in the same list under the top comment). Oldest first.
- * The `seen` set prevents duplicates and infinite loops on circular data.
- */
-export function getThreadReplies(rootId: Comment['id'], comments: Comment[]): Comment[] {
-  const childrenOf = new Map<Comment['id'], Comment[]>();
-  comments.forEach((c) => {
-    if (c.parentId == null) return;
-    const bucket = childrenOf.get(c.parentId);
-    if (bucket) bucket.push(c);
-    else childrenOf.set(c.parentId, [c]);
+export function getRootComments(allComments: Comment[]): Comment[] {
+  const uniqueCommentsById = new Map<Comment['id'], Comment>();
+  
+  allComments.forEach((comment) => {
+    uniqueCommentsById.set(comment.id, comment);
   });
 
-  const seen = new Set<Comment['id']>([rootId]);
-  const queue: Comment['id'][] = [rootId];
-  const result: Comment[] = [];
+  const deduplicatedComments = Array.from(uniqueCommentsById.values());
 
-  while (queue.length) {
-    const id = queue.shift()!;
-    for (const child of childrenOf.get(id) ?? []) {
-      if (seen.has(child.id)) continue;
-      seen.add(child.id);
-      result.push(child);
-      queue.push(child.id);
+  return deduplicatedComments
+    .filter((comment) => 
+      comment.parentId == null || !uniqueCommentsById.has(comment.parentId)
+    )
+    .sort((firstComment, secondComment) => 
+      secondComment.createdAt - firstComment.createdAt
+    );
+}
+
+export function getChildren(parentId: Comment['id'], allComments: Comment[]): Comment[] {
+  const uniqueChildrenById = new Map<Comment['id'], Comment>();
+
+  allComments.forEach((comment) => {
+    if (comment.parentId === parentId && comment.id !== parentId) {
+      uniqueChildrenById.set(comment.id, comment);
+    }
+  });
+
+  return Array.from(uniqueChildrenById.values()).sort(
+    (firstComment, secondComment) => 
+      firstComment.createdAt - secondComment.createdAt
+  );
+}
+
+export function getThreadReplies(rootCommentId: Comment['id'], allComments: Comment[]): Comment[] {
+  const childrenByParentId = new Map<Comment['id'], Comment[]>();
+
+  allComments.forEach((comment) => {
+    if (comment.parentId == null) return;
+    
+    const existingChildren = childrenByParentId.get(comment.parentId);
+    if (existingChildren) {
+      existingChildren.push(comment);
+    } else {
+      childrenByParentId.set(comment.parentId, [comment]);
+    }
+  });
+
+  const visitedCommentIds = new Set<Comment['id']>([rootCommentId]);
+  const commentQueue: Comment['id'][] = [rootCommentId];
+  const flattenedReplies: Comment[] = [];
+
+  while (commentQueue.length > 0) {
+    const currentCommentId = commentQueue.shift()!;
+    const directChildren = childrenByParentId.get(currentCommentId) ?? [];
+
+    for (const childComment of directChildren) {
+      if (visitedCommentIds.has(childComment.id)) continue;
+      
+      visitedCommentIds.add(childComment.id);
+      flattenedReplies.push(childComment);
+      commentQueue.push(childComment.id);
     }
   }
-  return result.sort((a, b) => a.createdAt - b.createdAt);
+
+  return flattenedReplies.sort(
+    (firstComment, secondComment) => 
+      firstComment.createdAt - secondComment.createdAt
+  );
 }
 
-/** Walk up parentId links to the top-level comment (safe against missing parents and cycles). */
-export function getThreadRoot(comment: Comment, comments: Comment[]): Comment {
-  const byId = new Map(comments.map((c) => [c.id, c] as const));
-  const visited = new Set<Comment['id']>();
-  let current = byId.get(comment.id) ?? comment; // use the live copy from the store
-  while (current.parentId != null && !visited.has(current.id)) {
-    visited.add(current.id);
-    const parent = byId.get(current.parentId);
-    if (!parent) break;
-    current = parent;
+export function getThreadRoot(targetComment: Comment, allComments: Comment[]): Comment {
+  const commentsById = new Map<Comment['id'], Comment>(
+    allComments.map((comment) => [comment.id, comment] as const)
+  );
+  
+  const visitedCommentIds = new Set<Comment['id']>();
+  let currentComment = commentsById.get(targetComment.id) ?? targetComment;
+
+  while (currentComment.parentId != null && !visitedCommentIds.has(currentComment.id)) {
+    visitedCommentIds.add(currentComment.id);
+    
+    const parentComment = commentsById.get(currentComment.parentId);
+    if (!parentComment) break;
+    
+    currentComment = parentComment;
   }
-  return current;
+
+  return currentComment;
 }
 
-/** "just now", "5 minutes ago", "3 days ago", "2 years ago" */
 export function formatTimeAgo(timestamp: number): string {
-  const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
-  const units: [number, string][] = [
+  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+  
+  const timeUnits: [number, string][] = [
     [31536000, 'year'],
     [2592000, 'month'],
     [604800, 'week'],
@@ -76,9 +101,14 @@ export function formatTimeAgo(timestamp: number): string {
     [3600, 'hour'],
     [60, 'minute'],
   ];
-  for (const [size, label] of units) {
-    const n = Math.floor(seconds / size);
-    if (n >= 1) return `${n} ${label}${n > 1 ? 's' : ''} ago`;
+
+  for (const [unitSizeInSeconds, unitName] of timeUnits) {
+    const unitCount = Math.floor(elapsedSeconds / unitSizeInSeconds);
+    
+    if (unitCount >= 1) {
+      return `${unitCount} ${unitName}${unitCount > 1 ? 's' : ''} ago`;
+    }
   }
+  
   return 'just now';
 }

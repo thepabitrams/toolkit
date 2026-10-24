@@ -1,65 +1,79 @@
-// src/features/comments/components/ReplyComposer.tsx
 import React, { useState } from 'react';
-import { FiX } from 'react-icons/fi';
 import { useCommentStore, type Comment } from '@/shared/store/comment-store';
-import { Button } from '@/core/components/ui/Button';
 
 interface ReplyComposerProps {
   toolId: string;
-  replyTarget: Comment;
-  onClose: () => void;
-  onSuccess: () => void;
+  replyTargetComment: Comment;
+  onCancelReply: () => void;
+  onReplySubmitted: () => void;
 }
 
-export function ReplyComposer({ toolId, replyTarget, onClose, onSuccess }: ReplyComposerProps) {
+export function ReplyComposer({
+  toolId,
+  replyTargetComment,
+  onCancelReply,
+  onReplySubmitted,
+}: ReplyComposerProps) {
   const addComment = useCommentStore((state) => state.addComment);
-  const [replyText, setReplyText] = useState('');
+  const [draftReplyText, setDraftReplyText] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!replyText.trim()) return;
-    addComment(toolId, replyText.trim(), replyTarget.id); // parentId = the comment being replied to
-    setReplyText('');
-    onSuccess();
+  const isSubmitDisabled = !draftReplyText.trim();
+
+  const handleReplySubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const trimmedReplyText = draftReplyText.trim();
+    if (!trimmedReplyText) return;
+
+    addComment(toolId, trimmedReplyText, replyTargetComment.id);
+    setDraftReplyText('');
+    onReplySubmitted();
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDraftReplyText(event.target.value);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="shrink-0 border-t border-slate-100 dark:border-slate-800 pt-3"
-    >
-      <div className="mb-2 flex items-center justify-between">
-        <span className="text-xs text-slate-500">
-          Replying to <span className="font-semibold text-slate-900 dark:text-white">{replyTarget.author}</span>
-        </span>
-        <button
-          type="button"
-          onClick={onClose}
-          className="p-1 rounded-full text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          aria-label="Close reply"
-        >
-          <FiX className="w-4 h-4" />
-        </button>
-      </div>
-
-      <textarea
-        value={replyText}
-        onChange={(e) => setReplyText(e.target.value)}
-        rows={2}
-        autoFocus
-        placeholder="Add a reply..."
-        aria-label={`Reply to ${replyTarget.author}`}
-        className="w-full resize-none rounded-xl bg-slate-100 dark:bg-[#1e242d] border border-transparent focus:border-blue-500 px-4 py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-      />
-
-      <div className="mt-2 flex justify-end gap-2">
-        <Button variant="ghost" type="button" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button variant="primary" type="submit" disabled={!replyText.trim()}>
-          Reply
-        </Button>
-      </div>
-    </form>
+    <div className="w-full pb-4">
+      <form onSubmit={handleReplySubmit}>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 shrink-0 flex items-center justify-center font-bold text-xs text-slate-500">
+            GU
+          </div>
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={draftReplyText}
+              onChange={handleInputChange}
+              className="w-full bg-slate-100 dark:bg-[#1e242d] border border-transparent focus:border-blue-500 rounded-full pl-4 pr-12 py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+              placeholder={`Reply to ${replyTargetComment.author}...`}
+              autoFocus
+              aria-label={`Reply to ${replyTargetComment.author}`}
+            />
+            <button
+              type="submit"
+              disabled={isSubmitDisabled}
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-full disabled:opacity-50 disabled:bg-slate-300 dark:disabled:bg-slate-700 transition-all hover:bg-blue-700"
+              aria-label="Send reply"
+            >
+              <svg
+                className="w-4 h-4 transform -rotate-45"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 }

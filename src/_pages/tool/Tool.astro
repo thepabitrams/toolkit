@@ -38,10 +38,9 @@ const { tool: activeToolConfig, slug: activeToolSlug, AboutComponent } = Astro.p
       </button>
       <button 
         id="comments-tab-button" 
-        class="pb-3 text-sm font-medium text-slate-500 hover:text-blue-600 border-b-2 border-transparent transition-colors flex items-center gap-2"
+        class="pb-3 text-sm font-medium text-slate-500 hover:text-blue-600 border-b-2 border-transparent transition-colors"
       >
         Comments
-        <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold py-0.5 px-2 rounded-full">15</span>
       </button>
     </div>
 
@@ -75,8 +74,8 @@ const { tool: activeToolConfig, slug: activeToolSlug, AboutComponent } = Astro.p
     const commentsSection = document.getElementById('comments-section');
 
     if (toolTabButton && aboutTabButton && commentsTabButton && toolWorkspaceSection && aboutContentSection && commentsSection) {
-      const activeTabClasses = "pb-3 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 transition-colors flex items-center gap-2";
-      const inactiveTabClasses = "pb-3 text-sm font-medium text-slate-500 hover:text-blue-600 border-b-2 border-transparent transition-colors flex items-center gap-2";
+      const activeTabClasses = "pb-3 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 transition-colors";
+      const inactiveTabClasses = "pb-3 text-sm font-medium text-slate-500 hover:text-blue-600 border-b-2 border-transparent transition-colors";
 
       const resetTabs = () => {
         toolWorkspaceSection.classList.add('hidden');
