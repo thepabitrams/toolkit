@@ -1,8 +1,5 @@
-// src/core/components/ui/Input.tsx
 import React, { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
-import inputMotion from '@/core/motion/compositions/inputMotion';
 
-// ✅ FIXED: Added Omit to ignore React's built-in prefix/suffix
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'prefix' | 'suffix'> {
   label?: string;
   error?: string;
@@ -10,6 +7,34 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   suffix?: ReactNode;
   fullWidth?: boolean;
 }
+
+const inputStyles = {
+  wrapper: 'flex flex-col gap-1.5 w-full',
+  container: (error?: boolean, className?: string) => {
+    const classList = [
+      'flex items-center gap-2 rounded-xl border bg-white dark:bg-gray-800 px-3 py-2.5',
+      'transition-all duration-200 ease-out',
+      'focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20',
+      'hover:border-gray-400 dark:hover:border-gray-500',
+      error
+        ? 'border-red-400 focus-within:border-red-500 focus-within:ring-red-500/20'
+        : 'border-gray-300 dark:border-gray-600',
+      className
+    ];
+    return classList.filter(Boolean).join(' ');
+  },
+  field: (className?: string) => {
+    const classList = [
+      'w-full bg-transparent outline-none text-base text-gray-900 dark:text-white',
+      'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+      'disabled:cursor-not-allowed disabled:text-gray-400 dark:disabled:text-gray-500',
+      'min-w-0',
+      'selection:bg-blue-500/30 dark:selection:bg-blue-400/30',
+      className
+    ];
+    return classList.filter(Boolean).join(' ');
+  },
+};
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (
@@ -37,7 +62,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     return (
-      <div className={`${inputMotion.wrapper} ${fullWidth ? 'w-full' : ''}`}>
+      <div className={`${inputStyles.wrapper} ${fullWidth ? 'w-full' : ''}`}>
         {label && (
           <label
             htmlFor={inputId}
@@ -48,9 +73,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           </label>
         )}
 
-        <div className={inputMotion.container(!!error, className)}>
+        <div className={inputStyles.container(!!error, className)}>
           {prefix && (
-            // ✅ FIXED: changed flex-shrink-0 to shrink-0
             <span className="shrink-0 text-gray-500 dark:text-gray-400 text-sm">
               {prefix}
             </span>
@@ -61,12 +85,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             type={type}
             disabled={disabled}
             required={required}
-            className={inputMotion.field()}
+            className={inputStyles.field()}
             onDoubleClick={handleDoubleClick}
             {...props}
           />
           {suffix && (
-            // ✅ FIXED: changed flex-shrink-0 to shrink-0
             <span className="shrink-0 text-gray-500 dark:text-gray-400 text-sm">
               {suffix}
             </span>

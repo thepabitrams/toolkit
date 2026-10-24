@@ -1,6 +1,4 @@
-// src/core/components/ui/Select.tsx
 import React, { useEffect } from 'react';
-import { Motion } from '@/core/motion/motion';
 
 export interface SelectOption {
   value: string;
@@ -14,10 +12,6 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
   placeholder?: string;
   className?: string;
 }
-
-const MotionSelect = Motion as React.ComponentType<
-  React.SelectHTMLAttributes<HTMLSelectElement> & { preset?: any; as?: React.ElementType }
->;
 
 export const Select: React.FC<SelectProps> = ({
   selectOptions,
@@ -45,8 +39,7 @@ export const Select: React.FC<SelectProps> = ({
   }, []);
 
   return (
-    <MotionSelect
-      as="select"
+    <select
       value={selectedValue}
       onChange={(changeEvent: React.ChangeEvent<HTMLSelectElement>) => onValueChange(changeEvent.target.value)}
       className={`
@@ -72,6 +65,6 @@ export const Select: React.FC<SelectProps> = ({
           {optionItem.label}
         </option>
       ))}
-    </MotionSelect>
+    </select>
   );
 };

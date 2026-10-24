@@ -1,6 +1,6 @@
 import React, { type ReactNode } from 'react';
 import { motion, type HTMLMotionProps } from 'motion/react';
-import { spring } from '@/config/motion1';
+import { spring } from '@/config/motion';
 
 interface CardProps extends Omit<HTMLMotionProps<"div">, "ref"> {
   children: ReactNode;

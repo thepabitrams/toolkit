@@ -8,7 +8,7 @@ import { Cropper } from './Cropper';
 import { ExportPanel } from '@/shared/components/export-panel';
 import { IMAGE_CONFIG } from '@/shared/entities/image';
 import { Card } from '@/core/components/ui';
-import { spring, stagger } from '@/config/motion1';
+import { spring, stagger } from '@/config/motion';
 import type { Unit } from './DimensionInput';
 
 const workspaceContainerVariants: Variants = {

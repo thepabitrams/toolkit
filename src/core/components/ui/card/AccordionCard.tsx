@@ -1,7 +1,7 @@
 import React, { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence, type Variants } from 'motion/react';
 import { FiChevronDown } from 'react-icons/fi';
-import { duration, easing } from '@/config/motion1';
+import { duration, easing } from '@/config/motion';
 import { Card } from './Card';
 
 const chevronVariants: Variants = {

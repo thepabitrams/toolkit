@@ -1,7 +1,4 @@
-// src/core/components/ui/Search.tsx
 import { FiSearch } from 'react-icons/fi';
-import { Motion } from '@/core/motion/motion';
-import { searchMotion } from '@/core/motion/compositions/searchMotion';
 
 interface SearchProps {
   value: string;
@@ -20,9 +17,7 @@ export function Search({
     <div className={`sticky ${offset} z-40 py-4`}>
       <div className="flex justify-center">
         <div className="relative w-full max-w-md group">
-          <Motion
-            preset={searchMotion}
-            as="div"
+          <div
             className={`
               relative w-full
               rounded-full
@@ -32,6 +27,11 @@ export function Search({
               hover:border-gray-300 dark:hover:border-gray-600
               focus-within:border-blue-500
               focus-within:ring-2 focus-within:ring-blue-500/20
+              transition-all duration-300 ease-out
+              hover:scale-[1.02] focus-within:scale-[1.02]
+              shadow-md dark:shadow-white/10
+              hover:shadow-lg dark:hover:shadow-white/20
+              focus-within:shadow-xl dark:focus-within:shadow-white/20
             `}
           >
             <FiSearch
@@ -62,7 +62,7 @@ export function Search({
                 focus:ring-0
               `}
             />
-          </Motion>
+          </div>
         </div>
       </div>
     </div>

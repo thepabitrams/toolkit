@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { fadeIn, scaleIn } from '@/config/motion1';
+import { fadeIn, scaleIn } from '@/config/motion';
 import { FiX } from 'react-icons/fi';
 
 interface OverlayProps {

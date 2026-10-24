@@ -7,7 +7,7 @@ import { FiMenu, FiX, FiHeart } from 'react-icons/fi';
 import { site, sponsor } from '@/config/site';
 import { ThemeToggle } from '@/core/components/ui/ThemeToggle';
 import { ToolHub } from '@/core/components/tool-hub';
-import { spring } from '@/config/motion1';
+import { spring } from '@/config/motion';
 
 const drawerSlideVariants: Variants = {
   hidden: { x: '-100%', opacity: 0 },

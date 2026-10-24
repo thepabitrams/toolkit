@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, type HTMLMotionProps } from 'motion/react';
-import { spring } from '@/config/motion1';
+import { spring } from '@/config/motion';
 
 export type IconButtonVariant = 'standard' | 'filled' | 'tonal' | 'outlined';
 export type IconButtonSize = 'xs' | 'sm' | 'md' | 'lg';

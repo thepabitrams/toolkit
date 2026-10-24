@@ -1,6 +1,4 @@
-// src/core/components/ui/ColorPicker.tsx
 import React, { useRef } from 'react';
-import colorPickerMotion from '@/core/motion/compositions/colorPickerMotion';
 
 interface ColorPickerProps {
   value: string;
@@ -11,6 +9,25 @@ interface ColorPickerProps {
   label?: string;
   showLabel?: boolean;
 }
+
+const colorPickerStyles = {
+  sizes: {
+    sm: 'w-6 h-6',
+    md: 'w-7 h-7',
+    lg: 'w-8 h-8',
+  },
+  base: (size: 'sm' | 'md' | 'lg' = 'sm', className?: string) => {
+    const classList = [
+      colorPickerStyles.sizes[size],
+      'p-0 border-0 rounded-lg cursor-pointer bg-transparent',
+      'disabled:opacity-50 disabled:cursor-not-allowed',
+      'flex-shrink-0',
+      className
+    ];
+    return classList.filter(Boolean).join(' ');
+  },
+  label: 'text-xs font-medium text-gray-600 dark:text-gray-400',
+};
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({
   value,
@@ -26,7 +43,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   return (
     <div className={`flex items-center gap-1.5 shrink-0 ${className}`}>
       {showLabel && label && (
-        <label className={colorPickerMotion.label}>{label}</label>
+        <label className={colorPickerStyles.label}>{label}</label>
       )}
       <input
         ref={inputRef}
@@ -34,7 +51,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className={colorPickerMotion.base(size)}
+        className={colorPickerStyles.base(size)}
       />
     </div>
   );
