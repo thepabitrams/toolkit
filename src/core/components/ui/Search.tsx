@@ -22,16 +22,20 @@ export function Search({
               relative w-full
               rounded-full
               overflow-hidden
-              bg-white dark:bg-gray-800
-              border border-gray-200 dark:border-gray-700
-              hover:border-gray-300 dark:hover:border-gray-600
+              bg-white dark:bg-[#171b22]
+              border border-gray-200 dark:border-[rgba(255,255,255,0.08)]
+              hover:border-gray-300 dark:hover:border-[rgba(255,255,255,0.14)]
               focus-within:border-blue-500
               focus-within:ring-2 focus-within:ring-blue-500/20
-              transition-all duration-300 ease-out
-              hover:scale-[1.02] focus-within:scale-[1.02]
-              shadow-md dark:shadow-white/10
-              hover:shadow-lg dark:hover:shadow-white/20
-              focus-within:shadow-xl dark:focus-within:shadow-white/20
+              transition-colors transition-shadow duration-300 ease-out
+              
+              shadow-md
+              hover:shadow-lg
+              focus-within:shadow-xl
+              
+              dark:shadow-[0_0_15px_rgba(186,230,253,0.10)]
+              dark:hover:shadow-[0_0_25px_rgba(186,230,253,0.20)]
+              dark:focus-within:shadow-[0_0_30px_rgba(186,230,253,0.25)]
             `}
           >
             <FiSearch
