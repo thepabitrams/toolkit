@@ -1,7 +1,11 @@
+packages:
+  - '.'
+
 allowBuilds:
   esbuild: true
   onnxruntime-node: false
   protobufjs: false
   workerd: true
+
 minimumReleaseAgeExclude:
   - astro@7.4.1
