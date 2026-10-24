@@ -124,7 +124,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
   return (
     <div className="w-full flex flex-col gap-6 py-2">
       
-      <div className="-mx-4 sm:mx-0">
+      <div className="w-full">
         <GalleryUploader
           files={originals}
           activeFileId={activeFileId}
@@ -139,14 +139,13 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           variants={pageStaggerContainer}
           initial="hidden"
           animate="visible"
-          className="-mx-4 sm:mx-0 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start"
         >
           <motion.div 
             variants={cardSpringItem}
             className="lg:col-span-4 w-full"
           >
-            {/* CLEAN CARD - NO OVERRIDES */}
-            <Card className="w-full p-0 rounded-none sm:rounded-2xl">
+            <Card className="w-full p-0">
               <DimensionInput
                 initialWidth={cropConfig.rawWidth}
                 initialHeight={cropConfig.rawHeight}
@@ -159,8 +158,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
             variants={cardSpringItem}
             className="lg:col-span-8 w-full"
           >
-            {/* CLEAN CARD - NO OVERRIDES */}
-            <Card className="w-full p-0 rounded-none sm:rounded-2xl overflow-hidden">
+            <Card className="w-full p-0 overflow-hidden">
               <Cropper
                 fileReference={activeOriginal}
                 aspectRatio={aspectRatio}
@@ -179,11 +177,10 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           variants={pageStaggerContainer}
           initial="hidden"
           animate="visible"
-          className="-mx-4 sm:mx-0 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 items-start"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 items-start"
         >
           <motion.div variants={cardSpringItem} className="col-span-1 w-full">
-            {/* CLEAN CARD - NO OVERRIDES */}
-            <Card className="w-full h-full p-0 rounded-none sm:rounded-2xl overflow-hidden flex flex-col">
+            <Card className="w-full h-full p-0 overflow-hidden flex flex-col">
               <FileCard
                 fileReference={activeProcessed}
                 displayVariant="process"
@@ -192,8 +189,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           </motion.div>
 
           <motion.div variants={cardSpringItem} className="col-span-1 w-full">
-            {/* CLEAN CARD - NO OVERRIDES */}
-            <Card className="w-full p-0 rounded-none sm:rounded-2xl overflow-hidden">
+            <Card className="w-full p-0 overflow-hidden">
               <ExportPanel
                 fileReference={activeProcessed}
                 actionVariant="single"
