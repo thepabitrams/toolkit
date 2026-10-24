@@ -1,5 +1,10 @@
 import { useState, useCallback } from "react";
-import { cropperZoomConfig } from "@/config/motion";
+
+const cropperZoomConfig = {
+  maximumZoomLevel: 5,
+  zoomIncrementStep: 0.1,
+  minimumZoomLevel: 1,
+};
 
 interface UsePrecisionCropReturn {
   cropPosition: { x: number; y: number };

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, type Variants } from 'motion/react';
 import { useFileStore } from '@/shared/store/file-store';
 import { GalleryUploader } from '@/shared/components/uploaders';
 import { FileCard } from '@/shared/components/file-card';
@@ -8,8 +8,26 @@ import { Cropper } from './Cropper';
 import { ExportPanel } from '@/shared/components/export-panel';
 import { IMAGE_CONFIG } from '@/shared/entities/image';
 import { Card } from '@/core/components/ui';
-import { pageStaggerContainer, cardSpringItem } from '@/config/motion';
+import { spring, stagger } from '@/config/motion1';
 import type { Unit } from './DimensionInput';
+
+const workspaceContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: stagger.standard },
+  },
+};
+
+const workspaceCardVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95, y: 10 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: spring.standard,
+  },
+};
 
 interface PrecisionCropProps {
   category: string;
@@ -136,13 +154,13 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
 
       {hasOriginal && (
         <motion.div 
-          variants={pageStaggerContainer}
+          variants={workspaceContainerVariants}
           initial="hidden"
           animate="visible"
           className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start"
         >
           <motion.div 
-            variants={cardSpringItem}
+            variants={workspaceCardVariants}
             className="lg:col-span-4 w-full"
           >
             <Card className="w-full p-0">
@@ -155,7 +173,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           </motion.div>
 
           <motion.div 
-            variants={cardSpringItem}
+            variants={workspaceCardVariants}
             className="lg:col-span-8 w-full"
           >
             <Card className="w-full p-0 overflow-hidden">
@@ -174,12 +192,12 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
 
       {hasProcessed && (
         <motion.div 
-          variants={pageStaggerContainer}
+          variants={workspaceContainerVariants}
           initial="hidden"
           animate="visible"
           className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 items-start"
         >
-          <motion.div variants={cardSpringItem} className="col-span-1 w-full">
+          <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full h-full p-0 overflow-hidden flex flex-col">
               <FileCard
                 fileReference={activeProcessed}
@@ -188,7 +206,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
             </Card>
           </motion.div>
 
-          <motion.div variants={cardSpringItem} className="col-span-1 w-full">
+          <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full p-0 overflow-hidden">
               <ExportPanel
                 fileReference={activeProcessed}

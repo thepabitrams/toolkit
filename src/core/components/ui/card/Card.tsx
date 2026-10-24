@@ -1,5 +1,6 @@
 import React, { type ReactNode } from 'react';
 import { motion, type HTMLMotionProps } from 'motion/react';
+import { spring } from '@/config/motion1';
 
 interface CardProps extends Omit<HTMLMotionProps<"div">, "ref"> {
   children: ReactNode;
@@ -17,7 +18,7 @@ export const Card = ({
 }: CardProps): React.JSX.Element => {
   return (
     <motion.div
-      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+      transition={spring.snappy}
       className={`
         bg-white dark:bg-[#171b22] 
         rounded-2xl 

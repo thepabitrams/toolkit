@@ -1,13 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, type Variants } from 'motion/react';
 import { IconButton } from '@/core/components/ui/IconButton';
 import { Container } from '@/core/components/ui/Container';
-import { LinkButton } from '@/core/components/ui/LinkButton'; 
+import { LinkButton } from '@/core/components/ui/LinkButton';
 import { FiMenu, FiX, FiHeart } from 'react-icons/fi';
 import { site, sponsor } from '@/config/site';
 import { ThemeToggle } from '@/core/components/ui/ThemeToggle';
 import { ToolHub } from '@/core/components/tool-hub';
-import { drawerSlideVariants } from '@/config/motion';
+import { spring } from '@/config/motion1';
+
+const drawerSlideVariants: Variants = {
+  hidden: { x: '-100%', opacity: 0 },
+  visible: { x: 0, opacity: 1, transition: spring.fluid },
+  exit: { x: '-100%', opacity: 0, transition: spring.fluid },
+};
 
 export default function ToolHeader(): React.JSX.Element {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);

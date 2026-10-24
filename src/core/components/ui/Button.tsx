@@ -1,5 +1,6 @@
 import React, { type ReactNode } from 'react';
 import { motion, type HTMLMotionProps } from 'motion/react';
+import { spring } from '@/config/motion1';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
@@ -19,7 +20,7 @@ export const Button = ({
   type = 'button',
   ...remainingProps
 }: ButtonProps): React.JSX.Element => {
-  const buttonVariantStyles = {
+  const variantStyles: Record<ButtonVariant, string> = {
     primary: 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-sm hover:shadow-md transition-all',
     secondary: 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 hover:shadow-sm transition-all',
     ghost: 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all',
@@ -29,14 +30,14 @@ export const Button = ({
   return (
     <motion.button
       whileTap={{ scale: disabled ? 1 : 0.97 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+      transition={spring.snappy}
       type={type}
       onClick={onClick}
       disabled={disabled}
       className={`
         inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium rounded-lg select-none cursor-pointer
         disabled:opacity-50 disabled:pointer-events-none
-        ${buttonVariantStyles[variant]}
+        ${variantStyles[variant]}
         ${className}
       `}
       {...remainingProps}

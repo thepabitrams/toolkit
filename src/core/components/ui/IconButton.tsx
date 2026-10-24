@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, type HTMLMotionProps } from 'motion/react';
+import { spring } from '@/config/motion1';
 
 export type IconButtonVariant = 'standard' | 'filled' | 'tonal' | 'outlined';
 export type IconButtonSize = 'xs' | 'sm' | 'md' | 'lg';
@@ -11,14 +12,14 @@ interface IconButtonProps extends Omit<HTMLMotionProps<"button">, "ref"> {
   ariaLabel: string;
 }
 
-const sizeMap = {
+const dimensionStyles: Record<IconButtonSize, string> = {
   xs: 'w-6 h-6 text-xs',
   sm: 'w-8 h-8 text-sm',
   md: 'w-10 h-10 text-base',
   lg: 'w-12 h-12 text-lg',
 };
 
-const iconSizeMap = {
+const iconDimensionStyles: Record<IconButtonSize, string> = {
   xs: 'w-3 h-3',
   sm: 'w-4 h-4',
   md: 'w-5 h-5',
@@ -34,7 +35,7 @@ export const IconButton = ({
   ariaLabel,
   ...remainingProps
 }: IconButtonProps): React.JSX.Element => {
-  const variantStyles = {
+  const variantStyles: Record<IconButtonVariant, string> = {
     standard: `
       bg-transparent
       text-gray-600 dark:text-gray-300
@@ -69,14 +70,11 @@ export const IconButton = ({
     `,
   };
 
-  const sizeClass = sizeMap[size];
-  const iconSizeClass = iconSizeMap[size];
-
   return (
     <motion.button
       whileHover={{ scale: disabled ? 1 : 1.05 }}
       whileTap={{ scale: disabled ? 1 : 0.95 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+      transition={spring.snappy}
       type="button"
       disabled={disabled}
       aria-label={ariaLabel}
@@ -88,12 +86,12 @@ export const IconButton = ({
         focus:outline-none
         disabled:opacity-50 disabled:pointer-events-none
         ${variantStyles[variant]}
-        ${sizeClass}
+        ${dimensionStyles[size]}
         ${className}
       `}
       {...remainingProps}
     >
-      <span className={iconSizeClass}>
+      <span className={iconDimensionStyles[size]}>
         {children}
       </span>
     </motion.button>
