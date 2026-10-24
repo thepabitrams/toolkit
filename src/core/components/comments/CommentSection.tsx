@@ -6,6 +6,7 @@ import { CommentList } from './CommentList';
 import { ThreadView } from './ThreadView';
 import { useComments } from './useComments';
 import { signIn, useSession } from '@/core/lib/auth-client';
+import { UserAvatar } from './UserAvatar';
 import type { Comment } from './types';
 
 interface CommentSectionProps {
@@ -60,13 +61,7 @@ export function CommentSection({ toolId }: CommentSectionProps) {
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
               {session.user.name}
             </span>
-            {session.user.image ? (
-              <img src={session.user.image} alt={session.user.name} className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
-            ) : (
-              <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
-                {session.user.name.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <UserAvatar imageSource={session.user.image} authorName={session.user.name} className="w-9 h-9 text-sm" />
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ import type { Comment } from './types';
 import { CommentNode } from './CommentNode';
 import { getRootComments } from './commentTree';
 import type { User } from 'better-auth';
+import { UserAvatar } from './UserAvatar';
 
 interface CommentListProps {
   toolId: string;
@@ -39,23 +40,17 @@ export function CommentList({
   };
 
   return (
-    <div className="w-full pb-4">
+    <div className="w-full pb-4 select-none">
       {isAuthenticated && currentUser ? (
         <form onSubmit={handleRootCommentSubmit} className="mb-8">
           <div className="flex items-center gap-3">
-            {currentUser.image ? (
-               <img src={currentUser.image} alt={currentUser.name} className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0" />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 shrink-0 flex items-center justify-center font-bold text-sm">
-                {currentUser.name.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <UserAvatar imageSource={currentUser.image} authorName={currentUser.name} className="w-10 h-10 text-sm" />
             <div className="flex-1 relative">
               <input
                 type="text"
                 value={draftRootCommentText}
                 onChange={(event) => setDraftRootCommentText(event.target.value)}
-                className="w-full bg-slate-100 dark:bg-[#1e242d] border border-transparent focus:border-blue-500 rounded-full pl-4 pr-12 py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full bg-slate-100 dark:bg-[#1e242d] border border-transparent focus:border-blue-500 rounded-full pl-4 pr-12 py-3 text-base sm:text-sm select-text text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                 placeholder="Add a comment..."
                 disabled={isLoading}
               />

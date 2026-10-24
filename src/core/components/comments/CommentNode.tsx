@@ -3,6 +3,7 @@ import { FiCornerDownRight } from 'react-icons/fi';
 import type { Comment } from './types';
 import { ViewRepliesButton } from './ViewRepliesButton';
 import { getChildren, formatTimeAgo } from './commentTree';
+import { UserAvatar } from './UserAvatar';
 
 interface CommentNodeProps {
   comment: Comment;
@@ -70,14 +71,10 @@ export function CommentNode({
   };
 
   return (
-    <div className="relative">
+    <div className="relative select-none">
       <div className="flex gap-3 relative z-20">
         <div className="flex flex-col items-center shrink-0">
-          <div
-            className={`${avatarSizeClassName} rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold`}
-          >
-            {comment.authorAvatar}
-          </div>
+          <UserAvatar imageSource={comment.authorAvatar} authorName={comment.authorName} className={`${avatarSizeClassName} font-bold`} />
           {hasChildComments && <div className={`w-0.5 flex-1 -mb-px ${TRUNK_COLOR_CLASS_NAME}`} />}
         </div>
 
@@ -88,7 +85,8 @@ export function CommentNode({
             </span>
             <span className="text-xs text-slate-400">{formatTimeAgo(comment.createdAt)}</span>
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          
+          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed select-text">
             {comment.content}
           </p>
 
@@ -106,7 +104,7 @@ export function CommentNode({
 
       {hasChildComments && (
         <div
-          className="flex flex-col relative"
+          className="flex flex-col relative select-none"
           style={{ paddingLeft: avatarCenterXCoordinate + CONNECTOR_GUTTER_PIXELS }}
         >
           {!isRepliesExpanded && (
