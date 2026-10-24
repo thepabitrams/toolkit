@@ -132,7 +132,7 @@ export const Cropper: React.FC<CropperProps> = ({
 
   if (!fileReference) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px] bg-gray-100 dark:bg-gray-700">
+      <div className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px] bg-slate-200/60 dark:bg-black/50">
         <p className="text-slate-400 text-sm">Select an image to begin</p>
       </div>
     );
@@ -140,16 +140,16 @@ export const Cropper: React.FC<CropperProps> = ({
 
   if (!imageObjectUrl) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px] bg-gray-100 dark:bg-gray-700">
+      <div className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px] bg-slate-200/60 dark:bg-black/50">
          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full h-full flex flex-col bg-transparent">
       <div
-        className="relative w-full h-[400px] md:h-[500px] bg-gray-100 dark:bg-gray-700 rounded-t-none sm:rounded-t-3xl"
+        className="relative w-full h-[400px] md:h-[500px] bg-slate-200/60 dark:bg-black/50"
         style={{ touchAction: 'none' }}
       >
         <ReactEasyCrop
@@ -166,11 +166,11 @@ export const Cropper: React.FC<CropperProps> = ({
           onZoomChange={setZoomLevel}
           onCropComplete={onCropAreaComplete}
           style={{
-            containerStyle: { width: "100%", height: "100%", position: "relative" },
+            containerStyle: { width: "100%", height: "100%", position: "relative", backgroundColor: "transparent" },
             cropAreaStyle: {
               border: "2px solid rgba(59, 130, 246, 0.8)",
               borderRadius: "8px",
-              boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
+              boxShadow: "none",
             },
             mediaStyle: {
               transition: "transform 0.15s ease-out",

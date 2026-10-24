@@ -22,7 +22,7 @@ export const FileDetails: React.FC<FileDetailsProperties> = ({
 
   if (!fileReference) {
     return (
-      <div className={`w-full p-3 ${className}`}>
+      <div className={`w-full p-4 flex justify-center ${className}`}>
         <p className="text-xs text-slate-400 dark:text-gray-500">No file uploaded</p>
       </div>
     );
@@ -32,11 +32,11 @@ export const FileDetails: React.FC<FileDetailsProperties> = ({
   const formatLabel = fileReference.type?.split('/')[1]?.toUpperCase() || 'FILE';
 
   return (
-    <div className={`w-full px-4 py-3 flex flex-col gap-1 ${className}`}>
-      <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+    <div className={`w-full px-4 py-4 flex flex-col items-center justify-center text-center gap-1.5 ${className}`}>
+      <p className="text-base font-semibold text-slate-900 dark:text-white truncate max-w-full">
         {fileReference.name}
       </p>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 dark:text-gray-400">
+      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[12px] text-slate-500 dark:text-gray-400">
         <span>{formattedSize}</span>
         <span className="w-px h-3 bg-slate-300 dark:bg-gray-600" />
         {isLoading ? (

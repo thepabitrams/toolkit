@@ -23,7 +23,7 @@ export const CropControls: React.FC<CropControlsProps> = ({
   handleApplyCrop,
 }): React.JSX.Element => {
   return (
-    <div className="flex flex-col w-full gap-4 p-4">
+    <div className="flex flex-col w-full gap-4 p-4 bg-transparent border-t border-slate-200 dark:border-gray-800">
       <div className="flex items-center justify-center gap-1.5 flex-wrap">
         <IconButton
           onClick={handleZoomOut}
@@ -47,7 +47,7 @@ export const CropControls: React.FC<CropControlsProps> = ({
           <FiZoomIn className="w-5 h-5" />
         </IconButton>
 
-        <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+        <span className="w-px h-6 bg-slate-300 dark:bg-gray-700 mx-1" />
 
         <IconButton
           onClick={handleReset}
@@ -61,7 +61,7 @@ export const CropControls: React.FC<CropControlsProps> = ({
       </div>
 
       <div className="text-center">
-        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+        <span className="text-xs font-medium text-slate-500 dark:text-gray-400">
           {Math.round(currentZoom * 100)}%
         </span>
       </div>
