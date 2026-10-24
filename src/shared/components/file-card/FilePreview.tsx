@@ -42,7 +42,7 @@ export const FilePreview: React.FC<FilePreviewProperties> = ({
     }
 
     return (
-      <div className={`w-full h-56 bg-slate-200/60 dark:bg-black/50 overflow-hidden flex items-center justify-center p-2 ${className}`}>
+      <div className={`w-full h-56 bg-slate-200/60 dark:bg-black/50 overflow-hidden flex items-center justify-center ${className}`}>
         {isImageFile ? (
           <img src={previewUrl} alt={fileReference.name} className="w-full h-full object-contain" />
         ) : isPdfFile ? (

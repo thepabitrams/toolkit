@@ -132,7 +132,7 @@ export const Cropper: React.FC<CropperProps> = ({
 
   if (!fileReference) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px] bg-slate-200/60 dark:bg-black/50">
+      <div className="flex flex-col items-center justify-center w-full h-100 md:h-125 bg-slate-200/60 dark:bg-black/50">
         <p className="text-slate-400 text-sm">Select an image to begin</p>
       </div>
     );
@@ -140,7 +140,7 @@ export const Cropper: React.FC<CropperProps> = ({
 
   if (!imageObjectUrl) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-[400px] md:h-[500px] bg-slate-200/60 dark:bg-black/50">
+      <div className="flex flex-col items-center justify-center w-full h-100 md:h-125 bg-slate-200/60 dark:bg-black/50">
          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -149,7 +149,7 @@ export const Cropper: React.FC<CropperProps> = ({
   return (
     <div className="w-full h-full flex flex-col bg-transparent">
       <div
-        className="relative w-full h-[400px] md:h-[500px] bg-slate-200/60 dark:bg-black/50"
+        className="relative w-full h-100 md:h-125 bg-slate-200/60 dark:bg-black/50"
         style={{ touchAction: 'none' }}
       >
         <ReactEasyCrop
