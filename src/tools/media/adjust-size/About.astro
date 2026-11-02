@@ -1,0 +1,67 @@
+---
+// src/tools/media/adjust-size/About.astro
+import { AccordionCard } from '@/core/components/ui';
+---
+
+<div class="flex flex-col gap-2">
+  
+  <AccordionCard title="How to use this tool" defaultOpen={true} client:load>
+    <div class="flex flex-col gap-4 mt-2">
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">1</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Upload Source Image</h4>
+          <p class="text-slate-500 text-sm">Select an image from your device using the upload gallery.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">2</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Configure Target Size</h4>
+          <p class="text-slate-500 text-sm">Specify the minimum and maximum file size constraints in kilobytes (KB).</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">3</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Process and Export</h4>
+          <p class="text-slate-500 text-sm">Click "Adjust File Size", wait for the local compression to complete, and download your optimized file.</p>
+        </div>
+      </div>
+    </div>
+  </AccordionCard>
+
+  <AccordionCard title="Project Overview" client:load>
+    <p class="mb-4">
+      Adjust Size is a fully client-side image optimization utility designed to compress or pad image formats (JPG, PNG, WebP, AVIF, GIF, BMP) to meet specific file size constraints.
+    </p>
+    <p>
+      By processing entirely within the browser, it ensures native execution speeds and guarantees 100% data privacy. Your files are never transmitted to an external server.
+    </p>
+  </AccordionCard>
+
+  <AccordionCard title="Why this tool exists" client:load>
+    <p class="mb-4">
+      Many platforms enforce strict upload limits (e.g., "File must be under 200KB"). Most online compressors either upload your files to a remote server (a privacy risk) or blindly reduce image quality until the file size drops below the threshold.
+    </p>
+    <p>
+      Adjust Size addresses this by employing a binary search algorithm combined with progressive pixel-level strategies (chroma subsampling, posterization, and Gaussian blur) to hit the target size while maximizing visual quality. For files smaller than the target range, it applies lossless byte-padding to meet minimum upload requirements.
+    </p>
+  </AccordionCard>
+
+  <AccordionCard title="Under the hood (Architecture)" client:load>
+    <p class="mb-4">
+      This tool leverages a modern, lightweight architecture optimized for performance:
+    </p>
+    <ul class="list-disc pl-5 space-y-2 mb-4 text-sm">
+      <li><strong class="text-slate-900 dark:text-white">Framework:</strong> Astro & React (Isomorphic rendering with minimal hydration).</li>
+      <li><strong class="text-slate-900 dark:text-white">State Management:</strong> Zustand (Normalized, high-performance file store).</li>
+      <li><strong class="text-slate-900 dark:text-white">Storage:</strong> OPFS (Origin Private File System) and IndexedDB (Direct disk access for multi-megabyte files without RAM bottlenecks).</li>
+      <li><strong class="text-slate-900 dark:text-white">Image Processing:</strong> HTML5 Canvas API, binary search compression loops, and byte-level format manipulation for size padding.</li>
+    </ul>
+    <p>
+      Zero backend. Zero API keys. Zero cloud storage. Just pure, local computation.
+    </p>
+  </AccordionCard>
+
+</div>

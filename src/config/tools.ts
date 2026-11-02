@@ -20,6 +20,16 @@ export const tools: ToolConfig[] = [
     category: 'media',
     component: () => import('@/tools/media/precision-crop'),
   },
+
+  {
+    slug: 'adjust-size',
+    displayName: 'Adjust Size',
+    displayDescription: 'Compress or pad an image to fit within a specific file size range, 100% in your browser.',
+    seoTitle: 'Free Image Size Adjuster - 100% Private | Toolkit',
+    seoDescription: 'Compress JPG, PNG, WebP, AVIF, GIF, and BMP images to a target KB size. Runs entirely in your browser.',
+  category: 'media',
+  component: () => import('@/tools/media/adjust-size'),
+},
 ];
 
 export const toolsBySlug: Record<string, ToolConfig> = Object.fromEntries(
