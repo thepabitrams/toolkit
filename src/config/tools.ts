@@ -29,7 +29,17 @@ export const tools: ToolConfig[] = [
     seoDescription: 'Compress JPG, PNG, WebP, AVIF, GIF, and BMP images to a target KB size. Runs entirely in your browser.',
   category: 'media',
   component: () => import('@/tools/media/adjust-size'),
-},
+  },
+
+  {
+    slug: 'add-text',
+    displayName: 'Add Text',
+    displayDescription: 'Overlay custom text, fonts, and colors onto your images locally.',
+    seoTitle: 'Free Image Text Editor - 100% Private | Toolkit',
+    seoDescription: 'Add text to your images directly in the browser. Custom fonts, colors, and opacity with no server uploads.',
+    category: 'media',
+    component: () => import('@/tools/media/add-text'),
+  },
 ];
 
 export const toolsBySlug: Record<string, ToolConfig> = Object.fromEntries(
