@@ -1,3 +1,4 @@
+// src/core/components/tool-hub/useFilteredTools.ts
 import { useMemo, useDeferredValue } from 'react';
 import { useToolStore } from './toolStore';
 import type { ToolConfig } from '@/config/tools';
@@ -5,6 +6,7 @@ import type { ToolConfig } from '@/config/tools';
 export interface ToolCatalogItem extends ToolConfig {
   id: string;
   name: string;
+  input?: string;
 }
 
 interface FilterOptions {
@@ -25,7 +27,7 @@ export function useFilteredTools(
   searchQuery: string,
   activeFilters: FilterOptions = {}
 ) {
-  const { favorites: favoriteToolSlugs, usageMetrics: toolUsageMetrics } = useToolStore();
+  const { favorites: favoriteToolSlugs, usageMetrics: toolUsageMetrics, currentToolSlug } = useToolStore();
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
   return useMemo(() => {
@@ -36,7 +38,7 @@ export function useFilteredTools(
     }
 
     if (activeFilters.input) {
-      filteredCatalog = filteredCatalog.filter((catalogTool) => (catalogTool as any).input === activeFilters.input);
+      filteredCatalog = filteredCatalog.filter((catalogTool) => catalogTool.input === activeFilters.input);
     }
 
     if (deferredSearchQuery.trim()) {
@@ -48,7 +50,16 @@ export function useFilteredTools(
       );
     }
 
+    const currentPathSlug = typeof window !== 'undefined' 
+      ? window.location.pathname.split('/').filter(Boolean)[0] || null 
+      : null;
+
+    const activeSlug = currentPathSlug || currentToolSlug;
+
     return [...filteredCatalog].sort((primaryTool, comparisonTool) => {
+      if (primaryTool.slug === activeSlug) return -1;
+      if (comparisonTool.slug === activeSlug) return 1;
+
       const isPrimaryFavorite = favoriteToolSlugs.includes(primaryTool.slug) ? 1 : 0;
       const isComparisonFavorite = favoriteToolSlugs.includes(comparisonTool.slug) ? 1 : 0;
       if (isPrimaryFavorite !== isComparisonFavorite) return isComparisonFavorite - isPrimaryFavorite;
@@ -63,5 +74,5 @@ export function useFilteredTools(
 
       return primaryTool.displayName.localeCompare(comparisonTool.displayName);
     });
-  }, [catalogTools, deferredSearchQuery, activeFilters, favoriteToolSlugs, toolUsageMetrics]);
+  }, [catalogTools, deferredSearchQuery, activeFilters, favoriteToolSlugs, toolUsageMetrics, currentToolSlug]);
 }

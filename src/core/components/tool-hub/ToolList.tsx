@@ -1,3 +1,4 @@
+// src/core/components/tool-hub/ToolList.tsx
 import { ToolListItem } from './ToolListItem';
 import type { ToolConfig } from '@/config/tools';
 
@@ -22,6 +23,7 @@ function ToolListSkeleton() {
 export function ToolList({
   toolItems,
   isLoadingCatalog,
+  activeToolSlug,
   handleToolSelect,
   handleToolHover,
   loadingToolSlug,
@@ -29,8 +31,8 @@ export function ToolList({
   if (isLoadingCatalog) {
     return (
       <div className="space-y-1">
-        {Array.from({ length: 8 }).map((_, placeholderIndex) => (
-          <ToolListSkeleton key={placeholderIndex} />
+        {Array.from({ length: 8 }).map((_, skeletonIndex) => (
+          <ToolListSkeleton key={`skeleton-${skeletonIndex}`} />
         ))}
       </div>
     );
@@ -46,14 +48,14 @@ export function ToolList({
 
   return (
     <div className="space-y-1">
-      {toolItems.map((toolItem, index) => (
+      {toolItems.map((catalogTool) => (
         <ToolListItem
-          key={toolItem.id}
-          tool={toolItem}
+          key={catalogTool.id}
+          tool={catalogTool}
           onToolSelect={handleToolSelect}
           onToolHover={handleToolHover}
-          isLoading={loadingToolSlug === toolItem.id}
-          isTopActive={index === 0}
+          isLoading={loadingToolSlug === catalogTool.id}
+          isActive={catalogTool.slug === activeToolSlug}
         />
       ))}
     </div>

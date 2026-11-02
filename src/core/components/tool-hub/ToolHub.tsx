@@ -1,3 +1,4 @@
+// src/core/components/tool-hub/ToolHub.tsx
 import { useState } from 'react';
 import { Search } from '@/core/components/ui/Search';
 import { Container } from '@/core/components/ui/Container';
@@ -50,10 +51,16 @@ export function ToolHub({
     if (matchedTool) matchedTool.component();
   };
 
+  const currentPathSlug = typeof window !== 'undefined' 
+    ? window.location.pathname.split('/').filter(Boolean)[0] || null 
+    : null;
+    
+  const activeSlug = currentPathSlug || currentToolSlug;
+
   const catalogProps = {
     toolItems: filteredTools,
     isLoadingCatalog: false,
-    activeToolSlug: currentToolSlug,
+    activeToolSlug: activeSlug,
     handleToolSelect: handleSelect,
     handleToolHover: handleHover,
   };
