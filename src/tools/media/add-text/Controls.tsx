@@ -1,5 +1,5 @@
 // src/tools/media/add-text/Controls.tsx
-import React from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import { FiMinus, FiPlus, FiRotateCcw } from 'react-icons/fi';
 import { Button } from '@/core/components/ui/Button';
 import { IconButton } from '@/core/components/ui/IconButton';
@@ -10,10 +10,10 @@ import type { TextConfiguration } from './useAddText';
 interface ControlsProps {
   textConfiguration: TextConfiguration;
   onTextChange: (content: string) => void;
-  onFontSizeChange: (size: number) => void;
+  onFontSizeChange: (sizeOrUpdater: number | ((previousSize: number) => number)) => void;
   onColorChange: (color: string) => void;
   onBackgroundColorChange: (color: string) => void;
-  onOpacityChange: (opacity: number) => void;
+  onOpacityChange: (opacityOrUpdater: number | ((prevOpacity: number) => number)) => void;
   onFontFamilyChange: (font: string) => void;
   onToggleBold: () => void;
   onToggleItalic: () => void;
@@ -35,6 +35,9 @@ const AVAILABLE_FONTS = [
   'Comic Sans MS, cursive',
 ];
 
+const MIN_FONT_SIZE = 8;
+const MAX_FONT_SIZE = 5000;
+
 export const Controls: React.FC<ControlsProps> = ({
   textConfiguration,
   onTextChange,
@@ -51,6 +54,53 @@ export const Controls: React.FC<ControlsProps> = ({
   onApply,
   isExporting,
 }): React.JSX.Element => {
+  const sizeHoldTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sizeHoldIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  
+  const opacityHoldTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const opacityHoldIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopAllHolds = useCallback(() => {
+    if (sizeHoldTimeoutRef.current) clearTimeout(sizeHoldTimeoutRef.current);
+    if (sizeHoldIntervalRef.current) clearInterval(sizeHoldIntervalRef.current);
+    if (opacityHoldTimeoutRef.current) clearTimeout(opacityHoldTimeoutRef.current);
+    if (opacityHoldIntervalRef.current) clearInterval(opacityHoldIntervalRef.current);
+  }, []);
+
+  const startSizeHold = useCallback((direction: 'increment' | 'decrement') => {
+    onFontSizeChange((previousSize) => 
+      direction === 'increment' 
+        ? Math.min(MAX_FONT_SIZE, previousSize + 4) 
+        : Math.max(MIN_FONT_SIZE, previousSize - 4)
+    );
+
+    sizeHoldTimeoutRef.current = setTimeout(() => {
+      let currentStep = 4;
+      sizeHoldIntervalRef.current = setInterval(() => {
+        currentStep = Math.min(currentStep + 2, 50);
+        onFontSizeChange((previousSize) => 
+          direction === 'increment' 
+            ? Math.min(MAX_FONT_SIZE, previousSize + currentStep) 
+            : Math.max(MIN_FONT_SIZE, previousSize - currentStep)
+        );
+      }, 50);
+    }, 400);
+  }, [onFontSizeChange]);
+
+  const startOpacityHold = useCallback((direction: 'increment' | 'decrement') => {
+    onOpacityChange((prev) => direction === 'increment' ? Math.min(1, prev + 0.05) : Math.max(0, prev - 0.05));
+
+    opacityHoldTimeoutRef.current = setTimeout(() => {
+      opacityHoldIntervalRef.current = setInterval(() => {
+        onOpacityChange((prev) => direction === 'increment' ? Math.min(1, prev + 0.05) : Math.max(0, prev - 0.05));
+      }, 40);
+    }, 400);
+  }, [onOpacityChange]);
+
+  useEffect(() => {
+    return () => stopAllHolds();
+  }, [stopAllHolds]);
+
   return (
     <div className="flex flex-col w-full gap-4 p-4 bg-transparent">
       <div className="space-y-3">
@@ -91,7 +141,11 @@ export const Controls: React.FC<ControlsProps> = ({
               Size
             </label>
             <IconButton
-              onClick={() => onFontSizeChange(Math.max(8, textConfiguration.fontSize - 4))}
+              onMouseDown={() => startSizeHold('decrement')}
+              onMouseUp={stopAllHolds}
+              onMouseLeave={stopAllHolds}
+              onTouchStart={() => startSizeHold('decrement')}
+              onTouchEnd={stopAllHolds}
               size="xs"
               variant="standard"
               ariaLabel="Decrease size"
@@ -102,7 +156,11 @@ export const Controls: React.FC<ControlsProps> = ({
               {textConfiguration.fontSize}
             </span>
             <IconButton
-              onClick={() => onFontSizeChange(Math.min(200, textConfiguration.fontSize + 4))}
+              onMouseDown={() => startSizeHold('increment')}
+              onMouseUp={stopAllHolds}
+              onMouseLeave={stopAllHolds}
+              onTouchStart={() => startSizeHold('increment')}
+              onTouchEnd={stopAllHolds}
               size="xs"
               variant="standard"
               ariaLabel="Increase size"
@@ -113,9 +171,9 @@ export const Controls: React.FC<ControlsProps> = ({
 
           <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 shrink-0" />
 
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             <label className="text-xs font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
-              Color
+              Font
             </label>
             <ColorPicker
               value={textConfiguration.color}
@@ -151,7 +209,11 @@ export const Controls: React.FC<ControlsProps> = ({
               Opacity
             </label>
             <IconButton
-              onClick={() => onOpacityChange(Math.max(0, textConfiguration.opacity - 0.05))}
+              onMouseDown={() => startOpacityHold('decrement')}
+              onMouseUp={stopAllHolds}
+              onMouseLeave={stopAllHolds}
+              onTouchStart={() => startOpacityHold('decrement')}
+              onTouchEnd={stopAllHolds}
               size="xs"
               variant="standard"
               ariaLabel="Decrease opacity"
@@ -162,7 +224,11 @@ export const Controls: React.FC<ControlsProps> = ({
               {Math.round(textConfiguration.opacity * 100)}%
             </span>
             <IconButton
-              onClick={() => onOpacityChange(Math.min(1, textConfiguration.opacity + 0.05))}
+              onMouseDown={() => startOpacityHold('increment')}
+              onMouseUp={stopAllHolds}
+              onMouseLeave={stopAllHolds}
+              onTouchStart={() => startOpacityHold('increment')}
+              onTouchEnd={stopAllHolds}
               size="xs"
               variant="standard"
               ariaLabel="Increase opacity"
@@ -175,7 +241,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
           <div className="flex items-center gap-1.5 flex-1 min-w-25 max-w-45">
             <label className="text-xs font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
-              Font
+              Family
             </label>
             <select
               value={textConfiguration.fontFamily}
