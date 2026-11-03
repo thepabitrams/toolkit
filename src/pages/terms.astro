@@ -1,0 +1,652 @@
+---
+// src/pages/terms.astro
+import { HomeLayout } from '@/layouts';
+import { site } from '@/config/site';
+
+const title = 'Terms of Service - Toolkit';
+const description = 'The contractual terms governing your access to and use of Toolkit. Separate from our Privacy Policy. 100% local processing for media and finance tools.';
+
+const LAST_UPDATED = 'November 4, 2026';
+
+const termsPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: `Terms of Service — ${site.name}`,
+  url: `${site.domain}/terms`,
+  description: `The contractual terms governing your access to and use of ${site.name}.`,
+  publisher: {
+    '@type': 'Person',
+    name: site.author,
+  },
+};
+---
+
+<HomeLayout
+  title={title}
+  description={description}
+  canonicalPath="/terms"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(termsPageSchema)} />
+
+  <main class="py-16 px-4 sm:px-6">
+    <article class="max-w-3xl mx-auto space-y-12">
+
+      <header class="space-y-5">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.1] tracking-tight">
+          Terms of Service
+        </h1>
+        <p class="text-sm text-gray-500 dark:text-gray-500">
+          Last updated: {LAST_UPDATED}
+        </p>
+        <p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+          These Terms of Service (&ldquo;Terms&rdquo;) constitute a legally
+          binding contract between you (&ldquo;you&rdquo; or
+          &ldquo;User&rdquo;) and {site.author} (&ldquo;I,&rdquo;
+          &ldquo;me,&rdquo; or &ldquo;my&rdquo;) governing your access to
+          and use of {site.name} (the &ldquo;Service&rdquo;). By
+          accessing, browsing, or using the Service, or by clicking
+          &ldquo;I Agree,&rdquo; you accept these Terms in full.
+        </p>
+        <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+          <strong class="font-semibold text-gray-900 dark:text-gray-100">
+            Important:</strong>{' '}
+          These Terms are separate from, and do not incorporate, the{' '}
+          <a
+            href="/privacy"
+            class="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Privacy Policy
+          </a>
+          . Your acceptance of these Terms does <strong class="font-semibold text-gray-900 dark:text-gray-100">not</strong> constitute
+          consent to the processing of personal data. Any such consent is
+          obtained separately and explicitly under the Privacy Policy, in
+          accordance with Rule 3 of India&apos;s Digital Personal Data
+          Protection Rules, 2025.
+        </p>
+      </header>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          1. Definitions
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+              &ldquo;Service&rdquo;
+            </strong>{' '}
+            means the website located at {site.domain}, including all
+            tools, features, content, and functionality made available
+            through it.
+          </p>
+          <p>
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+              &ldquo;User Content&rdquo;
+            </strong>{' '}
+            means any text, comment, image, file, or other material you
+            submit to, upload to, or process through the Service.
+          </p>
+          <p>
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+              &ldquo;Local Processing&rdquo;
+            </strong>{' '}
+            means the execution of tool functionality entirely within your
+            browser, without transmission of User Content to my servers.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          2. Acceptance and contract formation
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            You accept these Terms by taking an affirmative action, such
+            as checking an &ldquo;I Agree&rdquo; box, clicking an
+            &ldquo;Accept&rdquo; button, or otherwise manifesting assent
+            where the Service presents such an option. This constitutes a
+            valid electronic signature under the Information Technology
+            Act, 2000. Where no affirmative action is presented, your
+            continued use of the Service after conspicuous notice of these
+            Terms constitutes acceptance.
+          </p>
+          <p>
+            If you do not agree to these Terms, you must immediately cease
+            all use of the Service.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          3. Eligibility and capacity
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            You represent that you are at least 13 years of age and have
+            the legal capacity to enter into a binding contract. If you
+            are under the age of majority in your jurisdiction, you
+            represent that a parent or legal guardian has reviewed and
+            agreed to these Terms on your behalf.
+          </p>
+          <p>
+            I do not knowingly permit children under 13 to use the
+            Service. If I become aware that a child under 13 has provided
+            User Content, I will remove it in accordance with the Privacy
+            Policy and applicable law.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          4. Licence to use the service
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            Subject to your compliance with these Terms, I grant you a
+            limited, non-exclusive, non-transferable, revocable licence to
+            access and use the Service for your personal or internal
+            business purposes.
+          </p>
+          <p>
+            This licence does <strong class="font-semibold text-gray-900 dark:text-gray-100">not</strong> include the right to:
+          </p>
+          <ul class="list-disc list-inside space-y-2 ml-2">
+            <li>
+              Reproduce, distribute, publicly display, or commercially
+              exploit the Service or its underlying code, except as
+              expressly permitted by an applicable open-source licence
+            </li>
+            <li>
+              Modify, reverse engineer, decompile, or disassemble any
+              non-open-source portion of the Service
+            </li>
+            <li>
+              Use automated means (bots, scrapers, crawlers) to access
+              the Service at a rate that impairs performance for other
+              users
+            </li>
+            <li>
+              Remove, obscure, or alter any proprietary notices,
+              copyright notices, or branding
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          5. Google API Services and Limited Use
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            The Service requests only the basic{' '}
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">openid</strong>,{' '}
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">email</strong>, and{' '}
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">profile</strong>{' '}
+            scopes from Google. I do not request access to Gmail, Google
+            Drive, Google Calendar, or any other Google service. This
+            satisfies Google&apos;s requirement to request the minimum
+            relevant permissions[reference:7].
+          </p>
+          <p>
+            {site.name}&apos;s use and transfer of information received
+            from Google APIs to any other app will adhere to the{' '}
+            <a
+              href="https://developers.google.com/terms/api-services-user-data-policy"
+              target="_blank"
+              rel="noreferrer noopener"
+              class="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              Google API Services User Data Policy
+            </a>
+            , including the Limited Use requirements[reference:8].
+          </p>
+          <p>
+            I do not sell Google user data, do not use it for advertising
+            or profiling, and do not allow humans to read it unless you
+            have given explicit consent for a specific support request or
+            unless required for security investigations or to comply with
+            applicable law.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          6. Local processing and data handling
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            All media, files, and financial information you load into the
+            Service&apos;s tools are processed via Local Processing.
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+            I do not receive, view, store, or transmit your User Content
+            to any server.</strong> Any local state (such as tool
+            preferences or financial groups) is stored in your
+            browser&apos;s LocalStorage and IndexedDB and is automatically
+            cleared after 7 days of inactivity or when you clear your
+            browser data.
+          </p>
+          <p>
+            Because Local Processing prevents me from accessing your User
+            Content, I cannot recover it if it is lost. You are solely
+            responsible for maintaining backups of any User Content you
+            wish to retain.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          7. Acceptable use and content moderation
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            In compliance with Rule 3(1)(b) of the Information Technology
+            (Intermediary Guidelines and Digital Media Ethics Code)
+            Rules, 2021, and Article 14 of the EU Digital Services Act,
+            you agree not to use the Service to publish, upload, or
+            process User Content that:
+          </p>
+          <ul class="list-disc list-inside space-y-2 ml-2">
+            <li>
+              Belongs to another person and to which you do not have any
+              right
+            </li>
+            <li>
+              Is defamatory, obscene, pornographic, paedophilic, invasive
+              of another&apos;s privacy, or harmful to children
+            </li>
+            <li>
+              Is insulting or harassing on the basis of gender, religious
+              or ethnic identity, or otherwise promotes enmity or hatred
+            </li>
+            <li>
+              Encourages money laundering or gambling, or is otherwise
+              unlawful in any way
+            </li>
+            <li>
+              Threatens the unity, integrity, defence, security, or
+              sovereignty of India, or public order
+            </li>
+            <li>
+              Contains software viruses, malware, or any other computer
+              code designed to interrupt, destroy, or limit the
+              functionality of any computer resource
+            </li>
+            <li>
+              Impersonates any person or entity, or falsely states or
+              misrepresents an affiliation
+            </li>
+          </ul>
+          <p>
+            I reserve the right to remove any User Content and to
+            suspend or terminate access for anyone who violates these
+            rules. I will provide notice of any such action where
+            required by applicable law.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          8. User content and licence
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            You retain all ownership rights to your User Content. By
+            submitting User Content to the Service (including comments),
+            you grant me a non-exclusive, worldwide, royalty-free licence
+            to store, display, and distribute that User Content solely in
+            connection with operating the Service.
+          </p>
+          <p>
+            You represent and warrant that you own or have the necessary
+            rights to submit your User Content and that it does not
+            infringe any third party&apos;s intellectual property,
+            privacy, or other rights.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          9. Intellectual property
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            The Service, including its design, code, branding, and
+            documentation, is owned by {site.author} and is protected by
+            copyright and other intellectual property laws. Portions of
+            the Service are released as open source under their respective
+            licences; where an open-source licence applies, that licence
+            governs your use of the relevant code.
+          </p>
+          <p>
+            You may not use the {site.name} name, logo, or branding
+            without my prior written permission, except to refer to the
+            Service in a factual, non-misleading way.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          10. Third-party services
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            The Service relies on third-party providers, including Google
+            (for authentication via OAuth 2.0) and Cloudflare (for
+            hosting, edge computing, and database storage). Your use of
+            these third-party services is governed by their own terms and
+            privacy policies. I am not responsible for the availability,
+            accuracy, or practices of any third-party service.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          11. AI and automated features
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            Certain tools may use artificial intelligence models that run
+            entirely in your browser through a Web Worker. These models
+            do not transmit your User Content to any external AI service,
+            and all inference happens on your device.
+          </p>
+          <p>
+            AI-generated outputs are provided for convenience only. I
+            make no guarantee as to their accuracy, completeness, or
+            fitness for a particular purpose. You are solely responsible
+            for reviewing and verifying any AI-generated output before
+            relying on it.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          12. Financial disclaimer
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+              The finance tools (including the Bill Splitter) are provided
+              for convenience and informational purposes only. They do not
+              constitute financial, accounting, tax, or legal advice.
+            </strong>
+          </p>
+          <p>
+            The Bill Splitter uses a greedy settlement algorithm. While
+            designed to be correct, you are solely responsible for
+            verifying that any computed splits and settlements match your
+            actual agreement with the other parties involved. I make no
+            guarantee as to the accuracy of any calculation produced by
+            the finance tools.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          13. Disclaimers and limitation of liability
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            The Service is provided &ldquo;as is&rdquo; and &ldquo;as
+            available,&rdquo; without warranties of any kind, whether
+            express or implied, including but not limited to warranties
+            of merchantability, fitness for a particular purpose,
+            non-infringement, or uninterrupted or error-free operation.
+          </p>
+          <p>
+            To the maximum extent permitted by applicable law, {site.author}
+            shall not be liable for any indirect, incidental, special,
+            consequential, or punitive damages, or for any loss of data,
+            profits, or goodwill, arising out of or in connection with
+            your use of or inability to use the Service.
+          </p>
+          <p>
+            Some jurisdictions do not allow the exclusion of certain
+            warranties or the limitation of certain liabilities, so some
+            of the above may not apply to you.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          14. Indemnification
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            You agree to indemnify and hold harmless {site.author} from
+            any claims, damages, losses, or expenses (including reasonable
+            legal fees) arising out of your use of the Service, your
+            violation of these Terms, or your violation of any rights of a
+            third party.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          15. Grievance redressal and complaints
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            In accordance with Rule 3(2) of the Information Technology
+            (Intermediary Guidelines and Digital Media Ethics Code)
+            Rules, 2021, and Article 14 of the EU Digital Services Act, I
+            have appointed a Grievance Officer to receive and act on
+            complaints regarding the Service:
+          </p>
+          <ul class="list-disc list-inside space-y-2 ml-2">
+            <li>
+              <strong class="font-semibold text-gray-900 dark:text-gray-100">
+                Grievance Officer:
+              </strong>{' '}
+              {site.author}
+            </li>
+            <li>
+              <strong class="font-semibold text-gray-900 dark:text-gray-100">
+                Email:
+              </strong>{' '}
+              <a
+                href={`mailto:${site.email}`}
+                class="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                {site.email}
+              </a>
+            </li>
+            <li>
+              <strong class="font-semibold text-gray-900 dark:text-gray-100">
+                Acknowledgement:
+              </strong>{' '}
+              Within 24 hours of receipt
+            </li>
+            <li>
+              <strong class="font-semibold text-gray-900 dark:text-gray-100">
+                Resolution:
+              </strong>{' '}
+              Within 7 days for general complaints
+            </li>
+          </ul>
+          <p>
+            If your complaint is not resolved satisfactorily, you may
+            pursue remedies available under applicable law.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          16. Term and termination
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            These Terms remain in effect for as long as you use the
+            Service. I may suspend or terminate your access at any time,
+            with or without notice, if I reasonably believe you have
+            violated these Terms or if required by law. You may terminate
+            these Terms at any time by ceasing all use of the Service and
+            requesting deletion of any account data by emailing{' '}
+            <a
+              href={`mailto:${site.email}`}
+              class="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {site.email}
+            </a>
+            .
+          </p>
+          <p>
+            Sections 5, 6, 8, 9, 13, 14, 15, and 18 survive termination.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          17. Changes to these terms
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            I may update these Terms from time to time. When I do, I will
+            update the &ldquo;Last updated&rdquo; date at the top of this
+            page. For material changes, I will provide reasonable notice
+            through the Service or by email. In accordance with Article
+            14(2) of the EU Digital Services Act, I will notify you of any
+            significant changes to these Terms.
+          </p>
+          <p>
+            Your continued use of {site.name} after changes are posted
+            constitutes acceptance of the updated Terms.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          18. Governing law and dispute resolution
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            These Terms are governed by and construed in accordance with
+            the laws of India, without regard to its conflict of law
+            principles. Subject to the informal resolution provision
+            below, any legal action arising out of or relating to these
+            Terms shall be brought in the courts of competent jurisdiction
+            in India.
+          </p>
+          <p>
+            Before filing a formal claim, you agree to first contact me at{' '}
+            <a
+              href={`mailto:${site.email}`}
+              class="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {site.email}
+            </a>{' '}
+            to try to resolve the dispute informally within 30 days.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          19. General provisions
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+              Entire agreement:
+            </strong>{' '}
+            These Terms constitute the entire agreement between you and me
+            regarding the Service and supersede all prior agreements.
+          </p>
+          <p>
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+              Severability:
+            </strong>{' '}
+            If any provision is held invalid or unenforceable, the
+            remaining provisions continue in full force and effect.
+          </p>
+          <p>
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+              No waiver:
+            </strong>{' '}
+            My failure to enforce any right does not constitute a waiver
+            of that right.
+          </p>
+          <p>
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+              Assignment:
+            </strong>{' '}
+            You may not assign these Terms without my prior written
+            consent. I may assign these Terms in connection with a
+            merger, acquisition, or sale of assets.
+          </p>
+          <p>
+            <strong class="font-semibold text-gray-900 dark:text-gray-100">
+              Force majeure:
+            </strong>{' '}
+            I will not be liable for any failure or delay in performance
+            caused by events beyond my reasonable control.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          20. Contact
+        </h2>
+        <div class="space-y-4 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            For any questions about these Terms, contact me at{' '}
+            <a
+              href={`mailto:${site.email}`}
+              class="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {site.email}
+            </a>
+            .
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-500">
+            Operator: {site.author}, India
+          </p>
+        </div>
+      </section>
+
+      <footer class="pt-10 border-t border-gray-200 dark:border-gray-800">
+        <div class="flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-base">
+          <a
+            href="/"
+            class="inline-flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+          >
+            <span>{site.name}</span>
+          </a>
+
+          <span class="text-gray-400 dark:text-gray-500">·</span>
+
+          <span class="text-gray-500 dark:text-gray-500">
+            Built by
+          </span>
+
+          <a
+            href="https://pabitramohansingh.com"
+            target="_blank"
+            rel="noreferrer noopener"
+            class="inline-flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+          >
+            <span>{site.author}</span>
+          </a>
+        </div>
+      </footer>
+
+    </article>
+  </main>
+</HomeLayout>
