@@ -1,0 +1,67 @@
+---
+// src/tools/media/image-filters/About.astro
+import { AccordionCard } from '@/core/components/ui';
+---
+
+<div class="flex flex-col gap-2">
+  
+  <AccordionCard title="How to use this tool" defaultOpen={true} client:load>
+    <div class="flex flex-col gap-4 mt-2">
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">1</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Upload Image</h4>
+          <p class="text-slate-500 text-sm">Select an image from your device using the upload gallery.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">2</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Adjust Filters</h4>
+          <p class="text-slate-500 text-sm">Use the sliders to adjust lighting, color, and effects in real-time.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">3</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Apply and Download</h4>
+          <p class="text-slate-500 text-sm">Click "Apply Filters", wait for the local rendering to finish, and download your image.</p>
+        </div>
+      </div>
+    </div>
+  </AccordionCard>
+
+  <AccordionCard title="Project Overview" client:load>
+    <p class="mb-4">
+      Image Filters is a fully client-side image manipulation utility. It allows you to apply professional-grade adjustments (brightness, contrast, saturation, blur, vintage, etc.) without uploading your files to a server.
+    </p>
+    <p>
+      Because everything runs locally in your browser using the HTML5 Canvas API, it guarantees 100% privacy and operates at native speeds.
+    </p>
+  </AccordionCard>
+
+  <AccordionCard title="Why this tool exists" client:load>
+    <p class="mb-4">
+      Applying filters to images shouldn't require expensive software or sacrificing your privacy. Most online tools upload your photos to a backend server to process them.
+    </p>
+    <p>
+      This tool performs complex pixel-level matrix convolutions directly on your device. It gives you granular control over your image processing while preserving your original EXIF metadata and DPI.
+    </p>
+  </AccordionCard>
+
+  <AccordionCard title="Under the hood (Architecture)" client:load>
+    <p class="mb-4">
+      This tool leverages a modern, lightweight architecture optimized for performance:
+    </p>
+    <ul class="list-disc pl-5 space-y-2 mb-4 text-sm">
+      <li><strong class="text-slate-900 dark:text-white">Framework:</strong> Astro & React (Isomorphic rendering with minimal hydration).</li>
+      <li><strong class="text-slate-900 dark:text-white">State Management:</strong> Zustand (Normalized, high-performance file store).</li>
+      <li><strong class="text-slate-900 dark:text-white">Storage:</strong> OPFS (Origin Private File System) and IndexedDB for direct disk access.</li>
+      <li><strong class="text-slate-900 dark:text-white">Image Processing:</strong> HTML5 Canvas API, raw TypedArray manipulation, and custom convolution kernels.</li>
+    </ul>
+    <p>
+      Zero backend. Zero API keys. Zero cloud storage. Just pure, local computation.
+    </p>
+  </AccordionCard>
+
+</div>

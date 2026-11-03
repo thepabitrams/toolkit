@@ -50,6 +50,16 @@ export const tools: ToolConfig[] = [
     category: 'media',
     component: () => import('@/tools/media/flip-rotate'),
   },
+
+  {
+    slug: 'image-filters',
+    displayName: 'Image Filters',
+    displayDescription: 'Apply professional lighting, color, and effect filters to your images.',
+    seoTitle: 'Free Image Filters - 100% Private | Toolkit',
+    seoDescription: 'Apply brightness, contrast, saturation, blur, and vintage filters directly in your browser.',
+    category: 'media',
+    component: () => import('@/tools/media/image-filters'),
+  },
 ];
 
 export const toolsBySlug: Record<string, ToolConfig> = Object.fromEntries(
