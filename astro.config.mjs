@@ -25,7 +25,7 @@ export default defineConfig({
           short_name: 'Toolkit',
           description: 'Free browser-based tools. 100% local processing.',
           theme_color: '#1A73E8',
-          background_color: '#F1F3F4',
+          background_color: '#ffffff',
           display: 'standalone',
           start_url: '/',
           icons: [
