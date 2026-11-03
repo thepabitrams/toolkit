@@ -27,8 +27,8 @@ export const tools: ToolConfig[] = [
     displayDescription: 'Compress or pad an image to fit within a specific file size range, 100% in your browser.',
     seoTitle: 'Free Image Size Adjuster - 100% Private | Toolkit',
     seoDescription: 'Compress JPG, PNG, WebP, AVIF, GIF, and BMP images to a target KB size. Runs entirely in your browser.',
-  category: 'media',
-  component: () => import('@/tools/media/adjust-size'),
+    category: 'media',
+    component: () => import('@/tools/media/adjust-size'),
   },
 
   {
@@ -39,6 +39,16 @@ export const tools: ToolConfig[] = [
     seoDescription: 'Add text to your images directly in the browser. Custom fonts, colors, and opacity with no server uploads.',
     category: 'media',
     component: () => import('@/tools/media/add-text'),
+  },
+
+  {
+    slug: 'flip-rotate',
+    displayName: 'Rotate & Flip',
+    displayDescription: 'Rotate or flip images locally with zero quality loss.',
+    seoTitle: 'Free Image Rotator & Flipper - 100% Private | Toolkit',
+    seoDescription: 'Rotate 90 degrees or flip JPG, PNG, and WebP images in your browser. No uploads required.',
+    category: 'media',
+    component: () => import('@/tools/media/flip-rotate'),
   },
 ];
 
