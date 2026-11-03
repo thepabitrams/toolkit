@@ -20,7 +20,7 @@ export default defineConfig({
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
+        includeAssets: ['pwa-192x192.png', 'pwa-512x512.png'],
         manifest: {
           name: 'Toolkit',
           short_name: 'Toolkit',
