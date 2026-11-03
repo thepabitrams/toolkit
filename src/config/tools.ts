@@ -90,6 +90,16 @@ export const tools: ToolConfig[] = [
     category: 'productivity',
     component: () => import('@/tools/productivity/infinite-type'),
   },
+
+  {
+    slug: 'split',
+    displayName: 'Bill Splitter',
+    displayDescription: 'Split bills and expenses fairly with friends — no signup required.',
+    seoTitle: 'Free Bill Splitter - 100% Private | Toolkit',
+    seoDescription: 'Easily split bills, track shared expenses, and settle debts with friends. Runs entirely in your browser.',
+    category: 'finance',
+    component: () => import('@/tools/finance/split'),
+  },
 ];
 
 export const toolsBySlug: Record<string, ToolConfig> = Object.fromEntries(
