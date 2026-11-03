@@ -1,5 +1,9 @@
 // src/tools/media/background-remove/ai-models/background-worker.ts
-import { pipeline, RawImage } from '@huggingface/transformers';
+import { pipeline, RawImage, env } from '@huggingface/transformers';
+
+if (env.backends.onnx.wasm) {
+  env.backends.onnx.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/';
+}
 
 self.onmessage = async (event: MessageEvent) => {
   const { file: sourceImageFile, modelId: modelIdentifier, dtype: modelDataType } = event.data;
