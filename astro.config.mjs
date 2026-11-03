@@ -20,11 +20,12 @@ export default defineConfig({
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        includeAssets: ['favicon.ico', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
         manifest: {
           name: 'Toolkit',
           short_name: 'Toolkit',
           description: 'Free browser-based tools. 100% local processing.',
-          theme_color: '#1A73E8',
+          theme_color: '#0f172a',
           background_color: '#ffffff',
           display: 'standalone',
           start_url: '/',
@@ -32,23 +33,21 @@ export default defineConfig({
             {
               src: 'pwa-192x192.png',
               sizes: '192x192',
-              type: 'image/png'
+              type: 'image/png',
+              purpose: 'any',
             },
             {
               src: 'pwa-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any'
+              purpose: 'any',
             },
-            {
-              src: 'maskable-icon-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable'
-            }
-          ]
-        }
-      })
+          ],
+        },
+      }),
     ],
+    optimizeDeps: {
+      exclude: ['@6over3/zeroperl-ts'],
+    },
   },
 });
