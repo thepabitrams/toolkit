@@ -1,14 +1,16 @@
 // src/tools/finance/split/components/ResultsCard.tsx
-import React from 'react';
+import React, { useRef } from 'react';
 import { useSplitStore } from '@/tools/finance/split/store/useSplitStore';
 import { useSettlement } from '@/tools/finance/split/hooks/useSettlement';
 import { useCopySummary } from '@/tools/finance/split/hooks/useCopySummary';
 import { useSaveImage } from '@/tools/finance/split/hooks/useSaveImage';
+import { ReceiptTemplate } from './ReceiptTemplate';
 import { MdOutlineContentCopy, MdOutlineImage } from 'react-icons/md';
 
 export function ResultsCard() {
   const { selectedCurrency, groupMembers } = useSplitStore();
   const { totalExpense, perPersonShare, settlementTransactions } = useSettlement();
+  const receiptRef = useRef<HTMLDivElement>(null);
   
   const { copySummary } = useCopySummary({ 
     currency: selectedCurrency, 
@@ -21,18 +23,21 @@ export function ResultsCard() {
   });
   
   const { saveImage } = useSaveImage({ 
-    currency: selectedCurrency, 
-    totalExpense: totalExpense, 
-    perPersonShare: perPersonShare, 
-    groupMembers: groupMembers, 
-    settlementTransactions: settlementTransactions, 
     onSuccess: () => alert('Image saved!'), 
     onError: () => alert('Failed to save') 
   });
 
   return (
     <div className="flex flex-col h-full bg-transparent">
-      
+      <ReceiptTemplate
+        ref={receiptRef}
+        currency={selectedCurrency}
+        totalExpense={totalExpense}
+        perPersonShare={perPersonShare}
+        groupMembers={groupMembers}
+        settlementTransactions={settlementTransactions}
+      />
+
       <div className="grid grid-cols-2 divide-x divide-gray-100 dark:divide-gray-800 border-b border-gray-100 dark:border-gray-800">
         <div className="p-5 text-center">
           <div className="text-xs text-gray-500 font-medium mb-1">Total Spent</div>
@@ -80,13 +85,12 @@ export function ResultsCard() {
           <MdOutlineContentCopy className="w-4 h-4" /> Copy
         </button>
         <button 
-          onClick={saveImage} 
+          onClick={() => saveImage(receiptRef)} 
           className="flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-colors"
         >
           <MdOutlineImage className="w-4 h-4" /> Image
         </button>
       </div>
-
     </div>
   );
 }
