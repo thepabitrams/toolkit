@@ -1,7 +1,7 @@
+// src/shared/components/file-card/FileCard.tsx
 import React from 'react';
 import { FilePreview } from './FilePreview';
 import { FileDetails } from './FileDetails';
-import { Card } from '@/core/components/ui';
 import { MdClose } from 'react-icons/md';
 import type { FileReference } from '@/shared/store/file-store';
 
@@ -32,8 +32,9 @@ export const FileCard: React.FC<FileCardProperties> = ({
   };
 
   return (
-    <Card className={`flex flex-col w-full h-full overflow-hidden p-0 ${className}`}>
-      <div className="relative w-full border-b border-slate-200 dark:border-gray-800">
+    <div className={`flex flex-col w-full h-full overflow-hidden ${className}`}>
+      {/* 🛠️ FIX: Added h-96 (384px) so the image doesn't grow infinitely, but still allows the card to stretch */}
+      <div className="relative w-full h-96 flex items-center justify-center bg-slate-100 dark:bg-black/20">
         <FilePreview fileReference={fileReference} />
         
         {isOriginalVariant && handleFileRemove && (
@@ -54,7 +55,9 @@ export const FileCard: React.FC<FileCardProperties> = ({
         )}
       </div>
       
-      <FileDetails fileReference={fileReference} />
-    </Card>
+      <div className="w-full shrink-0 bg-white dark:bg-gray-950 border-t border-slate-200 dark:border-gray-800">
+        <FileDetails fileReference={fileReference} />
+      </div>
+    </div>
   );
 };
