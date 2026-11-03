@@ -6,7 +6,6 @@ import { StatusMessage } from '../components/StatusMessage';
 
 interface RemoveControlsProps {
   status: 'idle' | 'loading' | 'processing' | 'ready' | 'error';
-  progress: number;
   errorMessage?: string | null;
   selectedModelId: string;
   onModelChange: (modelId: string) => void;
@@ -16,7 +15,7 @@ interface RemoveControlsProps {
 }
 
 export const RemoveControls: React.FC<RemoveControlsProps> = ({
-  status, progress, errorMessage, selectedModelId, onModelChange, onGenerate, onRetry, availableModels
+  status, errorMessage, selectedModelId, onModelChange, onGenerate, onRetry, availableModels
 }): React.JSX.Element => {
   const isBusy = status === 'loading' || status === 'processing';
   const isError = status === 'error';
@@ -40,7 +39,7 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
       </div>
 
       <div className="min-h-11 flex items-center px-1">
-        <StatusMessage status={status} progress={progress} errorMessage={errorMessage} />
+        <StatusMessage status={status} errorMessage={errorMessage} />
       </div>
 
       <Button

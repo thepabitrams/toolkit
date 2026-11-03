@@ -1,28 +1,29 @@
-// src/tools/image/background-remove/remove/components/StatusBadge.tsx
-
+// src/tools/media/background-remove/components/StatusBadge.tsx
 import React from 'react';
 import { FiLoader, FiCheck, FiAlertCircle } from 'react-icons/fi';
 
-type BadgeStatus = 'loading' | 'processing' | 'ready' | 'error';
+type BadgeStatus = 'idle' | 'loading' | 'processing' | 'ready' | 'error';
 
 interface StatusBadgeProps {
   status: BadgeStatus;
-  progress?: number;
   className?: string;
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({
   status,
-  progress = 0,
   className = '',
 }) => {
+  if (status === 'idle') {
+    return null;
+  }
+
   const baseClasses = "absolute top-3 right-3 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-sm transition-all duration-200";
 
   if (status === 'loading' || status === 'processing') {
     return (
       <div className={`${baseClasses} bg-black/80 dark:bg-white/20 text-white shadow-sm border border-white/10 dark:border-white/20 ${className}`}>
         <FiLoader className="w-3 h-3 animate-spin" />
-        {status === 'loading' ? 'Loading' : `${Math.round(progress)}%`}
+        {status === 'loading' ? 'Loading' : 'Processing'}
       </div>
     );
   }
@@ -47,5 +48,3 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   return null;
 };
-
-export default StatusBadge;

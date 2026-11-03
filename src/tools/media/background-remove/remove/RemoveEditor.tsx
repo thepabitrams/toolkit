@@ -14,7 +14,7 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const { getRawFile, save } = useFileStore();
 
-  const { status, progress, errorMessage, selectedModelId, setSelectedModel, generateCutout, retry, availableModels } = useRemove();
+  const { status, errorMessage, selectedModelId, setSelectedModel, generateCutout, retry, availableModels } = useRemove();
 
   useEffect(() => {
     let isComponentMounted = true;
@@ -75,13 +75,11 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
     <div className="w-full flex flex-col bg-transparent">
       <div className="relative w-full h-80 bg-slate-200/60 dark:bg-black/50 flex items-center justify-center overflow-hidden">
         <img src={previewImageUrl} alt="Original" className="w-full h-full object-contain" style={{ opacity: isBusy ? 0.5 : 1 }} />
-        {/* 🛠️ FIX: Only render the badge if the status is NOT idle */}
-        {status !== 'idle' && <StatusBadge status={status} progress={progress} />}
+        <StatusBadge status={status} />
       </div>
       
       <RemoveControls
         status={status}
-        progress={progress}
         errorMessage={errorMessage}
         selectedModelId={selectedModelId}
         onModelChange={setSelectedModel}
