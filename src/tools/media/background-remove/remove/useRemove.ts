@@ -1,55 +1,49 @@
 // src/tools/media/background-remove/remove/useRemove.ts
 import { useState, useCallback } from 'react';
-import { strategies, strategyList } from '../strategies';
-import type { ModelStrategy } from '../strategies';
+import { AVAILABLE_AI_MODELS, runInference, type WorkerStatus } from '../ai-models';
 
 export interface CutoutResult {
-  mask: ImageData | null;
-  originalFile: File;
   previewBlob: Blob | null;
 }
 
-export function useRemove() {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'processing' | 'ready' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [selectedModelId, setSelectedModelId] = useState<string>('birefnet');
+export type UIStatus = 'idle' | 'loading' | 'processing' | 'ready' | 'error';
 
-  const getStrategy = useCallback((): ModelStrategy => {
-    const strategy = strategies[selectedModelId as keyof typeof strategies];
-    if (!strategy) throw new Error(`Strategy ${selectedModelId} not found`);
-    return strategy;
-  }, [selectedModelId]);
+export function useRemove() {
+  const [status, setStatus] = useState<UIStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [selectedModelIdentifier, setSelectedModelIdentifier] = useState<string>('birefnet');
 
   const generateCutout = useCallback(
-    async (sourceFile: File): Promise<CutoutResult> => {
+    async (sourceImageFile: File): Promise<CutoutResult> => {
       setStatus('loading');
       setErrorMessage(null);
 
-      const strategy = getStrategy();
+      const targetModelConfiguration = AVAILABLE_AI_MODELS.find((model) => model.identifier === selectedModelIdentifier);
+      if (!targetModelConfiguration) throw new Error(`Model ${selectedModelIdentifier} not found`);
 
       try {
-        const generatedBlob = await strategy.run(sourceFile, (progressValue: number) => {
-          if (progressValue === 10) {
-            setStatus('loading');
-          } else if (progressValue === 60) {
-            setStatus('processing');
-          } else if (progressValue === 100) {
-            setStatus('ready');
+        const cutoutBlob = await runInference(
+          sourceImageFile, 
+          targetModelConfiguration, 
+          (inferenceProgressStatus: WorkerStatus) => {
+            if (inferenceProgressStatus === 'done') {
+              setStatus('ready');
+            } else {
+              setStatus(inferenceProgressStatus);
+            }
           }
-        });
+        );
 
         setStatus('ready');
-        return { mask: null, originalFile: sourceFile, previewBlob: generatedBlob };
+        return { previewBlob: cutoutBlob };
       } catch (error) {
-        console.error(`[${strategy.name}] Execution failed:`, error);
+        console.error('Execution failed:', error);
         setStatus('error');
-        setErrorMessage(
-          `${strategy.name} failed: ${error instanceof Error ? error.message : String(error)}`
-        );
+        setErrorMessage(error instanceof Error ? error.message : String(error));
         throw error;
       }
     },
-    [getStrategy]
+    [selectedModelIdentifier]
   );
 
   const retry = useCallback(() => {
@@ -57,8 +51,8 @@ export function useRemove() {
     setErrorMessage(null);
   }, []);
 
-  const setSelectedModel = useCallback((modelId: string) => {
-    setSelectedModelId(modelId);
+  const setSelectedModel = useCallback((modelIdentifier: string) => {
+    setSelectedModelIdentifier(modelIdentifier);
     setStatus('idle');
     setErrorMessage(null);
   }, []);
@@ -71,11 +65,11 @@ export function useRemove() {
   return {
     status,
     errorMessage,
-    selectedModelId,
+    selectedModelId: selectedModelIdentifier,
     setSelectedModel,
     generateCutout,
     retry,
     reset,
-    availableModels: strategyList,
+    availableModels: AVAILABLE_AI_MODELS.map((model) => ({ id: model.identifier, name: model.displayName })),
   };
 }

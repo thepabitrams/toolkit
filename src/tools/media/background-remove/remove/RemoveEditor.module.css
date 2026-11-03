@@ -1,0 +1,47 @@
+/* src/tools/media/background-remove/remove/RemoveEditor.module.css */
+
+@property --trace-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.traceWrapper {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 0 3px var(--trace-glow)) drop-shadow(0 0 8px var(--trace-glow));
+  --trace-color: #000000;
+  --trace-glow: rgba(0, 0, 0, 0.45);
+}
+
+:global(.dark) .traceWrapper {
+  --trace-color: #ffffff;
+  --trace-glow: rgba(255, 255, 255, 0.5);
+}
+
+.traceLine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--trace-angle),
+    transparent 0%,
+    transparent 60%,
+    var(--trace-color) 80%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from { --trace-angle: 0deg; }
+  to { --trace-angle: 360deg; }
+}

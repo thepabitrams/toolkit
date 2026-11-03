@@ -1,6 +1,6 @@
 // src/tools/media/background-remove/components/StatusMessage.tsx
 import React, { useState, useEffect } from 'react';
-import { FiLoader, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiAlertCircle, FiCheck } from 'react-icons/fi';
 
 interface StatusMessageProps {
   status: 'idle' | 'loading' | 'processing' | 'ready' | 'error';
@@ -8,13 +8,30 @@ interface StatusMessageProps {
   className?: string;
 }
 
-const PROCESSING_STEPS = [
+const DOWNLOADING_MESSAGES = [
+  'Initializing neural network...',
+  'Downloading AI model weights...',
+  'Preparing WebGPU/WASM runtime...',
+  'Compiling tensor operations...',
+  'Allocating memory buffers...',
+  'Establishing local inference engine...',
+  'Optimizing model execution graph...',
+  'Verifying model integrity...',
+  'Starting background worker...',
+  'Almost ready to process...',
+];
+
+const PROCESSING_MESSAGES = [
   'Analyzing image pixels...',
   'Detecting foreground subject...',
   'Separating background layers...',
+  'Calculating alpha channel...',
   'Refining edge details...',
+  'Removing background artifacts...',
   'Applying AI mask...',
-  'Finalizing cutout...',
+  'Enhancing cutout precision...',
+  'Finalizing transparent layer...',
+  'Generating final output...',
 ];
 
 export const StatusMessage: React.FC<StatusMessageProps> = ({
@@ -22,18 +39,27 @@ export const StatusMessage: React.FC<StatusMessageProps> = ({
   errorMessage,
   className = '',
 }) => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  const activeMessages =
+    status === 'loading'
+      ? DOWNLOADING_MESSAGES
+      : status === 'processing'
+      ? PROCESSING_MESSAGES
+      : [];
 
   useEffect(() => {
-    if (status === 'processing') {
-      const interval = setInterval(() => {
-        setCurrentStepIndex((previousIndex) => (previousIndex + 1) % PROCESSING_STEPS.length);
-      }, 2500);
-      return () => clearInterval(interval);
-    } else {
-      setCurrentStepIndex(0);
-    }
+    setMessageIndex(0);
   }, [status]);
+
+  useEffect(() => {
+    if (activeMessages.length === 0) return;
+    const messageInterval = setInterval(() => {
+      setMessageIndex((previousIndex) => (previousIndex + 1) % activeMessages.length);
+    }, 4000);
+
+    return () => clearInterval(messageInterval);
+  }, [activeMessages.length]);
 
   if (status === 'idle') {
     return (
@@ -43,21 +69,29 @@ export const StatusMessage: React.FC<StatusMessageProps> = ({
     );
   }
 
-  if (status === 'loading') {
+  if (status === 'loading' || status === 'processing') {
     return (
-      <div className={`flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 ${className}`}>
-        <FiLoader className="w-4 h-4 animate-spin text-blue-500" />
-        <span>Downloading AI model (This may take a minute)...</span>
-      </div>
-    );
-  }
-
-  if (status === 'processing') {
-    return (
-      <div className={`flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 w-full ${className}`}>
-        <FiLoader className="w-4 h-4 animate-spin text-blue-500 shrink-0" />
-        <span className="animate-pulse transition-opacity duration-300">
-          {PROCESSING_STEPS[currentStepIndex]}
+      <div className={`flex items-center text-sm w-full ${className}`}>
+        <style>{`
+          @keyframes text-shimmer {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+          }
+          .shimmer-effect {
+            background: linear-gradient(90deg, #9CA3AF 0%, #111827 50%, #9CA3AF 100%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: text-shimmer 2s linear infinite;
+          }
+          .dark .shimmer-effect {
+            background: linear-gradient(90deg, #6B7280 0%, #F9FAFB 50%, #6B7280 100%);
+            background-size: 200% auto;
+          }
+        `}</style>
+        <span className="shimmer-effect font-medium">
+          {activeMessages[messageIndex]}
         </span>
       </div>
     );
@@ -65,18 +99,18 @@ export const StatusMessage: React.FC<StatusMessageProps> = ({
 
   if (status === 'error') {
     return (
-      <div className={`flex items-center gap-2 text-sm text-red-500 dark:text-red-400 ${className}`}>
+      <div className={`flex items-center gap-2 text-sm text-[#1A73E8] dark:text-blue-400 font-medium ${className}`}>
         <FiAlertCircle className="w-4 h-4 shrink-0" />
-        {errorMessage || 'Something went wrong'}
+        <span className="line-clamp-2 leading-snug">{errorMessage || 'Something went wrong'}</span>
       </div>
     );
   }
 
   if (status === 'ready') {
     return (
-      <div className={`flex items-center gap-2 text-sm text-green-600 dark:text-green-400 ${className}`}>
+      <div className={`flex items-center gap-2 text-sm text-[#1A73E8] dark:text-blue-400 font-medium ${className}`}>
         <FiCheck className="w-4 h-4 shrink-0" />
-        Background removed successfully
+        <span>Background removed successfully</span>
       </div>
     );
   }

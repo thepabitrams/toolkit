@@ -19,6 +19,7 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
 }): React.JSX.Element => {
   const isBusy = status === 'loading' || status === 'processing';
   const isError = status === 'error';
+  const isReady = status === 'ready';
 
   return (
     <div className="flex flex-col w-full gap-4 p-4 bg-transparent">
@@ -30,7 +31,7 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
           value={selectedModelId}
           onChange={(e) => onModelChange(e.target.value)}
           disabled={isBusy}
-          className="w-full h-11 px-3 text-sm bg-[#F1F3F4] dark:bg-gray-800/80 border border-transparent hover:border-[#DADCE0] dark:hover:border-gray-700 rounded-lg focus:outline-none focus:bg-white dark:focus:bg-gray-900 focus:border-[#1A73E8] focus:ring-1 focus:ring-[#1A73E8] text-[#202124] dark:text-white cursor-pointer transition-colors truncate"
+          className="w-full h-11 px-3 text-sm bg-[#F1F3F4] dark:bg-gray-800/80 border border-transparent hover:border-[#DADCE0] dark:hover:border-gray-700 rounded-lg focus:outline-none focus:bg-white dark:focus:bg-gray-900 focus:border-[#1A73E8] focus:ring-1 focus:ring-[#1A73E8] text-[#202124] dark:text-white cursor-pointer transition-colors truncate disabled:opacity-50"
         >
           {availableModels.map((model) => (
             <option key={model.id} value={model.id}>{model.name}</option>
@@ -46,12 +47,14 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
         onClick={isError ? onRetry : onGenerate}
         disabled={isBusy}
         variant="primary"
-        className="w-full py-2.5 rounded-full"
+        className="w-full py-2.5 rounded-full transition-all"
       >
         {isBusy ? (
           <><FiLoader className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
         ) : isError ? (
           <><FiRefreshCw className="w-4 h-4 mr-2" /> Retry</>
+        ) : isReady ? (
+          <><FiRefreshCw className="w-4 h-4 mr-2" /> Remove Again</>
         ) : (
           'Remove Background'
         )}

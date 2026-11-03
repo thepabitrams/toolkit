@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useFileStore } from '@/shared/store/file-store';
 import { useRemove } from './useRemove';
-import { StatusBadge } from '../components/StatusBadge';
 import { RemoveControls } from './RemoveControls';
+import styles from './RemoveEditor.module.css';
 import type { FileReference } from '@/shared/store/file-store';
 
 interface RemoveEditorProps {
@@ -63,7 +63,7 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
 
   if (!fileReference || !previewImageUrl) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-80 bg-slate-200/60 dark:bg-black/50">
+      <div className="flex flex-col items-center justify-center w-full h-80 bg-slate-200/60 dark:bg-black/50 rounded-t-xl">
         <p className="text-slate-400 text-sm">Upload an image first</p>
       </div>
     );
@@ -73,9 +73,21 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
 
   return (
     <div className="w-full flex flex-col bg-transparent">
-      <div className="relative w-full h-80 bg-slate-200/60 dark:bg-black/50 flex items-center justify-center overflow-hidden">
-        <img src={previewImageUrl} alt="Original" className="w-full h-full object-contain" style={{ opacity: isBusy ? 0.5 : 1 }} />
-        <StatusBadge status={status} />
+      
+      {/* This is the GRAY PREVIEW AREA that the animation traces */}
+      <div className="relative w-full h-80 bg-[#F1F3F4] dark:bg-[#2a2a2a] rounded-t-xl flex items-center justify-center overflow-hidden">
+        
+        {isBusy && (
+          <div className={styles.traceWrapper}>
+            <div className={styles.traceLine} />
+          </div>
+        )}
+
+        <img 
+          src={previewImageUrl} 
+          alt="Original" 
+          className="relative z-0 w-full h-full object-contain" 
+        />
       </div>
       
       <RemoveControls
