@@ -1,4 +1,5 @@
 ---
+// src/components/Head.astro
 import { site, social } from '@/config/site';
 
 export interface BreadcrumbItem {
@@ -123,4 +124,17 @@ const graphSchema = {
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171717" />
 
+<!-- PWA Manifest & Mobile App Tags -->
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content={site.name} />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
 <script is:inline type="application/ld+json" set:html={JSON.stringify(graphSchema)} />
+
+<script>
+  import { registerSW } from 'virtual:pwa-register';
+  registerSW({ immediate: true });
+</script>
