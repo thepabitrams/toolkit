@@ -1,5 +1,4 @@
 /// <reference types="astro/client" />
-/// <reference types="vite-plugin-pwa/client" />
 
 type Runtime = import('@astrojs/cloudflare').Runtime<Env>;
 
