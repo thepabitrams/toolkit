@@ -50,6 +50,24 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
 
   return (
     <div className="flex flex-col w-full gap-4 p-4 bg-transparent">
+      
+      {/* CSS for the typing dots */}
+      <style>{`
+        @keyframes typing-dots {
+          0%, 100% { content: ""; }
+          20% { content: "."; }
+          40% { content: ".."; }
+          60% { content: "..."; }
+        }
+        .loading-dots::after {
+          content: "...";
+          display: inline-block;
+          width: 16px;
+          text-align: left;
+          animation: typing-dots 1.5s steps(1, end) infinite;
+        }
+      `}</style>
+
       <div className="flex flex-col gap-1.5">
         <label className="text-[#5F6368] dark:text-gray-400 text-xs font-medium uppercase tracking-wide">
           AI Model
@@ -75,21 +93,16 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
         disabled={isBusy}
         variant="primary"
         className={`w-full h-12 rounded-full transition-all duration-300 flex items-center justify-center font-medium ${
-          isBusy ? 'bg-[#E8F0FE] text-[#1A73E8] hover:bg-[#E8F0FE] shadow-none' : ''
+          isBusy 
+            ? 'bg-[#E8F0FE] text-[#1A73E8] hover:bg-[#E8F0FE] dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/30 shadow-none' 
+            : ''
         }`}
       >
         {isBusy ? (
           <>
             <ChromeSpinner />
             <span className="relative flex items-center">
-              Processing
-              <motion.span
-                animate={{ opacity: [0, 1, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5, times: [0, 0.5, 1] }}
-                className="inline-block w-4 text-left"
-              >
-                ...
-              </motion.span>
+              Processing<span className="loading-dots"></span>
             </span>
           </>
         ) : isError ? (
