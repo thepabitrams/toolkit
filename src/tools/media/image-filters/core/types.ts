@@ -8,12 +8,19 @@ export interface FilterState {
   blur: number;
   highlights: number;
   shadows: number;
+  hue: number;
+  exposure: number;
+  posterize: number;
+  invert: number;
   grayscale: boolean;
   sepia: boolean;
   vintage: boolean;
   noir: boolean;
   vignette: boolean;
   hdr: boolean;
+  clarendon: boolean;
+  moon: boolean;
+  cyberpunk: boolean;
 }
 
 export type FilterKey = keyof FilterState;

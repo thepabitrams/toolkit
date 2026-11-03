@@ -10,12 +10,19 @@ export const FILTER_DEFAULTS: FilterState = {
   blur: 0,
   highlights: 0,
   shadows: 0,
+  hue: 0,
+  exposure: 0,
+  posterize: 0,
+  invert: 0,
   grayscale: false,
   sepia: false,
   vintage: false,
   noir: false,
   vignette: false,
   hdr: false,
+  clarendon: false,
+  moon: false,
+  cyberpunk: false,
 };
 
 export const FILTER_RANGES = {
@@ -27,6 +34,10 @@ export const FILTER_RANGES = {
   blur: { min: 0, max: 10, step: 0.5, default: 0 },
   highlights: { min: -100, max: 100, step: 1, default: 0 },
   shadows: { min: -100, max: 100, step: 1, default: 0 },
+  hue: { min: -180, max: 180, step: 1, default: 0 },
+  exposure: { min: -100, max: 100, step: 1, default: 0 },
+  posterize: { min: 0, max: 64, step: 1, default: 0 },
+  invert: { min: 0, max: 100, step: 1, default: 0 },
 };
 
 export const DEFAULT_DPI = 96;
