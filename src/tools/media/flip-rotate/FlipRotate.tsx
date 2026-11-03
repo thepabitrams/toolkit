@@ -161,7 +161,7 @@ export function FlipRotate({ toolId }: FlipRotateProps): React.JSX.Element {
         >
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full h-full p-0 overflow-hidden flex flex-col">
-              <FileCard fileReference={latestProcessedFile} displayVariant="process" />
+              <FileCard fileReference={latestProcessedFile} />
             </Card>
           </motion.div>
 

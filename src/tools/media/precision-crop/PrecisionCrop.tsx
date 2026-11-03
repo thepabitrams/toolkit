@@ -199,10 +199,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
         >
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full h-full p-0 overflow-hidden flex flex-col">
-              <FileCard
-                fileReference={activeProcessed}
-                displayVariant="process"
-              />
+              <FileCard fileReference={activeProcessed} />
             </Card>
           </motion.div>
 
