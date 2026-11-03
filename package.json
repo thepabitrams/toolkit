@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node generate-sw.mjs",
+    "build": "astro build",
     "preview": "pnpm run build && wrangler dev",
     "astro": "astro",
     "generate-types": "wrangler types",
