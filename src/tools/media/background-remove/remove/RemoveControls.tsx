@@ -1,6 +1,7 @@
 // src/tools/media/background-remove/remove/RemoveControls.tsx
 import React from 'react';
-import { FiLoader, FiRefreshCw } from 'react-icons/fi';
+import { motion } from 'motion/react';
+import { FiRefreshCw } from 'react-icons/fi';
 import { Button } from '@/core/components/ui';
 import { StatusMessage } from '../components/StatusMessage';
 
@@ -13,6 +14,32 @@ interface RemoveControlsProps {
   onRetry: () => void;
   availableModels: { id: string; name: string }[];
 }
+
+const ChromeSpinner: React.FC = () => (
+  <motion.svg
+    viewBox="0 0 50 50"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="4"
+    strokeLinecap="round"
+    className="w-5 h-5 mr-2.5"
+    animate={{ rotate: 360 }}
+    transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+  >
+    <circle cx="25" cy="25" r="20" opacity="0.2" strokeWidth="4" />
+    <motion.circle
+      cx="25"
+      cy="25"
+      r="20"
+      strokeWidth="4"
+      animate={{
+        strokeDasharray: ['1, 150', '90, 150', '90, 150'],
+        strokeDashoffset: [0, -35, -124],
+      }}
+      transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+    />
+  </motion.svg>
+);
 
 export const RemoveControls: React.FC<RemoveControlsProps> = ({
   status, errorMessage, selectedModelId, onModelChange, onGenerate, onRetry, availableModels
@@ -47,10 +74,24 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
         onClick={isError ? onRetry : onGenerate}
         disabled={isBusy}
         variant="primary"
-        className="w-full py-2.5 rounded-full transition-all"
+        className={`w-full h-12 rounded-full transition-all duration-300 flex items-center justify-center font-medium ${
+          isBusy ? 'bg-[#E8F0FE] text-[#1A73E8] hover:bg-[#E8F0FE] shadow-none' : ''
+        }`}
       >
         {isBusy ? (
-          <><FiLoader className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+          <>
+            <ChromeSpinner />
+            <span className="relative flex items-center">
+              Processing
+              <motion.span
+                animate={{ opacity: [0, 1, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5, times: [0, 0.5, 1] }}
+                className="inline-block w-4 text-left"
+              >
+                ...
+              </motion.span>
+            </span>
+          </>
         ) : isError ? (
           <><FiRefreshCw className="w-4 h-4 mr-2" /> Retry</>
         ) : isReady ? (

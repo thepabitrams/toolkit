@@ -77,20 +77,23 @@ export const StatusMessage: React.FC<StatusMessageProps> = ({
             0% { background-position: 100% 0; }
             100% { background-position: -100% 0; }
           }
-          .shimmer-effect {
+          .shimmer-text {
             background: linear-gradient(90deg, #9CA3AF 0%, #111827 50%, #9CA3AF 100%);
             background-size: 200% auto;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            color: transparent !important;
+            -webkit-text-fill-color: transparent !important;
             animation: text-shimmer 2s linear infinite;
+            display: inline-block;
+            font-weight: 500;
           }
-          .dark .shimmer-effect {
+          .dark .shimmer-text {
             background: linear-gradient(90deg, #6B7280 0%, #F9FAFB 50%, #6B7280 100%);
             background-size: 200% auto;
           }
         `}</style>
-        <span className="shimmer-effect font-medium">
+        <span className="shimmer-text">
           {activeMessages[messageIndex]}
         </span>
       </div>
@@ -99,7 +102,7 @@ export const StatusMessage: React.FC<StatusMessageProps> = ({
 
   if (status === 'error') {
     return (
-      <div className={`flex items-center gap-2 text-sm text-[#1A73E8] dark:text-blue-400 font-medium ${className}`}>
+      <div className={`flex items-center gap-2 text-sm text-red-500 dark:text-red-400 font-medium ${className}`}>
         <FiAlertCircle className="w-4 h-4 shrink-0" />
         <span className="line-clamp-2 leading-snug">{errorMessage || 'Something went wrong'}</span>
       </div>
