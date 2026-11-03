@@ -1,0 +1,67 @@
+---
+// src/tools/media/background-remove/About.astro
+import { AccordionCard } from '@/core/components/ui';
+---
+
+<div class="flex flex-col gap-2">
+  
+  <AccordionCard title="How to use this tool" defaultOpen={true} client:load>
+    <div class="flex flex-col gap-4 mt-2">
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">1</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Upload Image</h4>
+          <p class="text-slate-500 text-sm">Select an image containing a person, product, or object.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">2</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Remove Background</h4>
+          <p class="text-slate-500 text-sm">Choose an AI model and click "Remove Background". Wait for the local AI to process the image.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">3</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Add New Background</h4>
+          <p class="text-slate-500 text-sm">Pick a new background color, choose your export format, and click "Apply Background" to save.</p>
+        </div>
+      </div>
+    </div>
+  </AccordionCard>
+
+  <AccordionCard title="Project Overview" client:load>
+    <p class="mb-4">
+      Background Remover is a fully client-side AI utility. It allows you to automatically remove image backgrounds and replace them with new colors without ever uploading your private photos to a server.
+    </p>
+    <p>
+      Everything runs locally in your browser using Hugging Face Transformers and WebAssembly/WebGPU. It guarantees 100% privacy and operates at native speeds.
+    </p>
+  </AccordionCard>
+
+  <AccordionCard title="Why this tool exists" client:load>
+    <p class="mb-4">
+      Most background removers require you to upload your high-resolution images to a cloud server, wait in a queue, and pay a subscription fee.
+    </p>
+    <p>
+      This tool leverages the latest in open-source browser AI. The model weights are downloaded directly to your device, and the heavy pixel processing happens on your graphics card (GPU). It is completely free, infinitely scalable, and perfectly private.
+    </p>
+  </AccordionCard>
+
+  <AccordionCard title="Under the hood (Architecture)" client:load>
+    <p class="mb-4">
+      This tool leverages a modern, lightweight architecture optimized for performance:
+    </p>
+    <ul class="list-disc pl-5 space-y-2 mb-4 text-sm">
+      <li><strong class="text-slate-900 dark:text-white">Framework:</strong> Astro & React (Isomorphic rendering with minimal hydration).</li>
+      <li><strong class="text-slate-900 dark:text-white">State Management:</strong> Zustand (Normalized, high-performance file store).</li>
+      <li><strong class="text-slate-900 dark:text-white">Machine Learning:</strong> Hugging Face Transformers.js (Running locally via WebAssembly / WebGPU).</li>
+      <li><strong class="text-slate-900 dark:text-white">Image Processing:</strong> HTML5 Canvas API for compositing the final image and applying background colors.</li>
+    </ul>
+    <p>
+      Zero backend. Zero API keys. Zero cloud storage. Just pure, local computation.
+    </p>
+  </AccordionCard>
+
+</div>

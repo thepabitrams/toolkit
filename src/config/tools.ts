@@ -60,6 +60,16 @@ export const tools: ToolConfig[] = [
     category: 'media',
     component: () => import('@/tools/media/image-filters'),
   },
+
+  {
+    slug: 'background-remove',
+    displayName: 'Background Remover',
+    displayDescription: 'Remove image backgrounds automatically using AI, 100% locally in your browser.',
+    seoTitle: 'Free AI Background Remover - 100% Private | Toolkit',
+    seoDescription: 'Remove backgrounds from images instantly using local AI models. No uploads, no servers, completely private.',
+    category: 'media',
+    component: () => import('@/tools/media/background-remove'),
+  },
 ];
 
 export const toolsBySlug: Record<string, ToolConfig> = Object.fromEntries(
