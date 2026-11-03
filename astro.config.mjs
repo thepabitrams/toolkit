@@ -20,7 +20,7 @@ export default defineConfig({
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png', 'maskable-icon-512x512.png'],
+        includeAssets: ['favicon.ico', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
         manifest: {
           name: 'Toolkit',
           short_name: 'Toolkit',
@@ -41,12 +41,6 @@ export default defineConfig({
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any',
-            },
-            {
-              src: 'maskable-icon-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable',
             },
           ],
         },
