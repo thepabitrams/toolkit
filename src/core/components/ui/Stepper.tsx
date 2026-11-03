@@ -74,14 +74,14 @@ export const Stepper: React.FC<StepperProperties> = ({
       
       <div className="flex items-center bg-[#F1F3F4] dark:bg-gray-800/80 rounded-lg p-1 border border-transparent hover:border-[#DADCE0] dark:hover:border-gray-700 transition-colors focus-within:bg-white dark:focus-within:bg-gray-900 focus-within:border-[#1A73E8] dark:focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-[#1A73E8] dark:focus-within:ring-blue-500">
         <button
-          onPointerDown={() => startContinuousStep(-1)}
+          onPointerDown={() => !isAtMin && startContinuousStep(-1)}
           onPointerUp={stopContinuousStep}
           onPointerLeave={stopContinuousStep}
           onPointerCancel={stopContinuousStep}
           disabled={isAtMin}
           className={`w-9 h-9 shrink-0 flex items-center justify-center rounded-md transition-colors ${
             isAtMin 
-              ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed bg-transparent' 
+              ? 'text-gray-300 dark:text-gray-700 bg-transparent cursor-default' 
               : 'text-[#5F6368] dark:text-gray-400 hover:bg-[#E8EAED] dark:hover:bg-gray-700 active:bg-[#DADCE0] dark:active:bg-gray-600'
           }`}
           aria-label={`Decrease ${label}`}
@@ -98,14 +98,14 @@ export const Stepper: React.FC<StepperProperties> = ({
         />
         
         <button
-          onPointerDown={() => startContinuousStep(1)}
+          onPointerDown={() => !isAtMax && startContinuousStep(1)}
           onPointerUp={stopContinuousStep}
           onPointerLeave={stopContinuousStep}
           onPointerCancel={stopContinuousStep}
           disabled={isAtMax}
           className={`w-9 h-9 shrink-0 flex items-center justify-center rounded-md transition-colors ${
             isAtMax 
-              ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed bg-transparent' 
+              ? 'text-gray-300 dark:text-gray-700 bg-transparent cursor-default' 
               : 'text-[#5F6368] dark:text-gray-400 hover:bg-[#E8EAED] dark:hover:bg-gray-700 active:bg-[#DADCE0] dark:active:bg-gray-600'
           }`}
           aria-label={`Increase ${label}`}
