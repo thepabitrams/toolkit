@@ -133,7 +133,7 @@ export const Controls: React.FC<ControlsProps> = ({
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="w-16 flex items-center h-[44px]">
+          <div className="w-16 flex items-center h-11">
             <ColorPicker
               value={textConfiguration.color}
               onChange={onColorChange}
@@ -141,7 +141,7 @@ export const Controls: React.FC<ControlsProps> = ({
             />
           </div>
           
-          <div className="w-24 flex items-center gap-2 h-[44px]">
+          <div className="w-24 flex items-center gap-2 h-11">
             <ColorPicker
               value={textConfiguration.backgroundColor === 'transparent' ? '#ffffff' : textConfiguration.backgroundColor}
               onChange={onBackgroundColorChange}
@@ -161,7 +161,7 @@ export const Controls: React.FC<ControlsProps> = ({
             <select
               value={textConfiguration.fontFamily}
               onChange={(changeEvent: React.ChangeEvent<HTMLSelectElement>) => onFontFamilyChange(changeEvent.target.value)}
-              className="w-full h-[44px] px-3 text-sm bg-[#F1F3F4] dark:bg-gray-800/80 border border-transparent hover:border-[#DADCE0] dark:hover:border-gray-700 rounded-lg focus:outline-none focus:bg-white dark:focus:bg-gray-900 focus:border-[#1A73E8] focus:ring-1 focus:ring-[#1A73E8] text-[#202124] dark:text-white cursor-pointer transition-colors truncate"
+              className="w-full h-11 px-3 text-sm bg-[#F1F3F4] dark:bg-gray-800/80 border border-transparent hover:border-[#DADCE0] dark:hover:border-gray-700 rounded-lg focus:outline-none focus:bg-white dark:focus:bg-gray-900 focus:border-[#1A73E8] focus:ring-1 focus:ring-[#1A73E8] text-[#202124] dark:text-white cursor-pointer transition-colors truncate"
             >
               {AVAILABLE_FONTS.map((fontFamilyOption) => (
                 <option key={fontFamilyOption} value={fontFamilyOption}>
@@ -179,7 +179,7 @@ export const Controls: React.FC<ControlsProps> = ({
         <label className="text-[#5F6368] dark:text-gray-400 text-[11px] font-medium uppercase tracking-wide">
           Position
         </label>
-        <div className="flex bg-[#F1F3F4] dark:bg-gray-800/80 p-1 rounded-lg h-[44px] border border-transparent w-full">
+        <div className="flex bg-[#F1F3F4] dark:bg-gray-800/80 p-1 rounded-lg h-11 border border-transparent w-full">
           {['top', 'bottom'].map((positionOption) => {
             const isActive = textConfiguration.position === positionOption;
             return (
