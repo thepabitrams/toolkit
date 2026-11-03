@@ -1,0 +1,57 @@
+---
+// src/tools/productivity/infinite-type/About.astro
+import { AccordionCard } from '@/core/components/ui';
+---
+
+<div class="flex flex-col gap-2">
+  
+  <AccordionCard title="How to use this tool" defaultOpen={true} client:load>
+    <div class="flex flex-col gap-4 mt-2">
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">1</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Configure Pool</h4>
+          <p class="text-slate-500 text-sm">Type the characters you want to practice (e.g., letters, numbers, symbols).</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">2</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Start Typing</h4>
+          <p class="text-slate-500 text-sm">Press "Start" and begin typing. The text scrolls infinitely.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">3</div>
+        <div>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Track Stats</h4>
+          <p class="text-slate-500 text-sm">Monitor your Characters Per Minute (CPM), accuracy, and errors in real-time.</p>
+        </div>
+      </div>
+    </div>
+  </AccordionCard>
+
+  <AccordionCard title="Project Overview" client:load>
+    <p class="mb-4">
+      Infinite Type is a fully client-side typing drill. It generates endless strings of random characters from your custom pool so you can practice typing without ever running out of text.
+    </p>
+    <p>
+      Unlike traditional typing tests, Infinite Type does not rely on paragraphs. It continuously generates new lines as you finish them, keeping your fingers moving indefinitely.
+    </p>
+  </AccordionCard>
+
+  <AccordionCard title="Under the hood (Architecture)" client:load>
+    <p class="mb-4">
+      This tool leverages a modern, lightweight architecture optimized for performance:
+    </p>
+    <ul class="list-disc pl-5 space-y-2 mb-4 text-sm">
+      <li><strong class="text-slate-900 dark:text-white">Framework:</strong> Astro & React.</li>
+      <li><strong class="text-slate-900 dark:text-white">Performance:</strong> Uses raw keystroke listeners on a hidden input to handle fast typing without React lag.</li>
+      <li><strong class="text-slate-900 dark:text-white">Storage:</strong> LocalStorage for saving your custom character pool.</li>
+    </ul>
+    <p>
+      Zero backend. Zero API keys. Just pure, local computation.
+    </p>
+  </AccordionCard>
+
+</div>

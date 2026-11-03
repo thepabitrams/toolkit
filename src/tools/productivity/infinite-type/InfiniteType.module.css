@@ -1,0 +1,53 @@
+/* src/tools/productivity/infinite-type/InfiniteType.module.css */
+
+@keyframes cursorBlinkShadow {
+  0%, 49% { box-shadow: -2px 0 0 rgb(59 130 246); }
+  50%, 100% { box-shadow: -2px 0 0 transparent; }
+}
+
+.cursorBlink {
+  box-shadow: -2px 0 0 rgb(59 130 246);
+  animation: cursorBlinkShadow 1s step-end infinite;
+}
+
+.cursorHidden {
+  box-shadow: none;
+}
+
+@keyframes cursorBlinkBar {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.cursorBar {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 1em;
+  vertical-align: text-bottom;
+}
+
+.cursorBar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background-color: rgb(59 130 246);
+  animation: cursorBlinkBar 1s step-end infinite;
+}
+
+.cursorBarHidden {
+  display: none;
+}
+
+.infiniteScroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+  scrollbar-gutter: stable;
+}
+
+:global(.dark) .infiniteScroll {
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}

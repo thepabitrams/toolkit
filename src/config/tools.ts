@@ -80,6 +80,16 @@ export const tools: ToolConfig[] = [
     category: 'personalisation',
     component: () => import('@/tools/personalisation/wallpaper'),
   },
+
+  {
+    slug: 'infinite-type',
+    displayName: 'Infinite Type',
+    displayDescription: 'Endless typing drill with custom character pool.',
+    seoTitle: 'Infinite Type - Endless Typing Drill | Toolkit',
+    seoDescription: 'Practice typing infinitely with custom character pools. Track your CPM, accuracy, and errors.',
+    category: 'productivity',
+    component: () => import('@/tools/productivity/infinite-type'),
+  },
 ];
 
 export const toolsBySlug: Record<string, ToolConfig> = Object.fromEntries(
