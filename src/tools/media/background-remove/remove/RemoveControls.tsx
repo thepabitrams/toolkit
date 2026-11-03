@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { FiRefreshCw } from 'react-icons/fi';
 import { Button } from '@/core/components/ui';
 import { StatusMessage } from '../components/StatusMessage';
+import '../style/animations.css';
 
 interface RemoveControlsProps {
   status: 'idle' | 'loading' | 'processing' | 'ready' | 'error';
@@ -50,24 +51,6 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
 
   return (
     <div className="flex flex-col w-full gap-4 p-4 bg-transparent">
-      
-      {/* CSS for the typing dots */}
-      <style>{`
-        @keyframes typing-dots {
-          0%, 100% { content: ""; }
-          20% { content: "."; }
-          40% { content: ".."; }
-          60% { content: "..."; }
-        }
-        .loading-dots::after {
-          content: "...";
-          display: inline-block;
-          width: 16px;
-          text-align: left;
-          animation: typing-dots 1.5s steps(1, end) infinite;
-        }
-      `}</style>
-
       <div className="flex flex-col gap-1.5">
         <label className="text-[#5F6368] dark:text-gray-400 text-xs font-medium uppercase tracking-wide">
           AI Model
@@ -102,7 +85,8 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
           <>
             <ChromeSpinner />
             <span className="relative flex items-center">
-              Processing<span className="loading-dots"></span>
+              {/* 👈 Use the imported class */}
+              Processing<span className="br-loading-dots"></span>
             </span>
           </>
         ) : isError ? (

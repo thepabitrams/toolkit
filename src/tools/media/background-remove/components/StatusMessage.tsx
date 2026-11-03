@@ -1,6 +1,7 @@
 // src/tools/media/background-remove/components/StatusMessage.tsx
 import React, { useState, useEffect } from 'react';
 import { FiAlertCircle, FiCheck } from 'react-icons/fi';
+import '../style/animations.css';
 
 interface StatusMessageProps {
   status: 'idle' | 'loading' | 'processing' | 'ready' | 'error';
@@ -72,28 +73,8 @@ export const StatusMessage: React.FC<StatusMessageProps> = ({
   if (status === 'loading' || status === 'processing') {
     return (
       <div className={`flex items-center text-sm w-full ${className}`}>
-        <style>{`
-          @keyframes text-shimmer {
-            0% { background-position: 100% 0; }
-            100% { background-position: -100% 0; }
-          }
-          .shimmer-text {
-            background: linear-gradient(90deg, #9CA3AF 0%, #111827 50%, #9CA3AF 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text !important;
-            background-clip: text !important;
-            color: transparent !important;
-            -webkit-text-fill-color: transparent !important;
-            animation: text-shimmer 2s linear infinite;
-            display: inline-block;
-            font-weight: 500;
-          }
-          .dark .shimmer-text {
-            background: linear-gradient(90deg, #6B7280 0%, #F9FAFB 50%, #6B7280 100%);
-            background-size: 200% auto;
-          }
-        `}</style>
-        <span className="shimmer-text">
+        {/* 👈 Use the imported class */}
+        <span className="br-shimmer-text">
           {activeMessages[messageIndex]}
         </span>
       </div>
