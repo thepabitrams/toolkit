@@ -6,6 +6,7 @@ export interface SiteDetails {
   readonly title: string;
   readonly description: string;
   readonly domain: string;
+  readonly email: string;
   readonly jobTitle: string;
   readonly locale: string;
   readonly openGraphImage: string;
@@ -29,6 +30,7 @@ export const site: SiteDetails = {
   title: 'Toolkit by Pabitra Mohan Singh',
   description: 'Privacy-first, browser-based tools. No uploads, no servers.',
   domain: 'https://toolkit.pabitramohansingh.com',
+  email: 'support@pabitramohansingh.com',
   jobTitle: 'Software Engineer',
   locale: 'en_US',
   openGraphImage: 'https://toolkit.pabitramohansingh.com/og-image.png',
