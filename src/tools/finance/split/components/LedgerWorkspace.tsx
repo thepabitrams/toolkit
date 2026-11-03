@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSplitStore } from '@/tools/finance/split/store/useSplitStore';
-import { MdDeleteOutline } from 'react-icons/md';
+import { MdDeleteOutline, MdRestartAlt, MdClose } from 'react-icons/md';
 
 export function LedgerWorkspace() {
   const { 
     groupMembers, 
     addGroupMember, 
+    removeGroupMember,
+    resetSession,
     expenseRecords, 
     recordExpense, 
     deleteExpense, 
@@ -45,6 +47,21 @@ export function LedgerWorkspace() {
     }
   };
 
+  const handleMemberRemoval = (memberNameToRemove: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    const userConfirmed = window.confirm(`Remove ${memberNameToRemove} and all their expenses?`);
+    if (userConfirmed) {
+      removeGroupMember(memberNameToRemove);
+    }
+  };
+
+  const handleResetSession = () => {
+    const userConfirmed = window.confirm('Are you sure you want to delete the entire group and all expenses?');
+    if (userConfirmed) {
+      resetSession();
+    }
+  };
+
   const handleExpenseSubmission = () => {
     if (!activeMemberName) return;
     
@@ -62,7 +79,19 @@ export function LedgerWorkspace() {
   return (
     <div className="flex flex-col bg-transparent h-full">
       <div className="p-5 bg-transparent border-b border-gray-100 dark:border-gray-800 shrink-0">
-        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">Who is in the group?</h2>
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Who is in the group?</h2>
+          {groupMembers.length > 0 && (
+            <button 
+              onClick={handleResetSession}
+              className="text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+              aria-label="Reset All"
+              title="Reset All"
+            >
+              <MdRestartAlt className="w-5 h-5" />
+            </button>
+          )}
+        </div>
         
         <div className="flex gap-2 mb-4">
           <motion.div animate={isInputShaking ? { x: [-10, 10, -10, 10, 0] } : {}} className="flex-1">
@@ -85,17 +114,28 @@ export function LedgerWorkspace() {
             {groupMembers.map((memberName) => {
               const isActiveMember = activeMemberName === memberName;
               return (
-                <button
+                <div
                   key={memberName}
                   onClick={() => setActiveMemberName(memberName)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer ${
                     isActiveMember
-                      ? 'bg-blue-600 text-white shadow-sm'
+                      ? 'bg-[#E8F0FE] text-[#1967D2]'
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
-                  {memberName}
-                </button>
+                  <span>{memberName}</span>
+                  <button
+                    onClick={(mouseEvent) => handleMemberRemoval(memberName, mouseEvent)}
+                    className={`flex items-center justify-center rounded-full transition-colors ${
+                      isActiveMember 
+                        ? 'text-[#1967D2] hover:text-[#0a2b5c]' 
+                        : 'text-gray-400 hover:text-gray-700'
+                    }`}
+                    aria-label={`Remove ${memberName}`}
+                  >
+                    <MdClose className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -155,7 +195,10 @@ export function LedgerWorkspace() {
                       <span className="font-bold text-gray-800 dark:text-gray-200">
                         {selectedCurrency} {expenseRecord.expenseAmount.toFixed(2)}
                       </span>
-                      <button onClick={() => deleteExpense(expenseRecord.identifier)} className="text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 p-1 transition-colors">
+                      <button 
+                        onClick={() => deleteExpense(expenseRecord.identifier)} 
+                        className="text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 p-1 transition-colors"
+                      >
                         <MdDeleteOutline className="w-5 h-5" />
                       </button>
                     </div>
