@@ -8,14 +8,14 @@ interface UseSaveImageProps {
 }
 
 export function useSaveImage({ onSuccess, onError }: UseSaveImageProps) {
-  const saveImage = useCallback(async (elementRef: React.RefObject<HTMLDivElement | null>) => {
-    if (!elementRef.current) {
+  const downloadReceiptImage = useCallback(async (receiptElementRef: React.RefObject<HTMLDivElement | null>) => {
+    if (!receiptElementRef.current) {
       onError('Receipt element not found');
       return;
     }
 
     try {
-      await snapdom.download(elementRef.current, {
+      await snapdom.download(receiptElementRef.current, {
         format: 'png',
         filename: `toolkit-split-${Date.now()}.png`,
         scale: 2,
@@ -29,5 +29,5 @@ export function useSaveImage({ onSuccess, onError }: UseSaveImageProps) {
     }
   }, [onSuccess, onError]);
 
-  return { saveImage };
+  return { downloadReceiptImage };
 }

@@ -18,18 +18,18 @@ export function calculateBalances(
   const memberBalances = new Map<string, number>();
   groupMembers.forEach((memberName) => memberBalances.set(memberName, 0));
 
-  for (const expense of expenseRecords) {
-    if (expense.sharedByMembers.length === 0) continue;
+  for (const expenseRecord of expenseRecords) {
+    if (expenseRecord.sharedByMembers.length === 0) continue;
     
-    const shareAmount = roundToTwoDecimals(expense.expenseAmount / expense.sharedByMembers.length);
+    const shareAmount = roundToTwoDecimals(expenseRecord.expenseAmount / expenseRecord.sharedByMembers.length);
     
-    for (const memberName of expense.sharedByMembers) {
+    for (const memberName of expenseRecord.sharedByMembers) {
       const currentBalance = memberBalances.get(memberName) || 0;
       memberBalances.set(memberName, roundToTwoDecimals(currentBalance - shareAmount));
     }
     
-    const currentPayerBalance = memberBalances.get(expense.payerName) || 0;
-    memberBalances.set(expense.payerName, roundToTwoDecimals(currentPayerBalance + expense.expenseAmount));
+    const currentPayerBalance = memberBalances.get(expenseRecord.payerName) || 0;
+    memberBalances.set(expenseRecord.payerName, roundToTwoDecimals(currentPayerBalance + expenseRecord.expenseAmount));
   }
 
   for (const [memberName, balanceAmount] of memberBalances) {
@@ -50,11 +50,11 @@ export function calculateTransactions(
 
   const debtors = nonZeroBalances
     .filter(([, balanceAmount]) => balanceAmount < 0)
-    .sort((firstDebtor, secondDebtor) => firstDebtor[1] - secondDebtor[1]);
+    .sort((debtorA, debtorB) => debtorA[1] - debtorB[1]);
 
   const creditors = nonZeroBalances
     .filter(([, balanceAmount]) => balanceAmount > 0)
-    .sort((firstCreditor, secondCreditor) => secondCreditor[1] - firstCreditor[1]);
+    .sort((creditorA, creditorB) => creditorB[1] - creditorA[1]);
 
   const settlementTransactions: Transaction[] = [];
   let debtorIndex = 0;

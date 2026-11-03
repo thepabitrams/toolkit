@@ -30,16 +30,16 @@ export const ReceiptTemplate = forwardRef<HTMLDivElement, ReceiptTemplateProps>(
         className="w-200 bg-white p-15 text-[#202124] font-sans flex flex-col gap-10"
       >
         <div>
-          <h1 className="text-[32px] font-bold mb-6">BILL SPLIT SUMMARY</h1>
+          <h1 className="text-3xl font-bold mb-6">BILL SPLIT SUMMARY</h1>
           
           <div className="flex flex-col gap-4">
             <div className="flex items-center">
-              <span className="w-40 text-[16px] text-[#5F6368]">Total Spent:</span>
-              <span className="text-[18px] font-bold text-[#1A73E8]">{currency} {totalExpense.toFixed(2)}</span>
+              <span className="w-40 text-base text-[#5F6368]">Total Spent:</span>
+              <span className="text-lg font-bold text-[#1A73E8]">{currency} {totalExpense.toFixed(2)}</span>
             </div>
             <div className="flex items-center">
-              <span className="w-40 text-[16px] text-[#5F6368]">Per Person:</span>
-              <span className="text-[18px] font-bold text-[#1A73E8]">{currency} {perPersonShare.toFixed(2)}</span>
+              <span className="w-40 text-base text-[#5F6368]">Per Person:</span>
+              <span className="text-lg font-bold text-[#1A73E8]">{currency} {perPersonShare.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -47,8 +47,8 @@ export const ReceiptTemplate = forwardRef<HTMLDivElement, ReceiptTemplateProps>(
         <hr className="border-t border-[#E5E7EB]" />
 
         <div>
-          <h2 className="text-[18px] font-bold mb-3">Group Members ({groupMembers.length})</h2>
-          <p className="text-[16px] text-[#5F6368] leading-relaxed">
+          <h2 className="text-lg font-bold mb-3">Group Members ({groupMembers.length})</h2>
+          <p className="text-base text-[#5F6368] leading-relaxed">
             {groupMembers.join(', ')}
           </p>
         </div>
@@ -56,18 +56,18 @@ export const ReceiptTemplate = forwardRef<HTMLDivElement, ReceiptTemplateProps>(
         <hr className="border-t border-[#E5E7EB]" />
 
         <div>
-          <h2 className="text-[18px] font-bold mb-4">Transactions ({settlementTransactions.length})</h2>
+          <h2 className="text-lg font-bold mb-4">Transactions ({settlementTransactions.length})</h2>
           
           {settlementTransactions.length === 0 ? (
-            <p className="text-[16px] text-[#1A73E8]">All settled. Everyone is even.</p>
+            <p className="text-base text-[#1A73E8]">All settled. Everyone is even.</p>
           ) : (
             <div className="flex flex-col gap-4">
               {settlementTransactions.map((transaction, index) => (
-                <div key={index} className="flex items-center text-[16px]">
+                <div key={index} className="flex items-center text-base">
                   <span className="w-37.5 font-bold">{transaction.fromMember}</span>
                   <span className="w-12.5 text-[#5F6368] text-center">→</span>
                   <span className="flex-1 font-bold">{transaction.toMember}</span>
-                  <span className="text-[18px] font-bold text-[#1A73E8]">
+                  <span className="text-lg font-bold text-[#1A73E8]">
                     {currency} {transaction.transactionAmount.toFixed(2)}
                   </span>
                 </div>
@@ -79,10 +79,10 @@ export const ReceiptTemplate = forwardRef<HTMLDivElement, ReceiptTemplateProps>(
         <hr className="border-t border-[#E5E7EB]" />
 
         <div className="flex flex-col gap-1.5">
-          <h3 className="text-[16px] font-bold text-[#1A73E8]">{split.appName}</h3>
-          <p className="text-[14px] text-[#5F6368]">Created by {split.authorName}</p>
-          <p className="text-[14px] text-[#5F6368]">{split.url}</p>
-          <p className="text-[14px] text-[#9AA0A6]">{currentDateString}</p>
+          <h3 className="text-base font-bold text-[#1A73E8]">{split.appName}</h3>
+          <p className="text-sm text-[#5F6368]">Created by {split.authorName}</p>
+          <p className="text-sm text-[#5F6368]">{split.url}</p>
+          <p className="text-sm text-[#9AA0A6]">{currentDateString}</p>
         </div>
       </div>
     </div>

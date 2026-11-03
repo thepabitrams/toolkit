@@ -10,19 +10,19 @@ import { MdOutlineContentCopy, MdOutlineImage } from 'react-icons/md';
 export function ResultsCard() {
   const { selectedCurrency, groupMembers } = useSplitStore();
   const { totalExpense, perPersonShare, settlementTransactions } = useSettlement();
-  const receiptRef = useRef<HTMLDivElement>(null);
+  const receiptElementRef = useRef<HTMLDivElement>(null);
   
   const { copySummary } = useCopySummary({ 
     currency: selectedCurrency, 
-    total: totalExpense, 
-    perPerson: perPersonShare, 
-    people: groupMembers, 
-    transactions: settlementTransactions, 
+    totalExpense, 
+    perPersonShare, 
+    groupMembers, 
+    settlementTransactions, 
     onSuccess: () => alert('Copied!'), 
     onError: () => alert('Failed to copy') 
   });
   
-  const { saveImage } = useSaveImage({ 
+  const { downloadReceiptImage } = useSaveImage({ 
     onSuccess: () => alert('Image saved!'), 
     onError: () => alert('Failed to save') 
   });
@@ -30,7 +30,7 @@ export function ResultsCard() {
   return (
     <div className="flex flex-col h-full bg-transparent">
       <ReceiptTemplate
-        ref={receiptRef}
+        ref={receiptElementRef}
         currency={selectedCurrency}
         totalExpense={totalExpense}
         perPersonShare={perPersonShare}
@@ -61,15 +61,15 @@ export function ResultsCard() {
           {settlementTransactions.length === 0 ? (
             <div className="text-center text-sm text-gray-500 py-4">All settled!</div>
           ) : (
-            settlementTransactions.map((transaction, transactionIndex) => (
+            settlementTransactions.map((transactionRecord, transactionIndex) => (
               <div key={transactionIndex} className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-900/30">
                 <div className="text-sm">
-                  <span className="font-bold text-gray-800 dark:text-gray-200">{transaction.fromMember}</span>
+                  <span className="font-bold text-gray-800 dark:text-gray-200">{transactionRecord.fromMember}</span>
                   <span className="text-gray-500 dark:text-gray-400 mx-2">pays</span>
-                  <span className="font-bold text-gray-800 dark:text-gray-200">{transaction.toMember}</span>
+                  <span className="font-bold text-gray-800 dark:text-gray-200">{transactionRecord.toMember}</span>
                 </div>
                 <span className="font-bold text-blue-600 dark:text-blue-400">
-                  {selectedCurrency} {transaction.transactionAmount.toFixed(2)}
+                  {selectedCurrency} {transactionRecord.transactionAmount.toFixed(2)}
                 </span>
               </div>
             ))
@@ -85,7 +85,7 @@ export function ResultsCard() {
           <MdOutlineContentCopy className="w-4 h-4" /> Copy
         </button>
         <button 
-          onClick={() => saveImage(receiptRef)} 
+          onClick={() => downloadReceiptImage(receiptElementRef)} 
           className="flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-colors"
         >
           <MdOutlineImage className="w-4 h-4" /> Image

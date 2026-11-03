@@ -9,29 +9,32 @@ export function useUserCurrency() {
   useEffect(() => {
     const detectCurrency = async () => {
       try {
-        const language = navigator.language;
-        const countryCode = language.split('-')[1]?.toUpperCase();
+        const browserLanguage = navigator.language;
+        const isoCountryCode = browserLanguage.split('-')[1]?.toUpperCase();
         
-        if (countryCode && COUNTRY_TO_CURRENCY[countryCode]) {
-          setDetectedCurrency(COUNTRY_TO_CURRENCY[countryCode]);
+        if (isoCountryCode && COUNTRY_TO_CURRENCY[isoCountryCode]) {
+          setDetectedCurrency(COUNTRY_TO_CURRENCY[isoCountryCode]);
           setIsLoading(false);
           return;
         }
 
         try {
-          const response = await fetch('https://ipapi.co/json/');
-          if (response.ok) {
-            const data = await response.json() as { country_code?: string };
-            if (data?.country_code && COUNTRY_TO_CURRENCY[data.country_code.toUpperCase()]) {
-              setDetectedCurrency(COUNTRY_TO_CURRENCY[data.country_code.toUpperCase()]);
+          const networkResponse = await fetch('https://ipapi.co/json/');
+          if (networkResponse.ok) {
+            const ipLocationData = await networkResponse.json() as { country_code?: string };
+            if (ipLocationData?.country_code && COUNTRY_TO_CURRENCY[ipLocationData.country_code.toUpperCase()]) {
+              setDetectedCurrency(COUNTRY_TO_CURRENCY[ipLocationData.country_code.toUpperCase()]);
               setIsLoading(false);
               return;
             }
           }
-        } catch { /* Fallback */ }
+        } catch (networkError) {
+          console.warn('Network currency detection failed:', networkError);
+        }
 
         setDetectedCurrency(DEFAULT_CURRENCY);
-      } catch {
+      } catch (detectionError) {
+        console.error('Currency detection failed:', detectionError);
         setDetectedCurrency(DEFAULT_CURRENCY);
       } finally {
         setIsLoading(false);

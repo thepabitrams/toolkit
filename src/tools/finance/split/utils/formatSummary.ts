@@ -2,45 +2,56 @@
 import type { Transaction } from './settlement';
 import { split } from '../config/split-config';
 
-interface SummaryData {
+interface SummaryTextData {
   currency: string;
-  total: number;
-  perPerson: number;
-  people: string[];
-  transactions: Transaction[];
+  totalExpense: number;
+  perPersonShare: number;
+  groupMembers: string[];
+  settlementTransactions: Transaction[];
 }
 
-export function formatSummaryText({ currency, total, perPerson, people, transactions }: SummaryData): string {
-  const lines: string[] = [];
+export function formatSummaryText({ 
+  currency, 
+  totalExpense, 
+  perPersonShare, 
+  groupMembers, 
+  settlementTransactions 
+}: SummaryTextData): string {
+  const summaryLines: string[] = [];
   
-  lines.push('BILL SPLIT SUMMARY');
-  lines.push('');
+  summaryLines.push('BILL SPLIT SUMMARY');
+  summaryLines.push('');
   
-  lines.push(`Total Spent:         ${currency} ${total.toFixed(2)}`);
-  lines.push(`Per Person:    ${currency} ${perPerson.toFixed(2)}`);
-  lines.push('');
+  summaryLines.push(`Total Spent:         ${currency} ${totalExpense.toFixed(2)}`);
+  summaryLines.push(`Per Person:          ${currency} ${perPersonShare.toFixed(2)}`);
+  summaryLines.push('');
   
-  lines.push(`Group Members (${people.length})`);
-  lines.push(people.join(', '));
-  lines.push('');
+  summaryLines.push(`Group Members (${groupMembers.length})`);
+  summaryLines.push('');
+  summaryLines.push(groupMembers.join(', '));
+  summaryLines.push('');
   
-  lines.push(`Transactions (${transactions.length})`);
-  if (transactions.length === 0) {
-    lines.push('All settled. Everyone is even.');
+  summaryLines.push(`Transactions (${settlementTransactions.length})`);
+  summaryLines.push('');
+  
+  if (settlementTransactions.length === 0) {
+    summaryLines.push('All settled. Everyone is even.');
   } else {
-    const maxFromLength = Math.max(...transactions.map(transaction => transaction.fromMember.length));
-    const maxToLength = Math.max(...transactions.map(transaction => transaction.toMember.length));
+    const maxFromLength = Math.max(...settlementTransactions.map(transaction => transaction.fromMember.length));
+    const maxToLength = Math.max(...settlementTransactions.map(transaction => transaction.toMember.length));
     
-    for (const transaction of transactions) {
-      const fromPadded = transaction.fromMember.padEnd(maxFromLength);
-      const toPadded = transaction.toMember.padEnd(maxToLength);
-      const amountString = `${currency} ${transaction.transactionAmount.toFixed(2)}`;
-      lines.push(`${fromPadded}         →  ${toPadded}         ${amountString}`);
+    for (const transactionRecord of settlementTransactions) {
+      const paddedFromMember = transactionRecord.fromMember.padEnd(maxFromLength);
+      const paddedToMember = transactionRecord.toMember.padEnd(maxToLength);
+      const formattedAmount = `${currency} ${transactionRecord.transactionAmount.toFixed(2)}`;
+      
+      summaryLines.push(`${paddedFromMember}         →  ${paddedToMember}         ${formattedAmount}`);
     }
   }
-  lines.push('');
   
-  const dateString = new Date().toLocaleString('en-US', {
+  summaryLines.push('');
+  
+  const currentDateString = new Date().toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -49,10 +60,10 @@ export function formatSummaryText({ currency, total, perPerson, people, transact
     hour12: false,
   });
   
-  lines.push(split.appName);
-  lines.push(`Created by ${split.authorName}`);
-  lines.push(split.url);
-  lines.push(dateString);
+  summaryLines.push(split.appName);
+  summaryLines.push(`Created by ${split.authorName}`);
+  summaryLines.push(split.url);
+  summaryLines.push(currentDateString);
 
-  return lines.join('\n');
+  return summaryLines.join('\n');
 }

@@ -7,9 +7,9 @@ export function useSettlement() {
   const { groupMembers, expenseRecords } = useSplitStore();
 
   return useMemo(() => {
-    const totalExpense = expenseRecords.reduce((accumulator, expense) => accumulator + expense.expenseAmount, 0);
-    const activeMembers = groupMembers.length > 0 ? groupMembers : ['No one'];
-    const perPersonShare = activeMembers.length > 0 ? totalExpense / activeMembers.length : 0;
+    const totalExpense = expenseRecords.reduce((runningTotal, expenseRecord) => runningTotal + expenseRecord.expenseAmount, 0);
+    const eligibleGroupMembers = groupMembers.length > 0 ? groupMembers : ['No one'];
+    const perPersonShare = eligibleGroupMembers.length > 0 ? totalExpense / eligibleGroupMembers.length : 0;
     
     const memberBalances = calculateBalances(groupMembers, expenseRecords);
     const settlementTransactions = calculateTransactions(memberBalances);

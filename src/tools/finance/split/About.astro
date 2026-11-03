@@ -10,22 +10,22 @@ import { AccordionCard } from '@/core/components/ui';
       <div class="flex gap-4">
         <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">1</div>
         <div>
-          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Add Expenses</h4>
-          <p class="text-slate-500 text-sm">Enter the amount and who paid. The payer is automatically added to the group.</p>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Set Up the Group</h4>
+          <p class="text-slate-500 text-sm">Add your friends to the group list. You can easily switch between them by clicking their name.</p>
         </div>
       </div>
       <div class="flex gap-4">
         <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">2</div>
         <div>
-          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Review Transactions</h4>
-          <p class="text-slate-500 text-sm">The tool automatically calculates the minimum number of payments needed to settle all debts.</p>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Add Expenses</h4>
+          <p class="text-slate-500 text-sm">Select a person, enter what they paid for, and the amount. The tool automatically splits it among the whole group.</p>
         </div>
       </div>
       <div class="flex gap-4">
         <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">3</div>
         <div>
-          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Share Summary</h4>
-          <p class="text-slate-500 text-sm">Copy the text summary or download a clean image to share with your friends.</p>
+          <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Review & Share</h4>
+          <p class="text-slate-500 text-sm">The tool instantly calculates the minimum transactions needed to settle debts. Copy the text or download the receipt image to share.</p>
         </div>
       </div>
     </div>
@@ -36,7 +36,7 @@ import { AccordionCard } from '@/core/components/ui';
       Bill Splitter is a fully client-side expense sharing utility. It helps you split bills and expenses fairly with friends without needing any signup or server uploads.
     </p>
     <p>
-      It uses a greedy algorithm to minimize the number of transactions required to settle all debts. Everything is stored locally on your device.
+      It uses a greedy algorithm to minimize the number of transactions required to settle all debts. Everything is stored locally on your device for 7 days.
     </p>
   </AccordionCard>
 
@@ -45,9 +45,10 @@ import { AccordionCard } from '@/core/components/ui';
       This tool leverages a modern, lightweight architecture optimized for performance:
     </p>
     <ul class="list-disc pl-5 space-y-2 mb-4 text-sm">
-      <li><strong class="text-slate-900 dark:text-white">Framework:</strong> Astro & React.</li>
-      <li><strong class="text-slate-900 dark:text-white">State:</strong> Zustand with LocalStorage persistence for 7 days.</li>
+      <li><strong class="text-slate-900 dark:text-white">Framework:</strong> Astro & React with Tailwind CSS.</li>
+      <li><strong class="text-slate-900 dark:text-white">State:</strong> Zustand with LocalStorage persistence (auto-wipes after 7 days).</li>
       <li><strong class="text-slate-900 dark:text-white">Math:</strong> Custom greedy algorithm for debt settlement.</li>
+      <li><strong class="text-slate-900 dark:text-white">Image Export:</strong> SnapDOM for pixel-perfect, high-resolution receipt generation.</li>
     </ul>
     <p>
       Zero backend. Zero API keys. Just pure, local computation.

@@ -56,12 +56,11 @@ export function LedgerWorkspace() {
     setExpenseDescriptionInput('');
   };
 
-  const activeMemberExpenses = expenseRecords.filter((expenseRecord) => expenseRecord.payerName === activeMemberName);
-  const activeMemberTotalPaid = activeMemberExpenses.reduce((runningTotal, expenseRecord) => runningTotal + expenseRecord.expenseAmount, 0);
+  const activeMemberExpenseRecords = expenseRecords.filter((expenseRecord) => expenseRecord.payerName === activeMemberName);
+  const activeMemberTotalPaid = activeMemberExpenseRecords.reduce((runningTotal, expenseRecord) => runningTotal + expenseRecord.expenseAmount, 0);
 
   return (
     <div className="flex flex-col bg-transparent h-full">
-      
       <div className="p-5 bg-transparent border-b border-gray-100 dark:border-gray-800 shrink-0">
         <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">Who is in the group?</h2>
         
@@ -135,10 +134,10 @@ export function LedgerWorkspace() {
 
           <div className="p-5 space-y-2 h-55 overflow-y-auto">
             <AnimatePresence>
-              {activeMemberExpenses.length === 0 ? (
+              {activeMemberExpenseRecords.length === 0 ? (
                 <div className="text-center text-sm text-gray-400 py-4">No expenses yet.</div>
               ) : (
-                activeMemberExpenses.map((expenseRecord) => (
+                activeMemberExpenseRecords.map((expenseRecord) => (
                   <motion.div
                     key={expenseRecord.identifier}
                     initial={{ opacity: 0, y: -10 }}
