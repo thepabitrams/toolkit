@@ -1,4 +1,4 @@
-export type ToolCategory = 'media' | 'productivity' | 'finance';
+export type ToolCategory = 'media' | 'productivity' | 'finance' | 'personalisation';
 
 export interface ToolConfig {
   slug: string;
@@ -69,6 +69,16 @@ export const tools: ToolConfig[] = [
     seoDescription: 'Remove backgrounds from images instantly using local AI models. No uploads, no servers, completely private.',
     category: 'media',
     component: () => import('@/tools/media/background-remove'),
+  },
+
+  {
+    slug: 'wallpaper',
+    displayName: 'Wallpaper',
+    displayDescription: 'Create solid color wallpapers in any size and format.',
+    seoTitle: 'Free Solid Color Wallpaper Generator - 100% Private | Toolkit',
+    seoDescription: 'Generate custom solid color wallpapers for mobile and desktop in PNG, JPG, or WEBP. Runs locally in your browser.',
+    category: 'personalisation',
+    component: () => import('@/tools/personalisation/wallpaper'),
   },
 ];
 
