@@ -9,5 +9,5 @@ export interface SplitConfig {
 export const split: SplitConfig = {
   appName: 'Toolkit',
   authorName: 'Pabitra Mohan Singh',
-  url: 'toolkit.pabitramohansingh.com/split',
+  url: 'toolkit.pabitramohansingh.com/bill-splitter',
 };

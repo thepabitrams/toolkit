@@ -1,6 +1,6 @@
 // src/tools/finance/split/components/RankingCard.tsx
 import React from 'react';
-import { useSplitStore } from '@/tools/finance/split/store/useSplitStore';
+import { useSplitStore } from '@/tools/finance/bill-splitter/store/useSplitStore';
 
 export function RankingCard() {
   const { selectedCurrency, groupMembers, expenseRecords } = useSplitStore();

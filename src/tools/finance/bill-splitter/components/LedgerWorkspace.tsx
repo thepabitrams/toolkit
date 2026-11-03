@@ -1,7 +1,7 @@
 // src/tools/finance/split/components/LedgerWorkspace.tsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useSplitStore } from '@/tools/finance/split/store/useSplitStore';
+import { useSplitStore } from '@/tools/finance/bill-splitter/store/useSplitStore';
 import { MdDeleteOutline, MdRestartAlt, MdClose } from 'react-icons/md';
 
 export function LedgerWorkspace() {

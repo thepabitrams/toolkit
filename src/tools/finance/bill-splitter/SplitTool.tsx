@@ -2,11 +2,11 @@
 import React, { useEffect } from 'react';
 import { motion, type Variants } from 'motion/react';
 import { Card } from '@/core/components/ui';
-import { useSplitStore } from '@/tools/finance/split/store/useSplitStore';
-import { CurrencyCard } from '@/tools/finance/split/components/CurrencyCard';
-import { LedgerWorkspace } from '@/tools/finance/split/components/LedgerWorkspace';
-import { ResultsCard } from '@/tools/finance/split/components/ResultsCard';
-import { RankingCard } from '@/tools/finance/split/components/RankingCard';
+import { useSplitStore } from '@/tools/finance/bill-splitter/store/useSplitStore';
+import { CurrencyCard } from '@/tools/finance/bill-splitter/components/CurrencyCard';
+import { LedgerWorkspace } from '@/tools/finance/bill-splitter/components/LedgerWorkspace';
+import { ResultsCard } from '@/tools/finance/bill-splitter/components/ResultsCard';
+import { RankingCard } from '@/tools/finance/bill-splitter/components/RankingCard';
 import { spring, stagger } from '@/config/motion';
 
 const workspaceContainerVariants: Variants = {

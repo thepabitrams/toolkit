@@ -1,9 +1,9 @@
 // src/tools/finance/split/components/ResultsCard.tsx
 import React, { useRef } from 'react';
-import { useSplitStore } from '@/tools/finance/split/store/useSplitStore';
-import { useSettlement } from '@/tools/finance/split/hooks/useSettlement';
-import { useCopySummary } from '@/tools/finance/split/hooks/useCopySummary';
-import { useSaveImage } from '@/tools/finance/split/hooks/useSaveImage';
+import { useSplitStore } from '@/tools/finance/bill-splitter/store/useSplitStore';
+import { useSettlement } from '@/tools/finance/bill-splitter/hooks/useSettlement';
+import { useCopySummary } from '@/tools/finance/bill-splitter/hooks/useCopySummary';
+import { useSaveImage } from '@/tools/finance/bill-splitter/hooks/useSaveImage';
 import { ReceiptTemplate } from './ReceiptTemplate';
 import { MdOutlineContentCopy, MdOutlineImage } from 'react-icons/md';
 

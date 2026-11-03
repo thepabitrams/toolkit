@@ -1,7 +1,7 @@
 // src/tools/finance/split/components/CurrencyCard.tsx
 import React from 'react';
-import { useSplitStore } from '@/tools/finance/split/store/useSplitStore';
-import { CURRENCIES } from '@/tools/finance/split/data/currencyData';
+import { useSplitStore } from '@/tools/finance/bill-splitter/store/useSplitStore';
+import { CURRENCIES } from '@/tools/finance/bill-splitter/data/currencyData';
 import { SearchableSelect } from './SearchableSelect';
 
 export function CurrencyCard() {
