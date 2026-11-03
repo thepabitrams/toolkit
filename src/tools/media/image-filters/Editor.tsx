@@ -111,10 +111,9 @@ export const Editor: React.FC<EditorProps> = ({
   }
 
   return (
-    <div className="w-full flex flex-col h-[70vh] max-h-[750px] min-h-[550px] bg-transparent overflow-hidden rounded-xl">
+    <div className="w-full flex flex-col h-[70vh] max-h-187.5 min-h-137.5 bg-transparent overflow-hidden rounded-xl">
       
-      {/* Reduced mobile image height to give more room to the controls */}
-      <div className="relative w-full h-[220px] sm:h-[320px] shrink-0 bg-slate-200/60 dark:bg-black/50 flex items-center justify-center overflow-hidden border-b border-gray-200 dark:border-gray-800">
+      <div className="relative w-full h-55 sm:h-80 shrink-0 bg-slate-200/60 dark:bg-black/50 flex items-center justify-center overflow-hidden border-b border-gray-200 dark:border-gray-800">
         <canvas ref={previewCanvasRef} className="max-w-full max-h-full object-contain" />
         
         {isPreviewProcessing && (

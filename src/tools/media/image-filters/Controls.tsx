@@ -28,7 +28,6 @@ export const Controls: React.FC<ControlsProps> = ({
   return (
     <div className="flex flex-col w-full h-full bg-transparent overflow-hidden">
       
-      {/* 🛠️ Steppers: flex-1 takes exactly the remaining space, no overlapping */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
           <Stepper label="Brightness" value={filterConfiguration.brightness} min={FILTER_RANGES.brightness.min} max={FILTER_RANGES.brightness.max} step={1} onChange={(value) => onUpdateFilter('brightness', value)} />
@@ -46,8 +45,7 @@ export const Controls: React.FC<ControlsProps> = ({
         </div>
       </div>
 
-      {/* 🛠️ Presets: Strict 2 rows on mobile, slightly bigger on desktop */}
-      <div className={`shrink-0 overflow-y-auto border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/20 p-3 sm:p-4 ${isMobileViewport ? 'h-[88px]' : 'max-h-[120px]'}`}>
+      <div className={`shrink-0 overflow-y-auto border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/20 p-3 sm:p-4 ${isMobileViewport ? 'h-22' : 'max-h-30'}`}>
         <div className="flex flex-wrap gap-2">
           {[
             { key: 'grayscale', label: 'Grayscale' },
@@ -78,7 +76,6 @@ export const Controls: React.FC<ControlsProps> = ({
         </div>
       </div>
 
-      {/* 🛠️ Fixed Footer */}
       <div className="shrink-0 flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 z-10 gap-4">
         <button
           onClick={onResetFilters}
