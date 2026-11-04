@@ -1,0 +1,38 @@
+# Toolkit by Pabitra Mohan Singh
+
+> A growing collection of free, privacy-first, browser-based utilities. 100% local processing, zero tracking, no servers.
+
+Toolkit is operated by Pabitra Mohan Singh from India. All media, files, and financial information processed by the tools on this website remain entirely on your device. No data is transmitted to any server. The site is built with Astro, React, and Tailwind CSS.
+
+## Core Pages
+
+- [Toolkit Home](https://toolkit.pabitramohansingh.com/): The main tool hub and search interface.
+- [Privacy Policy](https://toolkit.pabitramohansingh.com/privacy): How the 100% local processing works and our zero-tracking guarantee.
+
+## Media Tools
+
+- [Precision Crop](https://toolkit.pabitramohansingh.com/precision-crop): Crop images with pixel-perfect precision in your browser.
+- [Add Text](https://toolkit.pabitramohansingh.com/add-text): Overlay custom text, fonts, and colors onto your images locally.
+- [Adjust Size](https://toolkit.pabitramohansingh.com/adjust-size): Compress or pad an image to fit within a specific file size range.
+- [Background Remover](https://toolkit.pabitramohansingh.com/background-remove): Remove image backgrounds automatically using AI, 100% locally.
+- [Image Filters](https://toolkit.pabitramohansingh.com/image-filters): Apply professional lighting, color, and effect filters to your images.
+- [Rotate & Flip](https://toolkit.pabitramohansingh.com/flip-rotate): Rotate or flip images locally with zero quality loss.
+
+## Personalisation
+
+- [Wallpaper Generator](https://toolkit.pabitramohansingh.com/wallpaper): Create solid color wallpapers in any size and format.
+
+## Finance
+
+- [Bill Splitter](https://toolkit.pabitramohansingh.com/bill-splitter): Split bills and group expenses fairly with friends.
+
+## Productivity
+
+- [Infinite Type](https://toolkit.pabitramohansingh.com/infinite-type): Endless typing drill with a custom character pool.
+
+## Optional
+
+### Legal
+
+- [Terms of Service](https://toolkit.pabitramohansingh.com/terms): Usage terms and disclaimers for the toolkit.
+- [Contact](https://toolkit.pabitramohansingh.com/contact): Get in touch with the developer.

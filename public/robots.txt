@@ -1,0 +1,42 @@
+# Allow all standard search engine crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://toolkit.pabitramohansingh.com/sitemap-index.xml
+
+# AI Search and Retrieval Bots (Explicitly Allowed for AI Visibility)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# TEAM
+# Developer: Pabitra Mohan Singh
+# Contact: contact@pabitramohansingh.com
+# Location: India
+
+# SITE
+# Last update: 2026-10-19
+# Standards: HTML5, CSS3, JavaScript
+# Components: Astro, Tailwind CSS
+# Software: VS Code, Figma, Git
