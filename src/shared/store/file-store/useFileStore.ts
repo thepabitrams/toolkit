@@ -1,3 +1,4 @@
+// src/shared/store/file-store/useFileStore.ts
 import { create } from 'zustand';
 import type { FileStore } from './types';
 import { handleInit } from './actions/init';
@@ -17,9 +18,9 @@ export const useFileStore = create<FileStore>((set, get) => ({
   bucketIndex: {},
   activeFileId: null,
 
-  init: () => handleInit(set, get),
-  upload: (files, bucketName = 'original', specificIndex, customName) => handleUpload(files, bucketName, specificIndex, customName, set, get),
-  save: (files, bucketName = 'process', parentId, specificIndex, customName) => handleSave(files, bucketName, parentId, specificIndex, customName, set, get),
+  init: (maximumToolFileLimit) => handleInit(maximumToolFileLimit, set, get),
+  upload: (files, bucketName = 'original', maximumToolFileLimit = 15, specificIndex, customName) => handleUpload(files, bucketName, maximumToolFileLimit, specificIndex, customName, set, get),
+  save: (files, bucketName = 'process', maximumToolFileLimit = 15, parentId, specificIndex, customName) => handleSave(files, bucketName, maximumToolFileLimit, parentId, specificIndex, customName, set, get),
   selectAll: (bucketName) => handleSelectAll(bucketName, get),
   getFile: (bucketName, identifier) => handleGetFile(bucketName, identifier, get),
   getRawFile: (storageKey) => handleGetRawFile(storageKey),

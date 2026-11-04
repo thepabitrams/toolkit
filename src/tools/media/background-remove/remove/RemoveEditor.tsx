@@ -6,6 +6,8 @@ import { RemoveControls } from './RemoveControls';
 import styles from './RemoveEditor.module.css';
 import type { FileReference } from '@/shared/store/file-store';
 
+const MAXIMUM_TOOL_FILES = 15;
+
 interface RemoveEditorProps {
   fileReference: FileReference | null;
 }
@@ -31,8 +33,8 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
           objectUrlInstance = URL.createObjectURL(sourceFile);
           setPreviewImageUrl(objectUrlInstance);
         }
-      } catch (error) {
-        console.warn('Failed to load preview:', error);
+      } catch (caughtError) {
+        console.warn('Failed to load preview:', caughtError);
       }
     };
 
@@ -46,18 +48,23 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
 
   const handleGenerateCutout = async (): Promise<void> => {
     if (!fileReference) return;
-    const actualFile = await getRawFile(fileReference.storageKey);
-    if (!actualFile) return;
+    const activeSourceFile = await getRawFile(fileReference.storageKey);
+    if (!activeSourceFile) return;
 
     try {
-      const result = await generateCutout(actualFile);
-      if (result && result.previewBlob) {
-        const fileExtension = result.previewBlob.type.split('/')[1] || 'png';
-        const cutoutFile = new File([result.previewBlob], `cutout.${fileExtension}`, { type: result.previewBlob.type });
-        await save([cutoutFile], 'cutout', undefined, 0);
+      const generationResult = await generateCutout(activeSourceFile);
+      if (generationResult && generationResult.previewBlob) {
+        const fileExtension = generationResult.previewBlob.type.split('/')[1] || 'png';
+        const cutoutFile = new File(
+          [generationResult.previewBlob], 
+          `cutout.${fileExtension}`, 
+          { type: generationResult.previewBlob.type }
+        );
+        
+        await save([cutoutFile], 'cutout', MAXIMUM_TOOL_FILES, fileReference.id, 0);
       }
-    } catch (error) {
-      console.error('Generation failed:', error);
+    } catch (caughtError) {
+      console.error('Generation failed:', caughtError);
     }
   };
 
@@ -73,8 +80,6 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
 
   return (
     <div className="w-full flex flex-col bg-transparent">
-      
-      {/* This is the GRAY PREVIEW AREA that the animation traces */}
       <div className="relative w-full h-80 bg-[#F1F3F4] dark:bg-[#2a2a2a] rounded-t-xl flex items-center justify-center overflow-hidden">
         
         {isBusy && (

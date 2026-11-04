@@ -5,6 +5,8 @@ import { useAdd } from './useAdd';
 import { AddControls } from './AddControls';
 import type { FileReference } from '@/shared/store/file-store';
 
+const MAXIMUM_TOOL_FILES = 15;
+
 interface AddEditorProps {
   cutoutFileReference: FileReference | null;
 }
@@ -33,8 +35,8 @@ export const AddEditor: React.FC<AddEditorProps> = ({ cutoutFileReference }): Re
           objectUrlInstance = URL.createObjectURL(sourceFile);
           setPreviewImageUrl(objectUrlInstance);
         }
-      } catch (error) {
-        console.warn('Failed to load cutout:', error);
+      } catch (caughtError) {
+        console.warn('Failed to load cutout:', caughtError);
       }
     };
 
@@ -47,14 +49,21 @@ export const AddEditor: React.FC<AddEditorProps> = ({ cutoutFileReference }): Re
   }, [cutoutFileReference, getRawFile]);
 
   const handleApply = async (): Promise<void> => {
-    if (!cutoutBlob) return;
+    // 👇 FIXED: Added the check for cutoutFileReference here
+    if (!cutoutBlob || !cutoutFileReference) return;
+    
     try {
-      const finalBlob = await applyBackground(cutoutBlob, outputFormat);
+      const finalBackgroundBlob = await applyBackground(cutoutBlob, outputFormat);
       const fileExtension = outputFormat === 'jpeg' ? 'jpg' : outputFormat;
-      const resultFile = new File([finalBlob], `final-with-bg.${fileExtension}`, { type: finalBlob.type });
-      await save([resultFile], 'process', undefined, 0);
-    } catch (error) {
-      console.error('Export failed:', error);
+      const resultFile = new File(
+        [finalBackgroundBlob], 
+        `final-with-bg.${fileExtension}`, 
+        { type: finalBackgroundBlob.type }
+      );
+      
+      await save([resultFile], 'process', MAXIMUM_TOOL_FILES, cutoutFileReference.id, 0);
+    } catch (caughtError) {
+      console.error('Export failed:', caughtError);
     }
   };
 

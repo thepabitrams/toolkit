@@ -13,6 +13,7 @@ import { useAdjustSize } from './useAdjustSize';
 
 const MASTER_BUCKET = 'original';
 const PROCESS_BUCKET = 'process';
+const MAXIMUM_TOOL_FILES = 15;
 
 const workspaceContainerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -56,7 +57,7 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
   const { processImage, isProcessing: isCompressing } = useAdjustSize();
 
   useEffect(() => {
-    init();
+    init(MAXIMUM_TOOL_FILES);
   }, [init]);
 
   const originalFiles = selectAll(MASTER_BUCKET);
@@ -79,7 +80,7 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
       
       setIsUploading(true);
       try {
-        await upload([droppedFiles[0]], MASTER_BUCKET, undefined, 'image');
+        await upload([droppedFiles[0]], MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
       } catch (error) {
         console.warn('Upload failed:', error);
       } finally {
@@ -112,7 +113,7 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
         { type: result.outputMimeType }
       );
 
-      await save([resultFile], PROCESS_BUCKET, undefined, 0);
+      await save([resultFile], PROCESS_BUCKET, MAXIMUM_TOOL_FILES, undefined, 0);
     } catch (error) {
       console.error('Processing failed:', error);
     } finally {

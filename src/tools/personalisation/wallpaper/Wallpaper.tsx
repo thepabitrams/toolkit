@@ -11,6 +11,7 @@ import { Controls } from './Controls';
 import { useGenerator } from './useGenerator';
 
 const PROCESS_BUCKET = 'process';
+const MAXIMUM_TOOL_FILES = 15;
 
 const workspaceContainerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -39,7 +40,7 @@ export function Wallpaper({ toolId }: WallpaperProps): React.JSX.Element {
   const { generateWallpaper } = useGenerator();
 
   useEffect(() => {
-    init();
+    init(MAXIMUM_TOOL_FILES);
   }, [init]);
 
   const processedFiles = selectAll(PROCESS_BUCKET);
@@ -54,9 +55,9 @@ export function Wallpaper({ toolId }: WallpaperProps): React.JSX.Element {
       const generatedFileName = `wallpaper_${imageWidth}x${imageHeight}.${fileExtension}`;
       const resultFile = new File([generatedBlob], generatedFileName, { type: generatedBlob.type });
       
-      await save([resultFile], PROCESS_BUCKET, undefined, 0);
-    } catch (error) {
-      console.error('Failed to generate wallpaper:', error);
+      await save([resultFile], PROCESS_BUCKET, MAXIMUM_TOOL_FILES, undefined, 0);
+    } catch (caughtError) {
+      console.error('Failed to generate wallpaper:', caughtError);
     } finally {
       setIsGenerating(false);
     }

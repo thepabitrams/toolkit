@@ -14,6 +14,7 @@ import { AddEditor } from './add';
 const MASTER_BUCKET = 'original';
 const CUTOUT_BUCKET = 'cutout';
 const PROCESS_BUCKET = 'process';
+const MAXIMUM_TOOL_FILES = 15;
 
 const workspaceContainerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -31,37 +32,56 @@ interface BackgroundRemoveProps {
 }
 
 export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.Element {
-  const { init, upload, selectAll, deleteBucket, moveToTool, activeFileId, setActiveFile } = useFileStore();
+  const {
+    init,
+    upload,
+    selectAll,
+    deleteBucket,
+    moveToTool,
+    activeFileId,
+    setActiveFile,
+  } = useFileStore();
+
   const [isUploading, setIsUploading] = useState(false);
 
-  useEffect(() => { init(); }, [init]);
+  useEffect(() => {
+    init(MAXIMUM_TOOL_FILES);
+  }, [init]);
 
   const originalFiles = selectAll(MASTER_BUCKET);
-  const activeOriginalFile = originalFiles.find((file) => file.id === activeFileId) || originalFiles[0] || null;
+  const activeOriginalFile =
+    originalFiles.find((file) => file.id === activeFileId) || originalFiles[0] || null;
 
   const cutoutFiles = selectAll(CUTOUT_BUCKET);
   const latestCutoutFile = cutoutFiles.length > 0 ? cutoutFiles[cutoutFiles.length - 1] : null;
 
   const processedFiles = selectAll(PROCESS_BUCKET);
-  const latestProcessedFile = processedFiles.length > 0 ? processedFiles[processedFiles.length - 1] : null;
+  const latestProcessedFile =
+    processedFiles.length > 0 ? processedFiles[processedFiles.length - 1] : null;
 
   useEffect(() => {
-    if (!activeFileId && originalFiles.length > 0) setActiveFile(originalFiles[0].id);
+    if (!activeFileId && originalFiles.length > 0) {
+      setActiveFile(originalFiles[0].id);
+    }
   }, [activeFileId, originalFiles, setActiveFile]);
 
-  const handleFileUpload = useCallback(async (droppedFiles: File[]): Promise<void> => {
-    if (droppedFiles.length === 0) return;
-    setIsUploading(true);
-    try {
-      await upload([droppedFiles[0]], MASTER_BUCKET, undefined, 'image');
-      await deleteBucket(CUTOUT_BUCKET);
-      await deleteBucket(PROCESS_BUCKET);
-    } catch (error) {
-      console.warn('Upload failed:', error);
-    } finally {
-      setIsUploading(false);
-    }
-  }, [upload, deleteBucket]);
+  const handleFileUpload = useCallback(
+    async (droppedFiles: File[]): Promise<void> => {
+      if (droppedFiles.length === 0) return;
+      
+      setIsUploading(true);
+      try {
+        await upload([droppedFiles[0]], MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
+        await deleteBucket(CUTOUT_BUCKET);
+        await deleteBucket(PROCESS_BUCKET);
+      } catch (caughtError) {
+        console.warn('Upload failed:', caughtError);
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [upload, deleteBucket]
+  );
 
   const handleClearWorkspace = useCallback(async (): Promise<void> => {
     await deleteBucket(MASTER_BUCKET);
@@ -70,11 +90,14 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
     setActiveFile(null);
   }, [deleteBucket, setActiveFile]);
 
-  const handleToolSelection = useCallback(async (targetToolSlug: string): Promise<void> => {
-    if (!targetToolSlug || !latestProcessedFile) return;
-    await moveToTool(latestProcessedFile.name, targetToolSlug);
-    window.location.href = `/${targetToolSlug}`;
-  }, [moveToTool, latestProcessedFile]);
+  const handleToolSelection = useCallback(
+    async (targetToolSlug: string): Promise<void> => {
+      if (!targetToolSlug || !latestProcessedFile) return;
+      await moveToTool(latestProcessedFile.name, targetToolSlug);
+      window.location.href = `/${targetToolSlug}`;
+    },
+    [moveToTool, latestProcessedFile]
+  );
 
   const hasActiveFile = !!activeOriginalFile;
   const hasCutoutFile = !!latestCutoutFile;
@@ -93,7 +116,12 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
       </div>
 
       {hasActiveFile && (
-        <motion.div variants={workspaceContainerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
+        <motion.div
+          variants={workspaceContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start"
+        >
           <motion.div variants={workspaceCardVariants} className="w-full">
             <Card className="w-full p-0 overflow-hidden">
               <RemoveEditor fileReference={activeOriginalFile} />
@@ -111,7 +139,12 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
       )}
 
       {hasProcessedFile && (
-        <motion.div variants={workspaceContainerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 items-start">
+        <motion.div
+          variants={workspaceContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 items-start"
+        >
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full p-0 overflow-hidden flex flex-col">
               <FileCard fileReference={latestProcessedFile} />

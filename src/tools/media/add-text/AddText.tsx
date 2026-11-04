@@ -12,6 +12,7 @@ import { Editor } from './Editor';
 
 const MASTER_BUCKET = 'original';
 const PROCESS_BUCKET = 'process';
+const MAXIMUM_TOOL_FILES = 15;
 
 const workspaceContainerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -51,7 +52,7 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    init();
+    init(MAXIMUM_TOOL_FILES);
   }, [init]);
 
   const originalFiles = selectAll(MASTER_BUCKET);
@@ -73,9 +74,9 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
       if (droppedFiles.length === 0) return;
       setIsUploading(true);
       try {
-        await upload([droppedFiles[0]], MASTER_BUCKET, undefined, 'image');
-      } catch (error) {
-        console.warn('Upload failed:', error);
+        await upload([droppedFiles[0]], MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
+      } catch (caughtError) {
+        console.warn('Upload failed:', caughtError);
       } finally {
         setIsUploading(false);
       }
@@ -94,9 +95,9 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
           `text-added.${fileExtension}`,
           { type: processedBlob.type }
         );
-        await save([resultFile], PROCESS_BUCKET, undefined, 0);
-      } catch (error) {
-        console.warn('Save failed:', error);
+        await save([resultFile], PROCESS_BUCKET, MAXIMUM_TOOL_FILES, activeOriginalFile.id, 0);
+      } catch (caughtError) {
+        console.warn('Save failed:', caughtError);
       } finally {
         setIsUploading(false);
       }

@@ -1,82 +1,101 @@
+// src/shared/store/file-store/actions/insert.ts
 import { write, remove as removeFromOPFS } from '@/core/services/opfs';
 import { getActiveToolIdentifier } from '../tool-context';
 import { syncCatalogToDatabase } from '../file-utils';
+import { handleToolCleanup } from './cleanupTool';
+import { handleGlobalCleanup } from './cleanupGlobal';
 import type { FileReference, StoreSet, StoreGet } from '../types';
 
 export const handleInsert = async (
-  files: File[], 
-  bucketName: string, 
-  specificIndex: number | undefined, 
-  parentId: string | undefined,
-  customName: string | undefined,
-  set: StoreSet, 
-  get: StoreGet
-) => {
-  const activeToolId = getActiveToolIdentifier();
-  const currentState = get();
-  const toolBuckets = currentState.bucketIndex[activeToolId] || {};
-  const currentBucketIds = [...(toolBuckets[bucketName] || [])];
+  uploadedFiles: File[],
+  targetBucketName: string,
+  maximumToolFileLimit: number,
+  specificTargetIndex: number | undefined,
+  parentFileIdentifier: string | undefined,
+  customDisplayName: string | undefined,
+  setState: StoreSet,
+  getState: StoreGet
+): Promise<void> => {
+  const activeToolIdentifier = getActiveToolIdentifier();
+  const currentStoreState = getState();
+  const activeToolBuckets = currentStoreState.bucketIndex[activeToolIdentifier] || {};
+  const currentBucketFileIdentifiers = [...(activeToolBuckets[targetBucketName] || [])];
 
   const newFileReferences: FileReference[] = [];
-  const idsToDelete: string[] = [];
+  const fileIdentifiersToDelete: string[] = [];
 
-  for (let index = 0; index < files.length; index++) {
-    const file = files[index];
-    const fileId = crypto.randomUUID();
-    const storageKey = `${bucketName}-${fileId}`;
+  for (let fileIndex = 0; fileIndex < uploadedFiles.length; fileIndex++) {
+    const uploadedFile = uploadedFiles[fileIndex];
+    const newFileIdentifier = crypto.randomUUID();
+    const storageKey = `${targetBucketName}-${newFileIdentifier}`;
     
-    await write(storageKey, await file.arrayBuffer());
+    await write(storageKey, await uploadedFile.arrayBuffer());
 
-    const targetIndex = specificIndex !== undefined ? specificIndex + index : currentBucketIds.length + index;
+    const targetBucketIndex = specificTargetIndex !== undefined 
+      ? specificTargetIndex + fileIndex 
+      : currentBucketFileIdentifiers.length + fileIndex;
     
-    let displayName = `${bucketName}${targetIndex + 1}`;
-    if (customName) {
-      displayName = files.length > 1 ? `${customName}${index + 1}` : customName;
+    let displayName = `${targetBucketName}${targetBucketIndex + 1}`;
+    if (customDisplayName) {
+      displayName = uploadedFiles.length > 1 
+        ? `${customDisplayName}${fileIndex + 1}` 
+        : customDisplayName;
     }
 
-    if (currentBucketIds[targetIndex]) {
-      idsToDelete.push(currentBucketIds[targetIndex]);
+    if (currentBucketFileIdentifiers[targetBucketIndex]) {
+      fileIdentifiersToDelete.push(currentBucketFileIdentifiers[targetBucketIndex]);
     }
 
     const newFileReference: FileReference = {
-      id: fileId,
-      toolId: activeToolId,
-      bucket: bucketName,
+      id: newFileIdentifier,
+      toolId: activeToolIdentifier,
+      bucket: targetBucketName,
       name: displayName,
       storageKey,
-      size: file.size,
-      type: file.type,
+      size: uploadedFile.size,
+      type: uploadedFile.type,
       createdAt: Date.now(),
-      parentId,
+      parentId: parentFileIdentifier,
     };
 
     newFileReferences.push(newFileReference);
-    currentBucketIds[targetIndex] = fileId;
+    currentBucketFileIdentifiers[targetBucketIndex] = newFileIdentifier;
   }
 
-  for (const oldId of idsToDelete) {
-    const oldFile = currentState.fileDetailMap[oldId];
-    if (oldFile) {
-      await removeFromOPFS(oldFile.storageKey);
+  for (const previousFileIdentifier of fileIdentifiersToDelete) {
+    const previousFileReference = currentStoreState.fileDetailMap[previousFileIdentifier];
+    if (previousFileReference) {
+      await removeFromOPFS(previousFileReference.storageKey);
     }
   }
 
-  set((state) => {
-    const nextDetailMap = { ...state.fileDetailMap };
-    newFileReferences.forEach((reference) => { nextDetailMap[reference.id] = reference; });
-    idsToDelete.forEach((id) => { delete nextDetailMap[id]; });
+  setState((previousState) => {
+    const updatedFileDetailMap = { ...previousState.fileDetailMap };
+    
+    newFileReferences.forEach((fileReference) => { 
+      updatedFileDetailMap[fileReference.id] = fileReference; 
+    });
+    
+    fileIdentifiersToDelete.forEach((fileIdentifier) => { 
+      delete updatedFileDetailMap[fileIdentifier]; 
+    });
 
     return {
-      fileDetailMap: nextDetailMap,
+      fileDetailMap: updatedFileDetailMap,
       bucketIndex: {
-        ...state.bucketIndex,
-        [activeToolId]: {
-          ...toolBuckets,
-          [bucketName]: currentBucketIds.filter((id) => id !== undefined),
+        ...previousState.bucketIndex,
+        [activeToolIdentifier]: {
+          ...activeToolBuckets,
+          [targetBucketName]: currentBucketFileIdentifiers.filter(
+            (fileIdentifier) => fileIdentifier !== undefined
+          ),
         },
       },
     };
   });
 
-  await syncCatalogToDatabase(get().fileDetailMap, get().bucketIndex);
+  await syncCatalogToDatabase(getState().fileDetailMap, getState().bucketIndex);
+
+  await handleToolCleanup(activeToolIdentifier, maximumToolFileLimit, setState, getState);
+  await handleGlobalCleanup(activeToolIdentifier, setState, getState);
 };

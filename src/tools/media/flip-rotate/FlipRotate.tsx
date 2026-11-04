@@ -12,6 +12,7 @@ import { Editor } from './Editor';
 
 const MASTER_BUCKET = 'original';
 const PROCESS_BUCKET = 'process';
+const MAXIMUM_TOOL_FILES = 15;
 
 const workspaceContainerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -51,7 +52,7 @@ export function FlipRotate({ toolId }: FlipRotateProps): React.JSX.Element {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    init();
+    init(MAXIMUM_TOOL_FILES);
   }, [init]);
 
   const originalFiles = selectAll(MASTER_BUCKET);
@@ -74,7 +75,7 @@ export function FlipRotate({ toolId }: FlipRotateProps): React.JSX.Element {
       
       setIsUploading(true);
       try {
-        await upload([droppedFiles[0]], MASTER_BUCKET, undefined, 'image');
+        await upload([droppedFiles[0]], MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
       } catch (error) {
         console.warn('Upload failed:', error);
       } finally {
@@ -96,7 +97,7 @@ export function FlipRotate({ toolId }: FlipRotateProps): React.JSX.Element {
           `transformed.${fileExtension}`,
           { type: processedBlob.type }
         );
-        await save([resultFile], PROCESS_BUCKET, undefined, 0);
+        await save([resultFile], PROCESS_BUCKET, MAXIMUM_TOOL_FILES, undefined, 0);
       } catch (error) {
         console.warn('Save failed:', error);
       } finally {
