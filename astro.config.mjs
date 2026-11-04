@@ -8,7 +8,12 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://toolkit.pabitramohansingh.com',
   output: 'server',
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(), 
+    sitemap({
+      filter: (page) => !page.includes('/404') && !page.includes('/api/'),
+    })
+  ],
   adapter: cloudflare({
     platformProxy: {
       enabled: true,
