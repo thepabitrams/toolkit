@@ -8,6 +8,7 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://toolkit.pabitramohansingh.com',
   output: 'server',
+  trailingSlash: 'always',
   integrations: [
     react(), 
     sitemap({
