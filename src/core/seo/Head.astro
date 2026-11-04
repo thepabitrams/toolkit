@@ -17,21 +17,22 @@ export interface HeadProps {
 }
 
 const {
-  title,
-  description = site.description,
-  openGraphImage = site.openGraphImage,
-  canonicalUrl = Astro.url.href,
-  noindex = false,
-  breadcrumbItems = [],
+  title: requestedPageTitle,
+  description: requestedPageDescription = site.description,
+  openGraphImage: requestedOpenGraphImage = site.openGraphImage,
+  canonicalUrl: requestedCanonicalUrl = Astro.url.href,
+  noindex: requestedNoIndexStatus = false,
+  breadcrumbItems: requestedBreadcrumbItems = [],
 } = Astro.props;
 
-const personId = `${site.domain}/#person`;
-const webSiteId = `${site.domain}/#website`;
-const webPageId = `${canonicalUrl.replace(/\/$/, '')}/#webpage`;
+const cleanWebPageName = requestedPageTitle.split(' - ')[0];
+const personSchemaIdentifier = `${site.domain}/#person`;
+const webSiteSchemaIdentifier = `${site.domain}/#website`;
+const webPageSchemaIdentifier = `${requestedCanonicalUrl.replace(/\/$/, '')}/#webpage`;
 
 const personSchema = {
   '@type': 'Person',
-  '@id': personId,
+  '@id': personSchemaIdentifier,
   name: site.author,
   url: site.domain,
   image: site.openGraphImage,
@@ -45,34 +46,49 @@ const personSchema = {
 
 const webSiteSchema = {
   '@type': 'WebSite',
-  '@id': webSiteId,
+  '@id': webSiteSchemaIdentifier,
   name: site.name,
   url: site.domain,
   description: site.description,
-  publisher: { '@id': personId },
+  publisher: { '@id': personSchemaIdentifier },
 } as const;
 
 const webPageSchema = {
   '@type': 'WebPage',
-  '@id': webPageId,
-  name: title,
-  description: description,
-  url: canonicalUrl,
-  mainEntityOfPage: { '@id': canonicalUrl },
+  '@id': webPageSchemaIdentifier,
+  name: cleanWebPageName,
+  description: requestedPageDescription,
+  url: requestedCanonicalUrl,
+  mainEntityOfPage: { '@id': requestedCanonicalUrl },
   dateModified: new Date().toISOString(),
   inLanguage: 'en',
-  isPartOf: { '@id': webSiteId },
-  about: { '@id': personId },
+  isPartOf: { '@id': webSiteSchemaIdentifier },
+  about: { '@id': personSchemaIdentifier },
 } as const;
 
-const breadcrumbSchema =
-  breadcrumbItems.length >= 2
+const webApplicationSchema = {
+  '@type': 'WebApplication',
+  name: site.name,
+  description: site.description,
+  url: site.domain,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires JavaScript. Requires HTML5.',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD'
+  }
+} as const;
+
+const breadcrumbListSchema =
+  requestedBreadcrumbItems.length >= 2
     ? {
         '@type': 'BreadcrumbList',
-        itemListElement: breadcrumbItems.map(
-          (breadcrumbItem: BreadcrumbItem, index: number) => ({
+        itemListElement: requestedBreadcrumbItems.map(
+          (breadcrumbItem: BreadcrumbItem, itemIndex: number) => ({
             '@type': 'ListItem',
-            position: index + 1,
+            position: itemIndex + 1,
             name: breadcrumbItem.name,
             item: breadcrumbItem.url,
           })
@@ -80,13 +96,14 @@ const breadcrumbSchema =
       }
     : null;
 
-const graphSchema = {
+const structuredDataGraph = {
   '@context': 'https://schema.org',
   '@graph': [
     personSchema,
     webSiteSchema,
     webPageSchema,
-    ...(breadcrumbSchema ? [breadcrumbSchema] : []),
+    webApplicationSchema,
+    ...(breadcrumbListSchema ? [breadcrumbListSchema] : []),
   ],
 };
 ---
@@ -94,10 +111,10 @@ const graphSchema = {
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>{title}</title>
-<meta name="description" content={description} />
+<title>{requestedPageTitle}</title>
+<meta name="description" content={requestedPageDescription} />
 
-{noindex ? (
+{requestedNoIndexStatus ? (
   <meta name="robots" content="noindex, follow" />
 ) : (
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -106,17 +123,17 @@ const graphSchema = {
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={site.name} />
 <meta property="og:locale" content={site.locale} />
-<meta property="og:title" content={title} />
-<meta property="og:description" content={description} />
-<meta property="og:url" content={canonicalUrl} />
-<meta property="og:image" content={openGraphImage} />
+<meta property="og:title" content={requestedPageTitle} />
+<meta property="og:description" content={requestedPageDescription} />
+<meta property="og:url" content={requestedCanonicalUrl} />
+<meta property="og:image" content={requestedOpenGraphImage} />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={title} />
-<meta name="twitter:description" content={description} />
-<meta name="twitter:image" content={openGraphImage} />
+<meta name="twitter:title" content={requestedPageTitle} />
+<meta name="twitter:description" content={requestedPageDescription} />
+<meta name="twitter:image" content={requestedOpenGraphImage} />
 
-<link rel="canonical" href={canonicalUrl} />
+<link rel="canonical" href={requestedCanonicalUrl} />
 
 <link rel="icon" type="image/svg+xml" href="/icons/pabitra-avatar-black.svg" media="(prefers-color-scheme: light)" />
 <link rel="icon" type="image/svg+xml" href="/icons/pabitra-avatar-white.svg" media="(prefers-color-scheme: dark)" />
@@ -131,30 +148,31 @@ const graphSchema = {
 <meta name="apple-mobile-web-app-title" content={site.name} />
 <link rel="apple-touch-icon" href="/pwa-192x192.png" />
 
-<script is:inline type="application/ld+json" set:html={JSON.stringify(graphSchema)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(structuredDataGraph)} />
 
 <script is:inline>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch((error) => {
-        console.error('Service Worker registration failed:', error);
+      navigator.serviceWorker.register('/sw.js').catch((serviceWorkerRegistrationError) => {
+        console.error('Service Worker registration failed:', serviceWorkerRegistrationError);
       });
     });
   }
 
-  let deferredInstallPrompt = null;
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    deferredInstallPrompt = event;
+  let deferredInstallPromptEvent = null;
+  
+  window.addEventListener('beforeinstallprompt', (beforeInstallPromptEvent) => {
+    beforeInstallPromptEvent.preventDefault();
+    deferredInstallPromptEvent = beforeInstallPromptEvent;
     window.dispatchEvent(new CustomEvent('pwa-installable'));
   });
 
   window.triggerPwaInstall = async () => {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt();
-    const { outcome } = await deferredInstallPrompt.userChoice;
+    if (!deferredInstallPromptEvent) return;
+    deferredInstallPromptEvent.prompt();
+    const { outcome } = await deferredInstallPromptEvent.userChoice;
     if (outcome === 'accepted') {
-      deferredInstallPrompt = null;
+      deferredInstallPromptEvent = null;
     }
   };
 </script>
