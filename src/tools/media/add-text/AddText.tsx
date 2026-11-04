@@ -55,19 +55,21 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
     init(MAXIMUM_TOOL_FILES);
   }, [init]);
 
-  const originalFiles = selectAll(MASTER_BUCKET);
-  const activeOriginalFile =
-    originalFiles.find((file) => file.id === activeFileId) || originalFiles[0] || null;
+  const originalFileReferences = selectAll(MASTER_BUCKET);
+  const activeOriginalFileReference =
+    originalFileReferences.find((fileReference) => fileReference.id === activeFileId) || 
+    originalFileReferences[0] || 
+    null;
 
-  const processedFiles = selectAll(PROCESS_BUCKET);
-  const latestProcessedFile =
-    processedFiles.length > 0 ? processedFiles[processedFiles.length - 1] : null;
+  const processedFileReferences = selectAll(PROCESS_BUCKET);
+  const latestProcessedFileReference =
+    processedFileReferences.length > 0 ? processedFileReferences[processedFileReferences.length - 1] : null;
 
   useEffect(() => {
-    if (!activeFileId && originalFiles.length > 0) {
-      setActiveFile(originalFiles[0].id);
+    if (!activeFileId && originalFileReferences.length > 0) {
+      setActiveFile(originalFileReferences[0].id);
     }
-  }, [activeFileId, originalFiles, setActiveFile]);
+  }, [activeFileId, originalFileReferences, setActiveFile]);
 
   const handleFileUpload = useCallback(
     async (droppedFiles: File[]): Promise<void> => {
@@ -86,7 +88,7 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
 
   const handleProcessImage = useCallback(
     async (processedBlob: Blob): Promise<void> => {
-      if (!activeOriginalFile) return;
+      if (!activeOriginalFileReference) return;
       setIsUploading(true);
       try {
         const fileExtension = processedBlob.type.split('/')[1] || 'png';
@@ -95,14 +97,14 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
           `text-added.${fileExtension}`,
           { type: processedBlob.type }
         );
-        await save([resultFile], PROCESS_BUCKET, MAXIMUM_TOOL_FILES, activeOriginalFile.id, 0);
+        await save([resultFile], PROCESS_BUCKET, MAXIMUM_TOOL_FILES, activeOriginalFileReference.id, 0);
       } catch (caughtError) {
         console.warn('Save failed:', caughtError);
       } finally {
         setIsUploading(false);
       }
     },
-    [activeOriginalFile, save]
+    [activeOriginalFileReference, save]
   );
 
   const handleClearWorkspace = useCallback(async (): Promise<void> => {
@@ -113,21 +115,21 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
 
   const handleToolSelection = useCallback(
     async (targetToolSlug: string): Promise<void> => {
-      if (!targetToolSlug || !latestProcessedFile) return;
-      await moveToTool(latestProcessedFile.name, targetToolSlug);
+      if (!targetToolSlug || !latestProcessedFileReference) return;
+      await moveToTool(latestProcessedFileReference.name, targetToolSlug);
       window.location.href = `/${targetToolSlug}`;
     },
-    [moveToTool, latestProcessedFile]
+    [moveToTool, latestProcessedFileReference]
   );
 
-  const hasActiveFile = !!activeOriginalFile;
-  const hasProcessedFile = !!latestProcessedFile;
+  const hasActiveOriginalFileReference = !!activeOriginalFileReference;
+  const hasProcessedFileReference = !!latestProcessedFileReference;
 
   return (
     <div className="w-full flex flex-col gap-6 py-2">
       <div className="w-full">
         <GalleryUploader
-          originalFileReferences={originalFiles}
+          originalFileReferences={originalFileReferences}
           activeFileIdentifier={activeFileId}
           acceptedMimeTypes={IMAGE_CONFIG.accept}
           isUploading={isUploading}
@@ -135,7 +137,7 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
         />
       </div>
 
-      {hasActiveFile && (
+      {hasActiveOriginalFileReference && (
         <motion.div
           variants={workspaceCardVariants}
           initial="hidden"
@@ -144,14 +146,14 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
         >
           <Card className="w-full p-0 overflow-hidden">
             <Editor
-              fileReference={activeOriginalFile}
+              fileReference={activeOriginalFileReference}
               onProcessImage={handleProcessImage}
             />
           </Card>
         </motion.div>
       )}
 
-      {hasProcessedFile && (
+      {hasProcessedFileReference && (
         <motion.div
           variants={workspaceContainerVariants}
           initial="hidden"
@@ -160,14 +162,14 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
         >
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full h-full p-0 overflow-hidden flex flex-col">
-              <FileCard fileReference={latestProcessedFile} />
+              <FileCard fileReference={latestProcessedFileReference} />
             </Card>
           </motion.div>
 
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full p-0 overflow-hidden">
               <ExportPanel
-                fileReference={latestProcessedFile}
+                fileReference={latestProcessedFileReference}
                 actionVariant="single"
                 defaultFileName="text-added"
                 handleClearFiles={handleClearWorkspace}

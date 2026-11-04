@@ -16,7 +16,13 @@ export const AddEditor: React.FC<AddEditorProps> = ({ cutoutFileReference }): Re
   const [cutoutBlob, setCutoutBlob] = useState<Blob | null>(null);
   const { getRawFile, save } = useFileStore();
 
-  const { backgroundColor, setBackgroundColor, outputFormat, setOutputFormat, applyBackground } = useAdd();
+  const { 
+    backgroundColor, 
+    setBackgroundColor, 
+    outputFormat, 
+    setOutputFormat, 
+    applyBackground 
+  } = useAdd();
 
   useEffect(() => {
     let isComponentMounted = true;
@@ -29,10 +35,10 @@ export const AddEditor: React.FC<AddEditorProps> = ({ cutoutFileReference }): Re
         return;
       }
       try {
-        const sourceFile = await getRawFile(cutoutFileReference.storageKey);
-        if (sourceFile && isComponentMounted) {
-          setCutoutBlob(sourceFile);
-          objectUrlInstance = URL.createObjectURL(sourceFile);
+        const rawCutoutFileBlob = await getRawFile(cutoutFileReference.storageKey);
+        if (rawCutoutFileBlob && isComponentMounted) {
+          setCutoutBlob(rawCutoutFileBlob);
+          objectUrlInstance = URL.createObjectURL(rawCutoutFileBlob);
           setPreviewImageUrl(objectUrlInstance);
         }
       } catch (caughtError) {
@@ -49,19 +55,18 @@ export const AddEditor: React.FC<AddEditorProps> = ({ cutoutFileReference }): Re
   }, [cutoutFileReference, getRawFile]);
 
   const handleApply = async (): Promise<void> => {
-    // 👇 FIXED: Added the check for cutoutFileReference here
     if (!cutoutBlob || !cutoutFileReference) return;
     
     try {
-      const finalBackgroundBlob = await applyBackground(cutoutBlob, outputFormat);
+      const compositedImageBlob = await applyBackground(cutoutBlob, outputFormat);
       const fileExtension = outputFormat === 'jpeg' ? 'jpg' : outputFormat;
-      const resultFile = new File(
-        [finalBackgroundBlob], 
+      const finalCompositedFile = new File(
+        [compositedImageBlob], 
         `final-with-bg.${fileExtension}`, 
-        { type: finalBackgroundBlob.type }
+        { type: compositedImageBlob.type }
       );
       
-      await save([resultFile], 'process', MAXIMUM_TOOL_FILES, cutoutFileReference.id, 0);
+      await save([finalCompositedFile], 'process', MAXIMUM_TOOL_FILES, cutoutFileReference.id, 0);
     } catch (caughtError) {
       console.error('Export failed:', caughtError);
     }

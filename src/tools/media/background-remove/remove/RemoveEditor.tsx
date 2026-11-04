@@ -16,7 +16,15 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const { getRawFile, save } = useFileStore();
 
-  const { status, errorMessage, selectedModelId, setSelectedModel, generateCutout, retry, availableModels } = useRemove();
+  const { 
+    status, 
+    errorMessage, 
+    selectedModelId, 
+    setSelectedModel, 
+    generateCutout, 
+    retry, 
+    availableModels 
+  } = useRemove();
 
   useEffect(() => {
     let isComponentMounted = true;
@@ -28,9 +36,9 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
         return;
       }
       try {
-        const sourceFile = await getRawFile(fileReference.storageKey);
-        if (sourceFile && isComponentMounted) {
-          objectUrlInstance = URL.createObjectURL(sourceFile);
+        const rawSourceFileBlob = await getRawFile(fileReference.storageKey);
+        if (rawSourceFileBlob && isComponentMounted) {
+          objectUrlInstance = URL.createObjectURL(rawSourceFileBlob);
           setPreviewImageUrl(objectUrlInstance);
         }
       } catch (caughtError) {
@@ -48,20 +56,22 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
 
   const handleGenerateCutout = async (): Promise<void> => {
     if (!fileReference) return;
-    const activeSourceFile = await getRawFile(fileReference.storageKey);
-    if (!activeSourceFile) return;
+    
+    const activeSourceBlob = await getRawFile(fileReference.storageKey);
+    if (!activeSourceBlob) return;
 
     try {
-      const generationResult = await generateCutout(activeSourceFile);
+      const generationResult = await generateCutout(activeSourceBlob);
+      
       if (generationResult && generationResult.previewBlob) {
         const fileExtension = generationResult.previewBlob.type.split('/')[1] || 'png';
-        const cutoutFile = new File(
+        const generatedCutoutFile = new File(
           [generationResult.previewBlob], 
           `cutout.${fileExtension}`, 
           { type: generationResult.previewBlob.type }
         );
         
-        await save([cutoutFile], 'cutout', MAXIMUM_TOOL_FILES, fileReference.id, 0);
+        await save([generatedCutoutFile], 'cutout', MAXIMUM_TOOL_FILES, fileReference.id, 0);
       }
     } catch (caughtError) {
       console.error('Generation failed:', caughtError);
@@ -76,13 +86,13 @@ export const RemoveEditor: React.FC<RemoveEditorProps> = ({ fileReference }): Re
     );
   }
 
-  const isBusy = status === 'loading' || status === 'processing';
+  const isGeneratingCutout = status === 'loading' || status === 'processing';
 
   return (
     <div className="w-full flex flex-col bg-transparent">
       <div className="relative w-full h-80 bg-[#F1F3F4] dark:bg-[#2a2a2a] rounded-t-xl flex items-center justify-center overflow-hidden">
         
-        {isBusy && (
+        {isGeneratingCutout && (
           <div className={styles.traceWrapper}>
             <div className={styles.traceLine} />
           </div>

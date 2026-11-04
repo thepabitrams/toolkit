@@ -48,22 +48,25 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
     init(MAXIMUM_TOOL_FILES);
   }, [init]);
 
-  const originalFiles = selectAll(MASTER_BUCKET);
-  const activeOriginalFile =
-    originalFiles.find((file) => file.id === activeFileId) || originalFiles[0] || null;
+  const originalFileReferences = selectAll(MASTER_BUCKET);
+  const activeOriginalFileReference =
+    originalFileReferences.find((fileReference) => fileReference.id === activeFileId) || 
+    originalFileReferences[0] || 
+    null;
 
-  const cutoutFiles = selectAll(CUTOUT_BUCKET);
-  const latestCutoutFile = cutoutFiles.length > 0 ? cutoutFiles[cutoutFiles.length - 1] : null;
+  const cutoutFileReferences = selectAll(CUTOUT_BUCKET);
+  const latestCutoutFileReference = 
+    cutoutFileReferences.length > 0 ? cutoutFileReferences[cutoutFileReferences.length - 1] : null;
 
-  const processedFiles = selectAll(PROCESS_BUCKET);
-  const latestProcessedFile =
-    processedFiles.length > 0 ? processedFiles[processedFiles.length - 1] : null;
+  const processedFileReferences = selectAll(PROCESS_BUCKET);
+  const latestProcessedFileReference =
+    processedFileReferences.length > 0 ? processedFileReferences[processedFileReferences.length - 1] : null;
 
   useEffect(() => {
-    if (!activeFileId && originalFiles.length > 0) {
-      setActiveFile(originalFiles[0].id);
+    if (!activeFileId && originalFileReferences.length > 0) {
+      setActiveFile(originalFileReferences[0].id);
     }
-  }, [activeFileId, originalFiles, setActiveFile]);
+  }, [activeFileId, originalFileReferences, setActiveFile]);
 
   const handleFileUpload = useCallback(
     async (droppedFiles: File[]): Promise<void> => {
@@ -92,22 +95,22 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
 
   const handleToolSelection = useCallback(
     async (targetToolSlug: string): Promise<void> => {
-      if (!targetToolSlug || !latestProcessedFile) return;
-      await moveToTool(latestProcessedFile.name, targetToolSlug);
+      if (!targetToolSlug || !latestProcessedFileReference) return;
+      await moveToTool(latestProcessedFileReference.name, targetToolSlug);
       window.location.href = `/${targetToolSlug}`;
     },
-    [moveToTool, latestProcessedFile]
+    [moveToTool, latestProcessedFileReference]
   );
 
-  const hasActiveFile = !!activeOriginalFile;
-  const hasCutoutFile = !!latestCutoutFile;
-  const hasProcessedFile = !!latestProcessedFile;
+  const hasActiveOriginalFileReference = !!activeOriginalFileReference;
+  const hasCutoutFileReference = !!latestCutoutFileReference;
+  const hasProcessedFileReference = !!latestProcessedFileReference;
 
   return (
     <div className="w-full flex flex-col gap-6 py-2">
       <div className="w-full">
         <GalleryUploader
-          originalFileReferences={originalFiles}
+          originalFileReferences={originalFileReferences}
           activeFileIdentifier={activeFileId}
           acceptedMimeTypes={IMAGE_CONFIG.accept}
           isUploading={isUploading}
@@ -115,7 +118,7 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
         />
       </div>
 
-      {hasActiveFile && (
+      {hasActiveOriginalFileReference && (
         <motion.div
           variants={workspaceContainerVariants}
           initial="hidden"
@@ -124,21 +127,21 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
         >
           <motion.div variants={workspaceCardVariants} className="w-full">
             <Card className="w-full p-0 overflow-hidden">
-              <RemoveEditor fileReference={activeOriginalFile} />
+              <RemoveEditor fileReference={activeOriginalFileReference} />
             </Card>
           </motion.div>
 
-          {hasCutoutFile && (
+          {hasCutoutFileReference && (
             <motion.div variants={workspaceCardVariants} className="w-full">
               <Card className="w-full p-0 overflow-hidden">
-                <AddEditor cutoutFileReference={latestCutoutFile} />
+                <AddEditor cutoutFileReference={latestCutoutFileReference} />
               </Card>
             </motion.div>
           )}
         </motion.div>
       )}
 
-      {hasProcessedFile && (
+      {hasProcessedFileReference && (
         <motion.div
           variants={workspaceContainerVariants}
           initial="hidden"
@@ -147,14 +150,14 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
         >
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full p-0 overflow-hidden flex flex-col">
-              <FileCard fileReference={latestProcessedFile} />
+              <FileCard fileReference={latestProcessedFileReference} />
             </Card>
           </motion.div>
 
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full p-0 overflow-hidden">
               <ExportPanel
-                fileReference={latestProcessedFile}
+                fileReference={latestProcessedFileReference}
                 actionVariant="single"
                 defaultFileName="background-removed"
                 handleClearFiles={handleClearWorkspace}

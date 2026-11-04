@@ -60,19 +60,21 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
     init(MAXIMUM_TOOL_FILES);
   }, [init]);
 
-  const originalFiles = selectAll(MASTER_BUCKET);
-  const activeOriginalFile =
-    originalFiles.find((file) => file.id === activeFileId) || originalFiles[0] || null;
+  const originalFileReferences = selectAll(MASTER_BUCKET);
+  const activeOriginalFileReference =
+    originalFileReferences.find((fileReference) => fileReference.id === activeFileId) || 
+    originalFileReferences[0] || 
+    null;
 
-  const processedFiles = selectAll(PROCESS_BUCKET);
-  const latestProcessedFile =
-    processedFiles.length > 0 ? processedFiles[processedFiles.length - 1] : null;
+  const processedFileReferences = selectAll(PROCESS_BUCKET);
+  const latestProcessedFileReference =
+    processedFileReferences.length > 0 ? processedFileReferences[processedFileReferences.length - 1] : null;
 
   useEffect(() => {
-    if (!activeFileId && originalFiles.length > 0) {
-      setActiveFile(originalFiles[0].id);
+    if (!activeFileId && originalFileReferences.length > 0) {
+      setActiveFile(originalFileReferences[0].id);
     }
-  }, [activeFileId, originalFiles, setActiveFile]);
+  }, [activeFileId, originalFileReferences, setActiveFile]);
 
   const handleFileUpload = useCallback(
     async (droppedFiles: File[]): Promise<void> => {
@@ -81,8 +83,8 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
       setIsUploading(true);
       try {
         await upload(droppedFiles, MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
-      } catch (error) {
-        console.warn('Upload failed:', error);
+      } catch (caughtError) {
+        console.warn('Upload failed:', caughtError);
       } finally {
         setIsUploading(false);
       }
@@ -91,35 +93,35 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
   );
 
   const handleProcessImage = useCallback(async (): Promise<void> => {
-    if (!activeOriginalFile) return;
+    if (!activeOriginalFileReference) return;
     if (minSizeKB >= maxSizeKB) return;
 
     setIsUploading(true);
     try {
-      const sourceFile = await getRawFile(activeOriginalFile.storageKey);
-      if (!sourceFile) throw new Error('Failed to read file from storage');
+      const sourceRawFile = await getRawFile(activeOriginalFileReference.storageKey);
+      if (!sourceRawFile) throw new Error('Failed to read file from storage');
 
-      const result = await processImage(sourceFile, minSizeKB, maxSizeKB);
-      if (!result?.processedBlob) throw new Error('Processing failed: No blob returned');
+      const processingResult = await processImage(sourceRawFile, minSizeKB, maxSizeKB);
+      if (!processingResult?.processedBlob) throw new Error('Processing failed: No blob returned');
 
-      if (!result.isWithinRange && result.error) {
-        console.warn(result.error);
+      if (!processingResult.isWithinRange && processingResult.error) {
+        console.warn(processingResult.error);
       }
 
-      const finalExtension = result.outputMimeType.split('/')[1] || 'png';
-      const resultFile = new File(
-        [result.processedBlob],
+      const finalExtension = processingResult.outputMimeType.split('/')[1] || 'png';
+      const generatedFileObject = new File(
+        [processingResult.processedBlob],
         `adjusted-${minSizeKB}-${maxSizeKB}KB.${finalExtension}`,
-        { type: result.outputMimeType }
+        { type: processingResult.outputMimeType }
       );
 
-      await save([resultFile], PROCESS_BUCKET, MAXIMUM_TOOL_FILES, undefined, 0);
-    } catch (error) {
-      console.error('Processing failed:', error);
+      await save([generatedFileObject], PROCESS_BUCKET, MAXIMUM_TOOL_FILES, activeOriginalFileReference.id, 0);
+    } catch (caughtError) {
+      console.error('Processing failed:', caughtError);
     } finally {
       setIsUploading(false);
     }
-  }, [activeOriginalFile, minSizeKB, maxSizeKB, processImage, save, getRawFile]);
+  }, [activeOriginalFileReference, minSizeKB, maxSizeKB, processImage, save, getRawFile]);
 
   const handleClearWorkspace = useCallback(async (): Promise<void> => {
     await deleteBucket(MASTER_BUCKET);
@@ -129,21 +131,21 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
 
   const handleToolSelection = useCallback(
     async (targetToolSlug: string): Promise<void> => {
-      if (!targetToolSlug || !latestProcessedFile) return;
-      await moveToTool(latestProcessedFile.name, targetToolSlug);
+      if (!targetToolSlug || !latestProcessedFileReference) return;
+      await moveToTool(latestProcessedFileReference.name, targetToolSlug);
       window.location.href = `/${targetToolSlug}`;
     },
-    [moveToTool, latestProcessedFile]
+    [moveToTool, latestProcessedFileReference]
   );
 
-  const hasActiveFile = !!activeOriginalFile;
-  const hasProcessedFile = !!latestProcessedFile;
+  const hasActiveOriginalFileReference = !!activeOriginalFileReference;
+  const hasProcessedFileReference = !!latestProcessedFileReference;
 
   return (
     <div className="w-full flex flex-col gap-6 py-2">
       <div className="w-full">
         <GalleryUploader
-          originalFileReferences={originalFiles}
+          originalFileReferences={originalFileReferences}
           activeFileIdentifier={activeFileId}
           acceptedMimeTypes={IMAGE_CONFIG.accept}
           isUploading={isUploading}
@@ -151,7 +153,7 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
         />
       </div>
 
-      {hasActiveFile && (
+      {hasActiveOriginalFileReference && (
         <motion.div
           variants={workspaceCardVariants}
           initial="hidden"
@@ -166,13 +168,13 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
               onMaxSizeChange={setMaxSizeKB}
               onProcess={handleProcessImage}
               isProcessing={isCompressing || isUploading}
-              hasActiveFile={hasActiveFile}
+              hasActiveFile={hasActiveOriginalFileReference}
             />
           </Card>
         </motion.div>
       )}
 
-      {hasProcessedFile && (
+      {hasProcessedFileReference && (
         <motion.div
           variants={workspaceContainerVariants}
           initial="hidden"
@@ -181,14 +183,14 @@ export function AdjustSize({ toolId }: AdjustSizeProps): React.JSX.Element {
         >
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full h-full p-0 overflow-hidden flex flex-col">
-              <FileCard fileReference={latestProcessedFile} />
+              <FileCard fileReference={latestProcessedFileReference} />
             </Card>
           </motion.div>
 
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full p-0 overflow-hidden">
               <ExportPanel
-                fileReference={latestProcessedFile}
+                fileReference={latestProcessedFileReference}
                 actionVariant="single"
                 defaultFileName={`adjusted-${minSizeKB}-${maxSizeKB}KB`}
                 handleClearFiles={handleClearWorkspace}
