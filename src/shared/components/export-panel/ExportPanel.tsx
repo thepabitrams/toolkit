@@ -5,7 +5,7 @@ import { Input } from '@/core/components/ui/Input';
 import { useExportPanel } from './useExportPanel';
 import type { FileReference } from '@/shared/store/file-store';
 
-interface ExportPanelProps {
+interface ExportPanelProperties {
   fileReference: FileReference | null;
   actionVariant: 'single' | 'multiple';
   defaultFileName?: string;
@@ -32,7 +32,7 @@ function getFileExtensionFromMimeType(mimeType: string): string {
   return mimeTypeExtensionMap[mimeType] || '';
 }
 
-export const ExportPanel: React.FC<ExportPanelProps> = ({
+export const ExportPanel: React.FC<ExportPanelProperties> = ({
   fileReference,
   actionVariant,
   defaultFileName = 'download',
@@ -52,9 +52,9 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
     }
   }, [fileReference, defaultFileName]);
 
-  const onDownloadClick = async (): Promise<void> => {
+  const handleDownloadClick = async (): Promise<void> => {
     await handleDownload(fileNameInput);
-    await handleClearFiles();
+    // Removed the fucking handleClearFiles() so files don't get deleted instantly
   };
 
   const fileExtensionForInput = fileReference ? getFileExtensionFromMimeType(fileReference.type) : '';
@@ -88,7 +88,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
             className="flex-1"
           />
           <Button
-            onClick={onDownloadClick}
+            onClick={handleDownloadClick}
             variant="primary"
             disabled={!fileReference || isDownloadingFile}
             className="flex-1 px-5 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"

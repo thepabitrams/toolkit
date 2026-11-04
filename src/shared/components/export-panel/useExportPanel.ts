@@ -27,8 +27,8 @@ export const useExportPanel = ({ fileReference }: UseExportPanelOptions): UseExp
     setDownloadError(null);
 
     try {
-      const file = await getRawFile(fileReference.storageKey);
-      if (!file) throw new Error('Failed to read file');
+      const rawFileObject = await getRawFile(fileReference.storageKey);
+      if (!rawFileObject) throw new Error('Failed to read file from OPFS');
 
       const fileExtension = fileReference.name.includes('.') 
         ? fileReference.name.split('.').pop() 
@@ -36,15 +36,15 @@ export const useExportPanel = ({ fileReference }: UseExportPanelOptions): UseExp
         
       const completeFileName = fileName ? `${fileName}.${fileExtension}` : fileReference.name;
       
-      const objectUrl = URL.createObjectURL(file);
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.href = objectUrl;
-      downloadAnchor.download = completeFileName;
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      document.body.removeChild(downloadAnchor);
+      const fileObjectUrl = URL.createObjectURL(rawFileObject);
+      const downloadAnchorElement = document.createElement('a');
+      downloadAnchorElement.href = fileObjectUrl;
+      downloadAnchorElement.download = completeFileName;
+      document.body.appendChild(downloadAnchorElement);
+      downloadAnchorElement.click();
+      document.body.removeChild(downloadAnchorElement);
       
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      setTimeout(() => URL.revokeObjectURL(fileObjectUrl), 1000);
     } catch (caughtError) {
       const processedError = caughtError instanceof Error ? caughtError : new Error('Download failed');
       setDownloadError(processedError);
