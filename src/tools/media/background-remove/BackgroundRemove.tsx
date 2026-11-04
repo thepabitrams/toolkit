@@ -71,7 +71,7 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
       
       setIsUploading(true);
       try {
-        await upload([droppedFiles[0]], MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
+        await upload(droppedFiles, MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
         await deleteBucket(CUTOUT_BUCKET);
         await deleteBucket(PROCESS_BUCKET);
       } catch (caughtError) {
@@ -107,8 +107,8 @@ export function BackgroundRemove({ toolId }: BackgroundRemoveProps): React.JSX.E
     <div className="w-full flex flex-col gap-6 py-2">
       <div className="w-full">
         <GalleryUploader
-          files={originalFiles}
-          activeFileId={activeFileId}
+          originalFileReferences={originalFiles}
+          activeFileIdentifier={activeFileId}
           acceptedMimeTypes={IMAGE_CONFIG.accept}
           isUploading={isUploading}
           handleFileUpload={handleFileUpload}

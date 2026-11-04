@@ -56,25 +56,25 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
     init(MAXIMUM_TOOL_FILES);
   }, [init]);
 
-  const originalFileReferences = selectAll(MASTER_BUCKET);
-  const activeOriginalFileReference = 
-    originalFileReferences.find((fileReference) => fileReference.id === activeFileId) || 
-    originalFileReferences[0] || 
+  const originalFiles = selectAll(MASTER_BUCKET);
+  const activeOriginalFile = 
+    originalFiles.find((file) => file.id === activeFileId) || 
+    originalFiles[0] || 
     null;
 
-  const activeLockerBucketName = activeOriginalFileReference 
-    ? activeOriginalFileReference.name.replace('image', 'locker') 
+  const activeLockerBucketName = activeOriginalFile 
+    ? activeOriginalFile.name.replace('image', 'locker') 
     : '';
     
-  const activeProcessedFileReference = activeOriginalFileReference 
+  const activeProcessedFile = activeOriginalFile 
     ? selectAll(activeLockerBucketName)[0] || null 
     : null;
 
   useEffect(() => {
-    if (!activeFileId && originalFileReferences.length > 0) {
-      setActiveFile(originalFileReferences[0].id);
+    if (!activeFileId && originalFiles.length > 0) {
+      setActiveFile(originalFiles[0].id);
     }
-  }, [activeFileId, originalFileReferences, setActiveFile]);
+  }, [activeFileId, originalFiles, setActiveFile]);
 
   const [cropConfiguration, setCropConfiguration] = useState({
     rawWidth: 1,
@@ -97,35 +97,35 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
   }, [upload]);
 
   const handleCropConfirm = useCallback(async (processedBlob: Blob, outputFileName: string): Promise<void> => {
-    if (!activeOriginalFileReference) return;
+    if (!activeOriginalFile) return;
     
     setIsProcessing(true);
     try {
       const croppedFile = new File([processedBlob], outputFileName, { type: processedBlob.type });
-      await save([croppedFile], activeLockerBucketName, MAXIMUM_TOOL_FILES, activeOriginalFileReference.id, 0, 'process1');
+      await save([croppedFile], activeLockerBucketName, MAXIMUM_TOOL_FILES, activeOriginalFile.id, 0, 'process1');
     } catch (caughtError) {
       console.warn('Save failed:', caughtError);
     } finally {
       setIsProcessing(false);
     }
-  }, [save, activeOriginalFileReference, activeLockerBucketName]);
+  }, [save, activeOriginalFile, activeLockerBucketName]);
 
   const handleClearWorkspace = useCallback(async (): Promise<void> => {
     await deleteBucket(MASTER_BUCKET);
     
-    originalFileReferences.forEach((originalFileReference) => {
-      const lockerBucketName = originalFileReference.name.replace('image', 'locker');
+    originalFiles.forEach((originalFile) => {
+      const lockerBucketName = originalFile.name.replace('image', 'locker');
       deleteBucket(lockerBucketName);
     });
     
     setActiveFile(null);
-  }, [deleteBucket, originalFileReferences, setActiveFile]);
+  }, [deleteBucket, originalFiles, setActiveFile]);
 
   const handleToolSelection = useCallback(async (targetToolSlug: string): Promise<void> => {
-    if (!targetToolSlug || !activeProcessedFileReference) return;
-    await moveToTool(activeProcessedFileReference.name, targetToolSlug);
+    if (!targetToolSlug || !activeProcessedFile) return;
+    await moveToTool(activeProcessedFile.name, targetToolSlug);
     window.location.href = `/${targetToolSlug}`;
-  }, [moveToTool, activeProcessedFileReference]);
+  }, [moveToTool, activeProcessedFile]);
 
   const handleDimensionChange = (
     updatedWidthPixels: number,
@@ -146,23 +146,23 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
   };
 
   const aspectRatio = cropConfiguration.widthPixels / cropConfiguration.heightPixels;
-  const hasActiveOriginalFile = !!activeOriginalFileReference;
-  const hasProcessedFile = !!activeProcessedFileReference;
+  const hasActiveFile = !!activeOriginalFile;
+  const hasProcessedFile = !!activeProcessedFile;
 
   return (
     <div className="w-full flex flex-col gap-6 py-2">
       
       <div className="w-full">
         <GalleryUploader
-          files={originalFileReferences}
-          activeFileId={activeFileId}
+          originalFileReferences={originalFiles}
+          activeFileIdentifier={activeFileId}
           acceptedMimeTypes={IMAGE_CONFIG.accept}
           isUploading={isProcessing}
           handleFileUpload={handleFileUpload}
         />
       </div>
 
-      {hasActiveOriginalFile && (
+      {hasActiveFile && (
         <motion.div 
           variants={workspaceContainerVariants}
           initial="hidden"
@@ -188,7 +188,7 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
           >
             <Card className="w-full p-0 overflow-hidden">
               <Cropper
-                fileReference={activeOriginalFileReference}
+                fileReference={activeOriginalFile}
                 aspectRatio={aspectRatio}
                 targetWidthPixels={cropConfiguration.widthPixels}
                 targetHeightPixels={cropConfiguration.heightPixels}
@@ -209,14 +209,14 @@ export function PrecisionCrop({ toolId }: PrecisionCropProps): React.JSX.Element
         >
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full h-full p-0 overflow-hidden flex flex-col">
-              <FileCard fileReference={activeProcessedFileReference} />
+              <FileCard fileReference={activeProcessedFile} />
             </Card>
           </motion.div>
 
           <motion.div variants={workspaceCardVariants} className="col-span-1 w-full">
             <Card className="w-full p-0 overflow-hidden">
               <ExportPanel
-                fileReference={activeProcessedFileReference}
+                fileReference={activeProcessedFile}
                 actionVariant="single"
                 defaultFileName={`${cropConfiguration.rawWidth}x${cropConfiguration.rawHeight}`}
                 handleClearFiles={handleClearWorkspace}

@@ -74,7 +74,7 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
       if (droppedFiles.length === 0) return;
       setIsUploading(true);
       try {
-        await upload([droppedFiles[0]], MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
+        await upload(droppedFiles, MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
       } catch (caughtError) {
         console.warn('Upload failed:', caughtError);
       } finally {
@@ -127,8 +127,8 @@ export function AddText({ toolId }: AddTextProps): React.JSX.Element {
     <div className="w-full flex flex-col gap-6 py-2">
       <div className="w-full">
         <GalleryUploader
-          files={originalFiles}
-          activeFileId={activeFileId}
+          originalFileReferences={originalFiles}
+          activeFileIdentifier={activeFileId}
           acceptedMimeTypes={IMAGE_CONFIG.accept}
           isUploading={isUploading}
           handleFileUpload={handleFileUpload}

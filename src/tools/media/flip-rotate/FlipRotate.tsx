@@ -75,7 +75,7 @@ export function FlipRotate({ toolId }: FlipRotateProps): React.JSX.Element {
       
       setIsUploading(true);
       try {
-        await upload([droppedFiles[0]], MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
+        await upload(droppedFiles, MASTER_BUCKET, MAXIMUM_TOOL_FILES, undefined, 'image');
       } catch (error) {
         console.warn('Upload failed:', error);
       } finally {
@@ -129,8 +129,8 @@ export function FlipRotate({ toolId }: FlipRotateProps): React.JSX.Element {
     <div className="w-full flex flex-col gap-6 py-2">
       <div className="w-full">
         <GalleryUploader
-          files={originalFiles}
-          activeFileId={activeFileId}
+          originalFileReferences={originalFiles}
+          activeFileIdentifier={activeFileId}
           acceptedMimeTypes={IMAGE_CONFIG.accept}
           isUploading={isUploading}
           handleFileUpload={handleFileUpload}
