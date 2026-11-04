@@ -1,0 +1,3 @@
+// src/tools/productivity/bulletin-board/shared/index.ts
+export { TaskForm } from './TaskForm';
+export type { TaskFormValues } from './TaskForm';

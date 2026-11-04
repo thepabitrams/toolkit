@@ -102,6 +102,16 @@ export const tools: ToolConfig[] = [
     category: 'finance',
     component: () => import('@/tools/finance/bill-splitter'),
   },
+
+  {
+    slug: 'bulletin-board',
+    displayName: 'Bulletin Board',
+    displayDescription: 'Daily task board with priorities, recurring check-ins, and notes.',
+    seoTitle: 'Bulletin Board — Daily Task Tracker',
+    seoDescription: 'Organize daily tasks with priorities, recurring check-ins, and notes. Track permanent or temporary tasks locally in your browser. 100% private.',
+    category: 'productivity',
+    component: () => import('@/tools/productivity/bulletin-board'),
+  },
 ];
 
 export const toolsBySlug: Record<string, ToolConfig> = Object.fromEntries(

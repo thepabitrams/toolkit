@@ -1,0 +1,54 @@
+---
+// src/tools/productivity/bulletin-board/About.astro
+import { AccordionCard } from '@/core/components/ui';
+---
+
+<AccordionCard title="How to use this tool" defaultOpen={true} client:load>
+  <div class="flex flex-col gap-4 mt-2">
+    <div class="flex gap-4">
+      <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">1</div>
+      <div>
+        <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Add a Task</h4>
+        <p class="text-slate-500 text-sm">Tap the + button in the "Today's Tasks" card. Give the task a title, choose permanent or temporary, and set how often it repeats.</p>
+      </div>
+    </div>
+    <div class="flex gap-4">
+      <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">2</div>
+      <div>
+        <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Check in Daily</h4>
+        <p class="text-slate-500 text-sm">Each task shows a 9-day check-in strip. Tap any day to mark the task done. The highlighted date is today.</p>
+      </div>
+    </div>
+    <div class="flex gap-4">
+      <div class="shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mt-1">3</div>
+      <div>
+        <h4 class="font-semibold text-slate-900 dark:text-white text-sm mb-1">Reorder by Priority</h4>
+        <p class="text-slate-500 text-sm">Type a number in the "#" field on any task to move it up or down the board. You can also manage deleted tasks in the Settings menu.</p>
+      </div>
+    </div>
+  </div>
+</AccordionCard>
+
+<AccordionCard title="Project Overview" client:load>
+  <p class="mb-4">
+    Bulletin Board is a fully client-side daily task tracker. It generates a dynamic 9-day rolling window for each task, allowing you to build permanent habits or manage temporary projects without ever losing track of your streaks.
+  </p>
+  <p>
+    Unlike traditional to-do lists, Bulletin Board handles recurring check-ins locally. Your tasks, notes, and check-ins are stored securely on your device.
+  </p>
+</AccordionCard>
+
+<AccordionCard title="Under the hood (Architecture)" client:load>
+  <p class="mb-4">
+    This tool leverages a modern, lightweight architecture optimized for performance:
+  </p>
+  <ul class="list-disc pl-5 space-y-2 mb-4 text-sm">
+    <li><strong class="text-slate-900 dark:text-white">Framework:</strong> Astro & React.</li>
+    <li><strong class="text-slate-900 dark:text-white">State Management:</strong> Zustand for lightning-fast, zero-boilerplate updates.</li>
+    <li><strong class="text-slate-900 dark:text-white">Storage:</strong> Origin Private File System (OPFS) with a seamless localStorage fallback.</li>
+    <li><strong class="text-slate-900 dark:text-white">Timezone Safe:</strong> Custom local-date parsing ensures your check-ins never break across timezones.</li>
+  </ul>
+  <p>
+    Zero backend. Zero API keys. Just pure, local computation.
+  </p>
+</AccordionCard>
