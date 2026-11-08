@@ -17,7 +17,7 @@ const MAXIMUM_TOOL_FILES = 15;
 const FORMAT_LABEL_BY_MIME: Record<OutputFormat, string> = {
   'image/jpeg': 'JPG',
   'image/png': 'PNG',
-  'image/webp': 'WEBP',
+  'image/webp': 'WebP',
   'image/avif': 'AVIF',
   'image/jxl': 'JXL',
   'image/bmp': 'BMP',
@@ -109,7 +109,7 @@ export function ImageConverter({ toolId }: ImageConverterProps): React.JSX.Eleme
   const replacePreviewFile = useCallback((fileId: string, previewFile: File | null): void => {
     setPreviewFileByFileId((previousFiles) => {
       if (previewFile) return { ...previousFiles, [fileId]: previewFile };
-      const { [fileId]: _removedFile, ...remainingFiles } = previousFiles;
+      const { [fileId]: ignoredFile, ...remainingFiles } = previousFiles;
       return remainingFiles;
     });
   }, []);
