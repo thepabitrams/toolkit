@@ -1,16 +1,20 @@
+// src/tools/media/image-converter/worker/svg-decoder.ts
 import { SVG_RENDER_WIDTH } from './constants';
 import { copyBytesToArrayBuffer } from './buffer-utils';
 import { decodePngBuffer } from './jsquash-codecs';
-
-import RESVG_WASM from '/wasm/resvg/resvg_bg.wasm';
 
 let resvgInitializationPromise: Promise<void> | null = null;
 
 function initializeResvg(): Promise<void> {
   if (!resvgInitializationPromise) {
     resvgInitializationPromise = (async (): Promise<void> => {
+      const response = await fetch('/wasm/resvg/resvg_bg.wasm');
+      if (!response.ok) {
+        throw new Error('Failed to fetch resvg_bg.wasm');
+      }
+      const buffer = await response.arrayBuffer();
       const { initWasm } = await import('@resvg/resvg-wasm');
-      await initWasm(RESVG_WASM);
+      await initWasm(buffer);
     })();
     
     resvgInitializationPromise.catch(() => {

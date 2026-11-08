@@ -5,10 +5,13 @@ export async function decodeEps(sourceBuffer: ArrayBuffer): Promise<ImageData> {
   const { createRenderer } = await import('pscat');
 
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = (input, init) => {
+  globalThis.fetch = async (input, init) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     if (url.includes('pscat.wasm')) {
-      return originalFetch('/wasm/pscat/pscat.wasm', init);
+      const response = await originalFetch('/wasm/pscat/pscat.wasm');
+      if (!response.ok) throw new Error('Failed to load pscat.wasm');
+      const buffer = await response.arrayBuffer();
+      return new Response(buffer, { headers: { 'Content-Type': 'application/wasm' } });
     }
     return originalFetch(input, init);
   };
