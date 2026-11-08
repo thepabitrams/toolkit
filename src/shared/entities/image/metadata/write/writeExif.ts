@@ -5,10 +5,12 @@ import type { ExifTags } from '../types';
 export async function writeExif(targetFile: File, metadataTags: ExifTags): Promise<Blob> {
   try {
     const writeResult = await writeMetadata(targetFile, metadataTags, {
-      fetch: (url: unknown) => {
-        const stringUrl = url instanceof Request ? url.url : String(url);
-        const resolvedUrl = stringUrl.endsWith('zeroperl.wasm') ? '/zeroperl.wasm' : stringUrl;
-        return fetch(resolvedUrl);
+      fetch: (input: unknown) => {
+        const stringifiedInput = input instanceof Request ? input.url : String(input);
+        const finalUrl = stringifiedInput.endsWith('zeroperl.wasm') 
+          ? '/zeroperl.wasm' 
+          : stringifiedInput;
+        return fetch(finalUrl);
       }
     });
     

@@ -26,10 +26,12 @@ async function executeMetadataExtraction(targetFile: File): Promise<ExifTags> {
     const extractionResult = await parseMetadata(targetFile, {
       args: ['-json', '-n'],
       transform: (rawStringifiedData: string) => JSON.parse(rawStringifiedData),
-      fetch: (url: unknown) => {
-        const stringUrl = url instanceof Request ? url.url : String(url);
-        const resolvedUrl = stringUrl.endsWith('zeroperl.wasm') ? '/zeroperl.wasm' : stringUrl;
-        return fetch(resolvedUrl);
+      fetch: (input: unknown) => {
+        const stringifiedInput = input instanceof Request ? input.url : String(input);
+        const finalUrl = stringifiedInput.endsWith('zeroperl.wasm') 
+          ? '/zeroperl.wasm' 
+          : stringifiedInput;
+        return fetch(finalUrl);
       }
     });
     
