@@ -25,14 +25,6 @@ export default defineConfig({
     worker: {
       format: 'es',
     },
-    optimizeDeps: {
-      exclude: [
-        '@jsquash/jpeg',
-        '@jsquash/png',
-        '@jsquash/webp',
-        '@jsquash/avif',
-        '@jsquash/jxl',
-      ],
-    },
+    assetsInclude: ['**/*.wasm'],
   },
 });
