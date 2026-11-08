@@ -5,7 +5,7 @@ const codecInitializationPromises = new Map<string, Promise<void>>();
 async function fetchWasmBuffer(filename: string): Promise<ArrayBuffer> {
   const response = await fetch(`/wasm/jsquash/${filename}`);
   if (!response.ok) {
-    throw new Error(`Failed to download WASM file: /wasm/jsquash/${filename}`);
+    throw new Error(`Failed to fetch WASM: ${filename} (Status: ${response.status})`);
   }
   return response.arrayBuffer();
 }
@@ -16,86 +16,71 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
   }
 
   const initPromise = (async (): Promise<void> => {
-    let decFilename = '';
-    let encFilename = '';
-
     switch (mimeType) {
-      case 'image/jpeg':
-        decFilename = 'mozjpeg_dec.wasm';
-        encFilename = 'mozjpeg_enc.wasm';
+      case 'image/jpeg': {
+        const { init: initDecode } = await import('@jsquash/jpeg/decode');
+        const { init: initEncode } = await import('@jsquash/jpeg/encode');
+        const [decBuffer, encBuffer] = await Promise.all([
+          fetchWasmBuffer('mozjpeg_dec.wasm'),
+          fetchWasmBuffer('mozjpeg_enc.wasm'),
+        ]);
+        await Promise.all([
+          initDecode({ wasmBinary: decBuffer }),
+          initEncode({ wasmBinary: encBuffer }),
+        ]);
         break;
-      case 'image/png':
-        decFilename = 'squoosh_png_bg.wasm';
-        encFilename = 'squoosh_png_bg.wasm';
+      }
+      case 'image/png': {
+        const { init: initDecode } = await import('@jsquash/png/decode');
+        const { init: initEncode } = await import('@jsquash/png/encode');
+        const pngBuffer = await fetchWasmBuffer('squoosh_png_bg.wasm');
+        await Promise.all([
+          initDecode({ wasmBinary: pngBuffer }),
+          initEncode({ wasmBinary: pngBuffer }),
+        ]);
         break;
-      case 'image/webp':
-        decFilename = 'webp_dec.wasm';
-        encFilename = 'webp_enc.wasm';
+      }
+      case 'image/webp': {
+        const { init: initDecode } = await import('@jsquash/webp/decode');
+        const { init: initEncode } = await import('@jsquash/webp/encode');
+        const [decBuffer, encBuffer] = await Promise.all([
+          fetchWasmBuffer('webp_dec.wasm'),
+          fetchWasmBuffer('webp_enc.wasm'),
+        ]);
+        await Promise.all([
+          initDecode({ wasmBinary: decBuffer }),
+          initEncode({ wasmBinary: encBuffer }),
+        ]);
         break;
-      case 'image/avif':
-        decFilename = 'avif_dec.wasm';
-        encFilename = 'avif_enc.wasm';
+      }
+      case 'image/avif': {
+        const { init: initDecode } = await import('@jsquash/avif/decode');
+        const { init: initEncode } = await import('@jsquash/avif/encode');
+        const [decBuffer, encBuffer] = await Promise.all([
+          fetchWasmBuffer('avif_dec.wasm'),
+          fetchWasmBuffer('avif_enc.wasm'),
+        ]);
+        await Promise.all([
+          initDecode({ wasmBinary: decBuffer }),
+          initEncode({ wasmBinary: encBuffer }),
+        ]);
         break;
-      case 'image/jxl':
-        decFilename = 'jxl_dec.wasm';
-        encFilename = 'jxl_enc.wasm';
+      }
+      case 'image/jxl': {
+        const { init: initDecode } = await import('@jsquash/jxl/decode');
+        const { init: initEncode } = await import('@jsquash/jxl/encode');
+        const [decBuffer, encBuffer] = await Promise.all([
+          fetchWasmBuffer('jxl_dec.wasm'),
+          fetchWasmBuffer('jxl_enc.wasm'),
+        ]);
+        await Promise.all([
+          initDecode({ wasmBinary: decBuffer }),
+          initEncode({ wasmBinary: encBuffer }),
+        ]);
         break;
+      }
       default:
         return;
-    }
-
-    const [decBuffer, encBuffer] = await Promise.all([
-      fetchWasmBuffer(decFilename),
-      fetchWasmBuffer(encFilename),
-    ]);
-
-    const originalFetch = globalThis.fetch;
-    globalThis.fetch = async (input, init) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
-      if (url.endsWith(decFilename)) {
-        return new Response(decBuffer, { headers: { 'Content-Type': 'application/wasm' } });
-      }
-      if (url.endsWith(encFilename)) {
-        return new Response(encBuffer, { headers: { 'Content-Type': 'application/wasm' } });
-      }
-      return originalFetch(input, init);
-    };
-
-    try {
-      switch (mimeType) {
-        case 'image/jpeg': {
-          const { init: initDecode } = await import('@jsquash/jpeg/decode');
-          const { init: initEncode } = await import('@jsquash/jpeg/encode');
-          await Promise.all([initDecode(), initEncode()]);
-          break;
-        }
-        case 'image/png': {
-          const { init: initDecode } = await import('@jsquash/png/decode');
-          const { init: initEncode } = await import('@jsquash/png/encode');
-          await Promise.all([initDecode(), initEncode()]);
-          break;
-        }
-        case 'image/webp': {
-          const { init: initDecode } = await import('@jsquash/webp/decode');
-          const { init: initEncode } = await import('@jsquash/webp/encode');
-          await Promise.all([initDecode(), initEncode()]);
-          break;
-        }
-        case 'image/avif': {
-          const { init: initDecode } = await import('@jsquash/avif/decode');
-          const { init: initEncode } = await import('@jsquash/avif/encode');
-          await Promise.all([initDecode(), initEncode()]);
-          break;
-        }
-        case 'image/jxl': {
-          const { init: initDecode } = await import('@jsquash/jxl/decode');
-          const { init: initEncode } = await import('@jsquash/jxl/encode');
-          await Promise.all([initDecode(), initEncode()]);
-          break;
-        }
-      }
-    } finally {
-      globalThis.fetch = originalFetch;
     }
   })();
 
