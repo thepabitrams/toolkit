@@ -112,6 +112,16 @@ export const tools: ToolConfig[] = [
     category: 'productivity',
     component: () => import('@/tools/productivity/bulletin-board'),
   },
+
+  {
+    slug: 'image-converter',
+    displayName: 'Image Converter',
+    displayDescription: 'Convert images between JPG, PNG, WebP, AVIF, JXL, and HEIC locally.',
+    seoTitle: 'Convert Images Online - JPG, PNG, WebP, AVIF, JXL',
+    seoDescription: 'Convert JPG, PNG, WebP, AVIF, JXL, and HEIC images directly in your browser. HEIC support, batch-ready, 100% private. No uploads, no servers.',
+    category: 'media',
+    component: () => import('@/tools/media/image-converter'),
+  },
 ];
 
 export const toolsBySlug: Record<string, ToolConfig> = Object.fromEntries(
