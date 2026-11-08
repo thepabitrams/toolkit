@@ -1,11 +1,24 @@
 import type { DecoderFunction, EncoderFunction } from './types';
 
+import JPEG_DEC_WASM_URL from '/wasm/jsquash/mozjpeg_dec.wasm?url';
+import JPEG_ENC_WASM_URL from '/wasm/jsquash/mozjpeg_enc.wasm?url';
+import PNG_WASM_URL from '/wasm/jsquash/squoosh_png_bg.wasm?url';
+import WEBP_DEC_WASM_URL from '/wasm/jsquash/webp_dec.wasm?url';
+import WEBP_ENC_WASM_URL from '/wasm/jsquash/webp_enc.wasm?url';
+import AVIF_DEC_WASM_URL from '/wasm/jsquash/avif_dec.wasm?url';
+import AVIF_ENC_WASM_URL from '/wasm/jsquash/avif_enc.wasm?url';
+import JXL_DEC_WASM_URL from '/wasm/jsquash/jxl_dec.wasm?url';
+import JXL_ENC_WASM_URL from '/wasm/jsquash/jxl_enc.wasm?url';
+
 const codecInitializationPromises = new Map<string, Promise<void>>();
 
-const locateWasmFile = (path: string): string => {
-  const filename = path.split('/').pop() || path;
-  return `/wasm/jsquash/${filename}`;
-};
+async function fetchWasmBuffer(url: string): Promise<ArrayBuffer> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch WASM file: ${url}`);
+  }
+  return response.arrayBuffer();
+}
 
 async function initializeJsquashCodec(mimeType: string): Promise<void> {
   if (codecInitializationPromises.has(mimeType)) {
@@ -17,45 +30,62 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
       case 'image/jpeg': {
         const { init: initDecode } = await import('@jsquash/jpeg/decode');
         const { init: initEncode } = await import('@jsquash/jpeg/encode');
+        const [decBuffer, encBuffer] = await Promise.all([
+          fetchWasmBuffer(JPEG_DEC_WASM_URL),
+          fetchWasmBuffer(JPEG_ENC_WASM_URL),
+        ]);
         await Promise.all([
-          initDecode({ locateFile: locateWasmFile }),
-          initEncode({ locateFile: locateWasmFile }),
+          initDecode(decBuffer),
+          initEncode(encBuffer),
         ]);
         break;
       }
       case 'image/png': {
         const { init: initDecode } = await import('@jsquash/png/decode');
         const { init: initEncode } = await import('@jsquash/png/encode');
+        const pngBuffer = await fetchWasmBuffer(PNG_WASM_URL);
         await Promise.all([
-          initDecode({ locateFile: locateWasmFile }),
-          initEncode({ locateFile: locateWasmFile }),
+          initDecode(pngBuffer),
+          initEncode(pngBuffer),
         ]);
         break;
       }
       case 'image/webp': {
         const { init: initDecode } = await import('@jsquash/webp/decode');
         const { init: initEncode } = await import('@jsquash/webp/encode');
+        const [decBuffer, encBuffer] = await Promise.all([
+          fetchWasmBuffer(WEBP_DEC_WASM_URL),
+          fetchWasmBuffer(WEBP_ENC_WASM_URL),
+        ]);
         await Promise.all([
-          initDecode({ locateFile: locateWasmFile }),
-          initEncode({ locateFile: locateWasmFile }),
+          initDecode(decBuffer),
+          initEncode(encBuffer),
         ]);
         break;
       }
       case 'image/avif': {
         const { init: initDecode } = await import('@jsquash/avif/decode');
         const { init: initEncode } = await import('@jsquash/avif/encode');
+        const [decBuffer, encBuffer] = await Promise.all([
+          fetchWasmBuffer(AVIF_DEC_WASM_URL),
+          fetchWasmBuffer(AVIF_ENC_WASM_URL),
+        ]);
         await Promise.all([
-          initDecode({ locateFile: locateWasmFile }),
-          initEncode({ locateFile: locateWasmFile }),
+          initDecode(decBuffer),
+          initEncode(encBuffer),
         ]);
         break;
       }
       case 'image/jxl': {
         const { init: initDecode } = await import('@jsquash/jxl/decode');
         const { init: initEncode } = await import('@jsquash/jxl/encode');
+        const [decBuffer, encBuffer] = await Promise.all([
+          fetchWasmBuffer(JXL_DEC_WASM_URL),
+          fetchWasmBuffer(JXL_ENC_WASM_URL),
+        ]);
         await Promise.all([
-          initDecode({ locateFile: locateWasmFile }),
-          initEncode({ locateFile: locateWasmFile }),
+          initDecode(decBuffer),
+          initEncode(encBuffer),
         ]);
         break;
       }
