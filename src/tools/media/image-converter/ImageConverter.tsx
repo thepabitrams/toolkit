@@ -10,10 +10,9 @@ import { IMAGE_CONFIG } from '@/shared/entities/image';
 import { Card } from '@/core/components/ui';
 import { spring, stagger } from '@/config/motion';
 
-const MASTER_BUCKET = 'original';
+const ORIGINAL_BUCKET = 'original';
+const PROCESS_BUCKET = 'process';
 const MAXIMUM_TOOL_FILES = 15;
-const ORIGINAL_FILE_LABEL = 'original1';
-const PROCESSED_FILE_LABEL = 'process1';
 
 const FORMAT_LABEL_BY_MIME: Record<OutputFormat, string> = {
   'image/jpeg': 'JPG',
@@ -77,18 +76,18 @@ export function ImageConverter({ toolId }: ImageConverterProps): React.JSX.Eleme
     init(MAXIMUM_TOOL_FILES);
   }, [init]);
 
-  const originalFileReferences = selectAll(MASTER_BUCKET);
+  const originalFileReferences = selectAll(ORIGINAL_BUCKET);
+  const processFileReferences = selectAll(PROCESS_BUCKET);
+
   const activeOriginalFileReference =
     originalFileReferences.find((fileReference) => fileReference.id === activeFileId) ||
     originalFileReferences[0] ||
     null;
 
-  const activeConvertedBucketName = activeOriginalFileReference
-    ? `converted-${activeOriginalFileReference.id}`
-    : '';
-
   const activeConvertedFileReference = activeOriginalFileReference
-    ? selectAll(activeConvertedBucketName)[0] || null
+    ? processFileReferences.find(
+        (fileReference) => fileReference.parentId === activeOriginalFileReference.id
+      ) ?? null
     : null;
 
   const activeConvertedFormat = activeOriginalFileReference
@@ -119,13 +118,7 @@ export function ImageConverter({ toolId }: ImageConverterProps): React.JSX.Eleme
     async (uploadedFiles: File[]): Promise<void> => {
       setIsUploading(true);
       try {
-        await upload(
-          uploadedFiles,
-          MASTER_BUCKET,
-          MAXIMUM_TOOL_FILES,
-          undefined,
-          ORIGINAL_FILE_LABEL
-        );
+        await upload(uploadedFiles, ORIGINAL_BUCKET, MAXIMUM_TOOL_FILES);
       } catch (caughtError) {
         console.warn('Upload failed:', caughtError);
       } finally {
@@ -155,14 +148,19 @@ export function ImageConverter({ toolId }: ImageConverterProps): React.JSX.Eleme
 
     const { convertedFile, previewFile } = conversionResults[0];
 
+    const existingProcessIndex = activeConvertedFileReference
+      ? processFileReferences.findIndex(
+          (fileReference) => fileReference.id === activeConvertedFileReference.id
+        )
+      : -1;
+
     try {
       await save(
         [convertedFile],
-        activeConvertedBucketName,
+        PROCESS_BUCKET,
         MAXIMUM_TOOL_FILES,
         activeOriginalFileReference.id,
-        0,
-        PROCESSED_FILE_LABEL
+        existingProcessIndex >= 0 ? existingProcessIndex : undefined
       );
       replacePreviewFile(activeOriginalFileReference.id, previewFile);
       setConvertedFormatByFileId((previousFormats) => ({
@@ -174,7 +172,8 @@ export function ImageConverter({ toolId }: ImageConverterProps): React.JSX.Eleme
     }
   }, [
     activeOriginalFileReference,
-    activeConvertedBucketName,
+    activeConvertedFileReference,
+    processFileReferences,
     convertFiles,
     getRawFile,
     replacePreviewFile,
@@ -184,14 +183,12 @@ export function ImageConverter({ toolId }: ImageConverterProps): React.JSX.Eleme
   ]);
 
   const handleClearWorkspace = useCallback(async (): Promise<void> => {
-    await deleteBucket(MASTER_BUCKET);
-    originalFileReferences.forEach((originalFileReference) => {
-      deleteBucket(`converted-${originalFileReference.id}`);
-    });
+    await deleteBucket(ORIGINAL_BUCKET);
+    await deleteBucket(PROCESS_BUCKET);
     setPreviewFileByFileId({});
     setConvertedFormatByFileId({});
     setActiveFile(null);
-  }, [deleteBucket, originalFileReferences, setActiveFile]);
+  }, [deleteBucket, setActiveFile]);
 
   const handleToolSelection = useCallback(
     async (targetToolSlug: string): Promise<void> => {
@@ -269,7 +266,7 @@ export function ImageConverter({ toolId }: ImageConverterProps): React.JSX.Eleme
               <ExportPanel
                 fileReference={activeConvertedFileReference}
                 actionVariant="single"
-                defaultFileName={PROCESSED_FILE_LABEL}
+                defaultFileName={activeConvertedFileReference.name}
                 handleClearFiles={handleClearWorkspace}
                 currentToolSlug={toolId}
                 handleToolSelection={handleToolSelection}

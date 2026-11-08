@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { detectFormatAndAlpha } from '@/shared/entities/image';
+import { detectFormatAndAlpha } from '@/shared/entities/image/detect';
 
 export type OutputFormat =
   | 'image/jpeg'
@@ -172,7 +172,15 @@ export function useImageConverter() {
       try {
         for (let fileIndex = 0; fileIndex < sourceFiles.length; fileIndex += 1) {
           const sourceFile = sourceFiles[fileIndex];
-          const { format: detectedSourceFormat } = await detectFormatAndAlpha(sourceFile);
+          
+          let detectedSourceFormat = sourceFile.type || 'image/png';
+          try {
+            const detectionResult = await detectFormatAndAlpha(sourceFile);
+            detectedSourceFormat = detectionResult.format;
+          } catch (caughtError) {
+            console.warn('Format detection failed, using file type:', caughtError);
+          }
+
           const resolvedSourceMime = resolveSourceMime(sourceFile, detectedSourceFormat);
           const conversionResult = await convertSingleFile(
             sourceFile,
