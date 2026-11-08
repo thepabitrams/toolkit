@@ -1,8 +1,5 @@
-// src/tools/media/image-converter/worker/eps-decoder.ts
 import { EPS_RENDER_DPI, EPS_RENDER_HEIGHT, EPS_RENDER_WIDTH } from './constants';
 import { createImageDataFromRgbaBytes } from './image-data-utils';
-
-import PSCAT_WASM_URL from 'pscat/pscat.wasm?url';
 
 export async function decodeEps(sourceBuffer: ArrayBuffer): Promise<ImageData> {
   const { createRenderer } = await import('pscat');
@@ -11,7 +8,7 @@ export async function decodeEps(sourceBuffer: ArrayBuffer): Promise<ImageData> {
   globalThis.fetch = (input, init) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     if (url.includes('pscat.wasm')) {
-      return originalFetch(PSCAT_WASM_URL, init);
+      return originalFetch('/wasm/pscat/pscat.wasm', init);
     }
     return originalFetch(input, init);
   };
