@@ -8,8 +8,13 @@ let resvgInitializationPromise: Promise<void> | null = null;
 function initializeResvg(): Promise<void> {
   if (!resvgInitializationPromise) {
     resvgInitializationPromise = (async (): Promise<void> => {
+      const response = await fetch('/wasm/resvg/resvg_bg.wasm');
+      if (!response.ok) {
+        throw new Error(`Failed to load resvg_bg.wasm (Status: ${response.status})`);
+      }
+      const buffer = await response.arrayBuffer();
       const { initWasm } = await import('@resvg/resvg-wasm');
-      await initWasm(fetch('/wasm/resvg/resvg_bg.wasm'));
+      await initWasm(buffer);
     })();
     
     resvgInitializationPromise.catch(() => {
