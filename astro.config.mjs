@@ -4,8 +4,6 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
-import wasm from 'vite-plugin-wasm';
-import topLevelAwait from 'vite-plugin-top-level-await';
 
 export default defineConfig({
   site: 'https://toolkit.pabitramohansingh.com',
@@ -23,12 +21,9 @@ export default defineConfig({
     },
   }),
   vite: {
-    plugins: [tailwindcss(), wasm(), topLevelAwait()],
+    plugins: [tailwindcss()],
     worker: {
       format: 'es',
-    },
-    build: {
-      target: 'esnext',
     },
     optimizeDeps: {
       exclude: [

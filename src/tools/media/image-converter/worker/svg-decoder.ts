@@ -1,3 +1,4 @@
+// src/tools/media/image-converter/worker/svg-decoder.ts
 import { SVG_RENDER_WIDTH } from './constants';
 import { copyBytesToArrayBuffer } from './buffer-utils';
 import { decodePngBuffer } from './jsquash-codecs';
@@ -7,10 +8,10 @@ let resvgInitializationPromise: Promise<void> | null = null;
 function initializeResvg(): Promise<void> {
   if (!resvgInitializationPromise) {
     resvgInitializationPromise = (async (): Promise<void> => {
-      const resvgWasmUrl = new URL('@resvg/resvg-wasm/index_bg.wasm', import.meta.url).href;
       const { initWasm } = await import('@resvg/resvg-wasm');
-      await initWasm(fetch(resvgWasmUrl));
+      await initWasm(fetch('/wasm/resvg_bg.wasm'));
     })();
+    
     resvgInitializationPromise.catch(() => {
       resvgInitializationPromise = null;
     });
