@@ -27,6 +27,9 @@ export default defineConfig({
     worker: {
       format: 'es',
     },
+    build: {
+      target: 'esnext',
+    },
     optimizeDeps: {
       exclude: [
         '@6over3/zeroperl-ts',
