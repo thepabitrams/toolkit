@@ -8,10 +8,13 @@ function initializeResvg(): Promise<void> {
   if (!resvgInitializationPromise) {
     resvgInitializationPromise = (async (): Promise<void> => {
       const response = await fetch('/wasm/resvg/resvg_bg.wasm');
-      if (!response.ok) throw new Error('Failed to fetch resvg_bg.wasm');
-      const buffer = await response.arrayBuffer();
+      if (!response.ok) {
+        throw new Error('Failed to fetch resvg_bg.wasm');
+      }
+      const resvgWasmBuffer = await response.arrayBuffer();
+      const resvgWasmModule = await WebAssembly.compile(resvgWasmBuffer);
       const { initWasm } = await import('@resvg/resvg-wasm');
-      await initWasm(buffer);
+      await initWasm(resvgWasmModule);
     })();
     
     resvgInitializationPromise.catch(() => {

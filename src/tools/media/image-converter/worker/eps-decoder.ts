@@ -4,13 +4,13 @@ import { createImageDataFromRgbaBytes } from './image-data-utils';
 export async function decodeEps(sourceBuffer: ArrayBuffer): Promise<ImageData> {
   const { createRenderer } = await import('pscat');
 
-  const originalFetch = globalThis.fetch;
+  const originalFetchImplementation = globalThis.fetch;
   globalThis.fetch = (input, init) => {
-    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
-    if (url.includes('pscat.wasm')) {
-      return originalFetch('/wasm/pscat/pscat.wasm', init);
+    const requestUrl = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    if (requestUrl.includes('pscat.wasm')) {
+      return originalFetchImplementation('/wasm/pscat/pscat.wasm', init);
     }
-    return originalFetch(input, init);
+    return originalFetchImplementation(input, init);
   };
 
   try {
@@ -27,6 +27,6 @@ export async function decodeEps(sourceBuffer: ArrayBuffer): Promise<ImageData> {
       renderedPage.height
     );
   } finally {
-    globalThis.fetch = originalFetch;
+    globalThis.fetch = originalFetchImplementation;
   }
 }
