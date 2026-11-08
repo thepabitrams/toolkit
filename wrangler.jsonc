@@ -22,7 +22,7 @@
     }
   ],
   "assets": {
-    "directory": "./dist/client",
+    "directory": "./dist",
     "binding": "ASSETS"
   },
   "observability": {
