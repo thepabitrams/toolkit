@@ -9,7 +9,7 @@ export async function decodeEps(sourceBuffer: ArrayBuffer): Promise<ImageData> {
   globalThis.fetch = (input, init) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     if (url.includes('pscat.wasm')) {
-      return originalFetch('/wasm/pscat.wasm', init);
+      return originalFetch('/wasm/pscat/pscat.wasm', init);
     }
     return originalFetch(input, init);
   };

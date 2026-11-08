@@ -29,7 +29,7 @@ async function executeMetadataExtraction(targetFile: File): Promise<ExifTags> {
       fetch: (input: unknown) => {
         const stringifiedInput = input instanceof Request ? input.url : String(input);
         const finalUrl = stringifiedInput.includes('zeroperl.wasm') 
-          ? '/wasm/zeroperl.wasm' 
+          ? '/wasm/zeroperl/zeroperl.wasm' 
           : stringifiedInput;
         return fetch(finalUrl);
       }

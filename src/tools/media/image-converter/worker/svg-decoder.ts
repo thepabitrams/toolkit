@@ -9,7 +9,7 @@ function initializeResvg(): Promise<void> {
   if (!resvgInitializationPromise) {
     resvgInitializationPromise = (async (): Promise<void> => {
       const { initWasm } = await import('@resvg/resvg-wasm');
-      await initWasm(fetch('/wasm/resvg_bg.wasm'));
+      await initWasm(fetch('/wasm/resvg/resvg_bg.wasm'));
     })();
     
     resvgInitializationPromise.catch(() => {

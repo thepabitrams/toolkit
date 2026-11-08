@@ -8,7 +8,7 @@ export async function writeExif(targetFile: File, metadataTags: ExifTags): Promi
       fetch: (input: unknown) => {
         const stringifiedInput = input instanceof Request ? input.url : String(input);
         const finalUrl = stringifiedInput.includes('zeroperl.wasm') 
-          ? '/wasm/zeroperl.wasm' 
+          ? '/wasm/zeroperl/zeroperl.wasm' 
           : stringifiedInput;
         return fetch(finalUrl);
       }

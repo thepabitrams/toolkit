@@ -5,7 +5,7 @@ const codecInitializationPromises = new Map<string, Promise<void>>();
 
 const locateWasmFile = (path: string): string => {
   const filename = path.split('/').pop() || path;
-  return `/wasm/${filename}`;
+  return `/wasm/jsquash/${filename}`;
 };
 
 async function initializeJsquashCodec(mimeType: string): Promise<void> {
