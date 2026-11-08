@@ -10,10 +10,10 @@ export default defineConfig({
   output: 'server',
   trailingSlash: 'always',
   integrations: [
-    react(), 
+    react(),
     sitemap({
       filter: (page) => !page.includes('/404') && !page.includes('/api/'),
-    })
+    }),
   ],
   adapter: cloudflare({
     platformProxy: {
@@ -25,6 +25,5 @@ export default defineConfig({
     worker: {
       format: 'es',
     },
-    assetsInclude: ['**/*.wasm'],
   },
 });

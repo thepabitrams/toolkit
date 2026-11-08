@@ -1,4 +1,3 @@
-// src/tools/media/image-converter/worker/eps-decoder.ts
 import { EPS_RENDER_DPI, EPS_RENDER_HEIGHT, EPS_RENDER_WIDTH } from './constants';
 import { createImageDataFromRgbaBytes } from './image-data-utils';
 
