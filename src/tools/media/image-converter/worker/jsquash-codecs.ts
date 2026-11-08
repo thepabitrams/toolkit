@@ -3,13 +3,10 @@ import type { DecoderFunction, EncoderFunction } from './types';
 
 const codecInitializationPromises = new Map<string, Promise<void>>();
 
-async function loadWasmBuffer(filename: string): Promise<ArrayBuffer> {
-  const response = await fetch(`/wasm/jsquash/${filename}`);
-  if (!response.ok) {
-    throw new Error(`Failed to load WASM file: ${filename} (Status: ${response.status})`);
-  }
-  return response.arrayBuffer();
-}
+const locateWasmFile = (path: string): string => {
+  const filename = path.split('/').pop() || path;
+  return `/wasm/jsquash/${filename}`;
+};
 
 async function initializeJsquashCodec(mimeType: string): Promise<void> {
   if (codecInitializationPromises.has(mimeType)) {
@@ -21,62 +18,45 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
       case 'image/jpeg': {
         const { init: initDecode } = await import('@jsquash/jpeg/decode');
         const { init: initEncode } = await import('@jsquash/jpeg/encode');
-        const [decBuffer, encBuffer] = await Promise.all([
-          loadWasmBuffer('mozjpeg_dec.wasm'),
-          loadWasmBuffer('mozjpeg_enc.wasm')
-        ]);
         await Promise.all([
-          initDecode(decBuffer),
-          initEncode(encBuffer)
+          initDecode({ locateFile: locateWasmFile }),
+          initEncode({ locateFile: locateWasmFile }),
         ]);
         break;
       }
       case 'image/png': {
         const { init: initDecode } = await import('@jsquash/png/decode');
         const { init: initEncode } = await import('@jsquash/png/encode');
-        const pngBuffer = await loadWasmBuffer('squoosh_png_bg.wasm');
         await Promise.all([
-          initDecode(pngBuffer),
-          initEncode(pngBuffer)
+          initDecode({ locateFile: locateWasmFile }),
+          initEncode({ locateFile: locateWasmFile }),
         ]);
         break;
       }
       case 'image/webp': {
         const { init: initDecode } = await import('@jsquash/webp/decode');
         const { init: initEncode } = await import('@jsquash/webp/encode');
-        const [decBuffer, encBuffer] = await Promise.all([
-          loadWasmBuffer('webp_dec.wasm'),
-          loadWasmBuffer('webp_enc.wasm')
-        ]);
         await Promise.all([
-          initDecode(decBuffer),
-          initEncode(encBuffer)
+          initDecode({ locateFile: locateWasmFile }),
+          initEncode({ locateFile: locateWasmFile }),
         ]);
         break;
       }
       case 'image/avif': {
         const { init: initDecode } = await import('@jsquash/avif/decode');
         const { init: initEncode } = await import('@jsquash/avif/encode');
-        const [decBuffer, encBuffer] = await Promise.all([
-          loadWasmBuffer('avif_dec.wasm'),
-          loadWasmBuffer('avif_enc.wasm')
-        ]);
         await Promise.all([
-          initDecode(decBuffer),
-          initEncode(encBuffer)
+          initDecode({ locateFile: locateWasmFile }),
+          initEncode({ locateFile: locateWasmFile }),
         ]);
         break;
       }
       case 'image/jxl': {
         const { init: initDecode } = await import('@jsquash/jxl/decode');
         const { init: initEncode } = await import('@jsquash/jxl/encode');
-        const [decBuffer, encBuffer] = await Promise.all([
-          loadWasmBuffer('jxl_dec.wasm'),
-          loadWasmBuffer('jxl_enc.wasm')
-        ]);
         await Promise.all([
-          initDecode(decBuffer),
-          initEncode(encBuffer)
+          initDecode({ locateFile: locateWasmFile }),
+          initEncode({ locateFile: locateWasmFile }),
         ]);
         break;
       }

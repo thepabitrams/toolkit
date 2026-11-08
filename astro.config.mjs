@@ -27,7 +27,6 @@ export default defineConfig({
     },
     optimizeDeps: {
       exclude: [
-        '@6over3/zeroperl-ts',
         '@jsquash/jpeg',
         '@jsquash/png',
         '@jsquash/webp',
