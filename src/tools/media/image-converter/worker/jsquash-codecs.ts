@@ -24,9 +24,13 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
           fetchWasmBuffer('mozjpeg_dec.wasm'),
           fetchWasmBuffer('mozjpeg_enc.wasm'),
         ]);
+        const [decModule, encModule] = await Promise.all([
+          WebAssembly.compile(decBuffer),
+          WebAssembly.compile(encBuffer),
+        ]);
         await Promise.all([
-          initDecode({ wasmBinary: decBuffer }),
-          initEncode({ wasmBinary: encBuffer }),
+          initDecode(decModule),
+          initEncode(encModule),
         ]);
         break;
       }
@@ -34,9 +38,10 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
         const { init: initDecode } = await import('@jsquash/png/decode');
         const { init: initEncode } = await import('@jsquash/png/encode');
         const pngBuffer = await fetchWasmBuffer('squoosh_png_bg.wasm');
+        const pngModule = await WebAssembly.compile(pngBuffer);
         await Promise.all([
-          initDecode({ wasmBinary: pngBuffer }),
-          initEncode({ wasmBinary: pngBuffer }),
+          initDecode(pngModule),
+          initEncode(pngModule),
         ]);
         break;
       }
@@ -47,9 +52,13 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
           fetchWasmBuffer('webp_dec.wasm'),
           fetchWasmBuffer('webp_enc.wasm'),
         ]);
+        const [decModule, encModule] = await Promise.all([
+          WebAssembly.compile(decBuffer),
+          WebAssembly.compile(encBuffer),
+        ]);
         await Promise.all([
-          initDecode({ wasmBinary: decBuffer }),
-          initEncode({ wasmBinary: encBuffer }),
+          initDecode(decModule),
+          initEncode(encModule),
         ]);
         break;
       }
@@ -60,9 +69,13 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
           fetchWasmBuffer('avif_dec.wasm'),
           fetchWasmBuffer('avif_enc.wasm'),
         ]);
+        const [decModule, encModule] = await Promise.all([
+          WebAssembly.compile(decBuffer),
+          WebAssembly.compile(encBuffer),
+        ]);
         await Promise.all([
-          initDecode({ wasmBinary: decBuffer }),
-          initEncode({ wasmBinary: encBuffer }),
+          initDecode(decModule),
+          initEncode(encModule),
         ]);
         break;
       }
@@ -73,9 +86,13 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
           fetchWasmBuffer('jxl_dec.wasm'),
           fetchWasmBuffer('jxl_enc.wasm'),
         ]);
+        const [decModule, encModule] = await Promise.all([
+          WebAssembly.compile(decBuffer),
+          WebAssembly.compile(encBuffer),
+        ]);
         await Promise.all([
-          initDecode({ wasmBinary: decBuffer }),
-          initEncode({ wasmBinary: encBuffer }),
+          initDecode(decModule),
+          initEncode(encModule),
         ]);
         break;
       }
