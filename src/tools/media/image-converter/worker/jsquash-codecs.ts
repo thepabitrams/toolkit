@@ -1,21 +1,11 @@
 import type { DecoderFunction, EncoderFunction } from './types';
 
-import JPEG_DEC_WASM_URL from '@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?url';
-import JPEG_ENC_WASM_URL from '@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm?url';
-import PNG_WASM_URL from '@jsquash/png/codec/pkg/squoosh_png_bg.wasm?url';
-import WEBP_DEC_WASM_URL from '@jsquash/webp/codec/dec/webp_dec.wasm?url';
-import WEBP_ENC_WASM_URL from '@jsquash/webp/codec/enc/webp_enc.wasm?url';
-import AVIF_DEC_WASM_URL from '@jsquash/avif/codec/dec/avif_dec.wasm?url';
-import AVIF_ENC_WASM_URL from '@jsquash/avif/codec/enc/avif_enc.wasm?url';
-import JXL_DEC_WASM_URL from '@jsquash/jxl/codec/dec/jxl_dec.wasm?url';
-import JXL_ENC_WASM_URL from '@jsquash/jxl/codec/enc/jxl_enc.wasm?url';
-
 const codecInitializationPromises = new Map<string, Promise<void>>();
 
-async function fetchWasmBuffer(url: string): Promise<ArrayBuffer> {
-  const response = await fetch(url);
+async function fetchWasmBuffer(filename: string): Promise<ArrayBuffer> {
+  const response = await fetch(`/wasm/jsquash/${filename}`);
   if (!response.ok) {
-    throw new Error(`Failed to fetch WASM file: ${url}`);
+    throw new Error(`Failed to download WASM file: /wasm/jsquash/${filename}`);
   }
   return response.arrayBuffer();
 }
@@ -31,8 +21,8 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
         const { init: initDecode } = await import('@jsquash/jpeg/decode');
         const { init: initEncode } = await import('@jsquash/jpeg/encode');
         const [decBuffer, encBuffer] = await Promise.all([
-          fetchWasmBuffer(JPEG_DEC_WASM_URL),
-          fetchWasmBuffer(JPEG_ENC_WASM_URL),
+          fetchWasmBuffer('mozjpeg_dec.wasm'),
+          fetchWasmBuffer('mozjpeg_enc.wasm'),
         ]);
         await Promise.all([
           initDecode({ wasmBinary: decBuffer }),
@@ -43,7 +33,7 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
       case 'image/png': {
         const { init: initDecode } = await import('@jsquash/png/decode');
         const { init: initEncode } = await import('@jsquash/png/encode');
-        const pngBuffer = await fetchWasmBuffer(PNG_WASM_URL);
+        const pngBuffer = await fetchWasmBuffer('squoosh_png_bg.wasm');
         await Promise.all([
           initDecode({ wasmBinary: pngBuffer }),
           initEncode({ wasmBinary: pngBuffer }),
@@ -54,8 +44,8 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
         const { init: initDecode } = await import('@jsquash/webp/decode');
         const { init: initEncode } = await import('@jsquash/webp/encode');
         const [decBuffer, encBuffer] = await Promise.all([
-          fetchWasmBuffer(WEBP_DEC_WASM_URL),
-          fetchWasmBuffer(WEBP_ENC_WASM_URL),
+          fetchWasmBuffer('webp_dec.wasm'),
+          fetchWasmBuffer('webp_enc.wasm'),
         ]);
         await Promise.all([
           initDecode({ wasmBinary: decBuffer }),
@@ -67,8 +57,8 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
         const { init: initDecode } = await import('@jsquash/avif/decode');
         const { init: initEncode } = await import('@jsquash/avif/encode');
         const [decBuffer, encBuffer] = await Promise.all([
-          fetchWasmBuffer(AVIF_DEC_WASM_URL),
-          fetchWasmBuffer(AVIF_ENC_WASM_URL),
+          fetchWasmBuffer('avif_dec.wasm'),
+          fetchWasmBuffer('avif_enc.wasm'),
         ]);
         await Promise.all([
           initDecode({ wasmBinary: decBuffer }),
@@ -80,8 +70,8 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
         const { init: initDecode } = await import('@jsquash/jxl/decode');
         const { init: initEncode } = await import('@jsquash/jxl/encode');
         const [decBuffer, encBuffer] = await Promise.all([
-          fetchWasmBuffer(JXL_DEC_WASM_URL),
-          fetchWasmBuffer(JXL_ENC_WASM_URL),
+          fetchWasmBuffer('jxl_dec.wasm'),
+          fetchWasmBuffer('jxl_enc.wasm'),
         ]);
         await Promise.all([
           initDecode({ wasmBinary: decBuffer }),
