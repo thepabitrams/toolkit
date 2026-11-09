@@ -1,3 +1,4 @@
+// src/shared/components/uploaders/gallery-uploader/useGalleryThumbnail.ts
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDragControls } from 'motion/react';
 import { useFileStore } from '@/shared/store/file-store';

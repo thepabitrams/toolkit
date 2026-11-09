@@ -1,3 +1,4 @@
+// src/tools/media/image-converter/worker/jsquash-codecs.ts
 import type { DecoderFunction, EncoderFunction } from './types';
 
 const codecInitializationPromises = new Map<string, Promise<void>>();
@@ -16,88 +17,100 @@ async function initializeJsquashCodec(mimeType: string): Promise<void> {
   }
 
   const initPromise = (async (): Promise<void> => {
-    switch (mimeType) {
-      case 'image/jpeg': {
-        const { init: initDecoder } = await import('@jsquash/jpeg/decode');
-        const { init: initEncoder } = await import('@jsquash/jpeg/encode');
-        const [decoderBuffer, encoderBuffer] = await Promise.all([
-          downloadWasmArrayBuffer('mozjpeg_dec.wasm'),
-          downloadWasmArrayBuffer('mozjpeg_enc.wasm'),
-        ]);
-        const [decoderModule, encoderModule] = await Promise.all([
-          WebAssembly.compile(decoderBuffer),
-          WebAssembly.compile(encoderBuffer),
-        ]);
-        await Promise.all([
-          initDecoder(decoderModule),
-          initEncoder(encoderModule),
-        ]);
-        break;
+    const originalInstantiate = WebAssembly.instantiate;
+    (WebAssembly as any).instantiate = async function (moduleOrBuffer: any, imports: any) {
+      if (imports && imports.env && !imports.env.emscripten_notify_memory_growth) {
+        imports.env.emscripten_notify_memory_growth = () => {};
       }
-      case 'image/png': {
-        const { init: initDecoder } = await import('@jsquash/png/decode');
-        const { init: initEncoder } = await import('@jsquash/png/encode');
-        const pngBuffer = await downloadWasmArrayBuffer('squoosh_png_bg.wasm');
-        const pngModule = await WebAssembly.compile(pngBuffer);
-        await Promise.all([
-          initDecoder(pngModule),
-          initEncoder(pngModule),
-        ]);
-        break;
+      return originalInstantiate(moduleOrBuffer, imports);
+    };
+
+    try {
+      switch (mimeType) {
+        case 'image/jpeg': {
+          const { init: initDecoder } = await import('@jsquash/jpeg/decode');
+          const { init: initEncoder } = await import('@jsquash/jpeg/encode');
+          const [decoderBuffer, encoderBuffer] = await Promise.all([
+            downloadWasmArrayBuffer('mozjpeg_dec.wasm'),
+            downloadWasmArrayBuffer('mozjpeg_enc.wasm'),
+          ]);
+          const [decoderModule, encoderModule] = await Promise.all([
+            WebAssembly.compile(decoderBuffer),
+            WebAssembly.compile(encoderBuffer),
+          ]);
+          await Promise.all([
+            initDecoder(decoderModule),
+            initEncoder(encoderModule),
+          ]);
+          break;
+        }
+        case 'image/png': {
+          const { init: initDecoder } = await import('@jsquash/png/decode');
+          const { init: initEncoder } = await import('@jsquash/png/encode');
+          const pngBuffer = await downloadWasmArrayBuffer('squoosh_png_bg.wasm');
+          const pngModule = await WebAssembly.compile(pngBuffer);
+          await Promise.all([
+            initDecoder(pngModule),
+            initEncoder(pngModule),
+          ]);
+          break;
+        }
+        case 'image/webp': {
+          const { init: initDecoder } = await import('@jsquash/webp/decode');
+          const { init: initEncoder } = await import('@jsquash/webp/encode');
+          const [decoderBuffer, encoderBuffer] = await Promise.all([
+            downloadWasmArrayBuffer('webp_dec.wasm'),
+            downloadWasmArrayBuffer('webp_enc.wasm'),
+          ]);
+          const [decoderModule, encoderModule] = await Promise.all([
+            WebAssembly.compile(decoderBuffer),
+            WebAssembly.compile(encoderBuffer),
+          ]);
+          await Promise.all([
+            initDecoder(decoderModule),
+            initEncoder(encoderModule),
+          ]);
+          break;
+        }
+        case 'image/avif': {
+          const { init: initDecoder } = await import('@jsquash/avif/decode');
+          const { init: initEncoder } = await import('@jsquash/avif/encode');
+          const [decoderBuffer, encoderBuffer] = await Promise.all([
+            downloadWasmArrayBuffer('avif_dec.wasm'),
+            downloadWasmArrayBuffer('avif_enc.wasm'),
+          ]);
+          const [decoderModule, encoderModule] = await Promise.all([
+            WebAssembly.compile(decoderBuffer),
+            WebAssembly.compile(encoderBuffer),
+          ]);
+          await Promise.all([
+            initDecoder(decoderModule),
+            initEncoder(encoderModule),
+          ]);
+          break;
+        }
+        case 'image/jxl': {
+          const { init: initDecoder } = await import('@jsquash/jxl/decode');
+          const { init: initEncoder } = await import('@jsquash/jxl/encode');
+          const [decoderBuffer, encoderBuffer] = await Promise.all([
+            downloadWasmArrayBuffer('jxl_dec.wasm'),
+            downloadWasmArrayBuffer('jxl_enc.wasm'),
+          ]);
+          const [decoderModule, encoderModule] = await Promise.all([
+            WebAssembly.compile(decoderBuffer),
+            WebAssembly.compile(encoderBuffer),
+          ]);
+          await Promise.all([
+            initDecoder(decoderModule),
+            initEncoder(encoderModule),
+          ]);
+          break;
+        }
+        default:
+          return;
       }
-      case 'image/webp': {
-        const { init: initDecoder } = await import('@jsquash/webp/decode');
-        const { init: initEncoder } = await import('@jsquash/webp/encode');
-        const [decoderBuffer, encoderBuffer] = await Promise.all([
-          downloadWasmArrayBuffer('webp_dec.wasm'),
-          downloadWasmArrayBuffer('webp_enc.wasm'),
-        ]);
-        const [decoderModule, encoderModule] = await Promise.all([
-          WebAssembly.compile(decoderBuffer),
-          WebAssembly.compile(encoderBuffer),
-        ]);
-        await Promise.all([
-          initDecoder(decoderModule),
-          initEncoder(encoderModule),
-        ]);
-        break;
-      }
-      case 'image/avif': {
-        const { init: initDecoder } = await import('@jsquash/avif/decode');
-        const { init: initEncoder } = await import('@jsquash/avif/encode');
-        const [decoderBuffer, encoderBuffer] = await Promise.all([
-          downloadWasmArrayBuffer('avif_dec.wasm'),
-          downloadWasmArrayBuffer('avif_enc.wasm'),
-        ]);
-        const [decoderModule, encoderModule] = await Promise.all([
-          WebAssembly.compile(decoderBuffer),
-          WebAssembly.compile(encoderBuffer),
-        ]);
-        await Promise.all([
-          initDecoder(decoderModule),
-          initEncoder(encoderModule),
-        ]);
-        break;
-      }
-      case 'image/jxl': {
-        const { init: initDecoder } = await import('@jsquash/jxl/decode');
-        const { init: initEncoder } = await import('@jsquash/jxl/encode');
-        const [decoderBuffer, encoderBuffer] = await Promise.all([
-          downloadWasmArrayBuffer('jxl_dec.wasm'),
-          downloadWasmArrayBuffer('jxl_enc.wasm'),
-        ]);
-        const [decoderModule, encoderModule] = await Promise.all([
-          WebAssembly.compile(decoderBuffer),
-          WebAssembly.compile(encoderBuffer),
-        ]);
-        await Promise.all([
-          initDecoder(decoderModule),
-          initEncoder(encoderModule),
-        ]);
-        break;
-      }
-      default:
-        return;
+    } finally {
+      (WebAssembly as any).instantiate = originalInstantiate;
     }
   })();
 

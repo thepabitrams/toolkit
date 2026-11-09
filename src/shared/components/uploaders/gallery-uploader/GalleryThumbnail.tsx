@@ -1,3 +1,4 @@
+// src/shared/components/uploaders/gallery-uploader/GalleryThumbnail.tsx
 import React, { memo } from 'react';
 import { Reorder, motion } from 'motion/react';
 import { useFileStore } from '@/shared/store/file-store';
