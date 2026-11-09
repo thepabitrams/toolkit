@@ -1,7 +1,6 @@
 import React from "react";
 import { FiZoomIn, FiZoomOut, FiRefreshCw } from "react-icons/fi";
-import { Button } from "@/core/components/ui/Button";
-import { IconButton } from "@/core/components/ui/IconButton";
+import { Button, IconButton } from "@/core/components/ui";
 
 interface CropControlsProps {
   currentZoom: number;

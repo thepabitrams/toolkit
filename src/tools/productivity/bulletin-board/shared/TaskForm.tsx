@@ -1,10 +1,6 @@
 // src/tools/productivity/bulletin-board/shared/TaskForm.tsx
 import React from 'react';
-import { Button } from '@/core/components/ui/Button';
-import { Input } from '@/core/components/ui/Input';
-import { Textarea } from '@/core/components/ui/Textarea';
-import { Select } from '@/core/components/ui/Select';
-import { DatePicker } from '@/core/components/ui/DatePicker';
+import { Button, Input, Textarea, Select, DatePicker } from '@/core/components/ui';
 
 export interface TaskFormValues {
   title: string;

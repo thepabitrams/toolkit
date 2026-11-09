@@ -13,3 +13,4 @@ export { Select } from './Select';
 export { Textarea } from './Textarea';
 export { ThemeToggle } from './ThemeToggle';
 export { Stepper } from './Stepper';
+export { Spinner } from './Spinner';

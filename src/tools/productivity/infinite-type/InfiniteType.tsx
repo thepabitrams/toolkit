@@ -9,7 +9,7 @@ import { Controls } from './Controls';
 import { Viewport } from './Viewport';
 
 const RESIZE_THRESHOLD_PX = 20;
-const TOOLKIT_URL = 'https://toolpabitrams.pages.dev/';
+const TOOLKIT_URL = 'https://toolkit.pabitramohansingh.com/';
 
 const workspaceContainerVariants: Variants = {
   hidden: { opacity: 0 },

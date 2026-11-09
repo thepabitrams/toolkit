@@ -1,7 +1,6 @@
 // src/tools/media/image-converter/components/ConverterPanel.tsx
 import { motion } from 'motion/react';
-import { Button } from '@/core/components/ui/Button';
-import { Spinner } from '@/core/components/ui/Spinner';
+import { Button, Spinner } from '@/core/components/ui';
 import { spring } from '@/config/motion';
 import type { OutputFormat } from '../useImageConverter';
 

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'motion/react';
-import { Input } from '@/core/components/ui/Input';
+import { Input } from '@/core/components/ui';
 import { spring } from '@/config/motion';
 
 export type Unit = 'px' | 'mm' | 'cm' | 'inch';
