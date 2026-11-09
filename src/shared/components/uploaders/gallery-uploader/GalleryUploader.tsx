@@ -1,4 +1,3 @@
-// src/shared/components/uploaders/gallery-uploader/GalleryUploader.tsx
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, Reorder } from 'motion/react';
@@ -27,12 +26,13 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
   const setActiveFileAction = useFileStore((state) => state.setActiveFile);
   const reorderBucketAction = useFileStore((state) => state.reorderBucket);
 
-  const [displayedFileReferences, setDisplayedFileReferences] = useState<FileReference[]>(originalFileReferences);
+  const [displayedFileReferences, setDisplayedFileReferences] =
+    useState<FileReference[]>(originalFileReferences);
   const draggedFileIdentifierReference = useRef<string | null>(null);
 
   const displayedFileReferencesReference = useRef(displayedFileReferences);
   displayedFileReferencesReference.current = displayedFileReferences;
-  
+
   const originalFileReferencesReference = useRef(originalFileReferences);
   originalFileReferencesReference.current = originalFileReferences;
 
@@ -80,8 +80,12 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
     draggedFileIdentifierReference.current = null;
     if (!draggedFileIdentifier) return;
 
-    const originalFileIndex = originalFileReferencesReference.current.findIndex((fileReference) => fileReference.id === draggedFileIdentifier);
-    const targetFileIndex = displayedFileReferencesReference.current.findIndex((fileReference) => fileReference.id === draggedFileIdentifier);
+    const originalFileIndex = originalFileReferencesReference.current.findIndex(
+      (fileReference) => fileReference.id === draggedFileIdentifier
+    );
+    const targetFileIndex = displayedFileReferencesReference.current.findIndex(
+      (fileReference) => fileReference.id === draggedFileIdentifier
+    );
 
     if (originalFileIndex !== -1 && targetFileIndex !== -1 && originalFileIndex !== targetFileIndex) {
       reorderBucketAction('original', originalFileIndex, targetFileIndex);
@@ -106,7 +110,7 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
     >
       <Card
         className={`relative flex flex-col overflow-hidden transition-all duration-200 ${
-          isDragActive ? 'ring-2 ring-blue-500/50 bg-blue-50/20 dark:bg-blue-900/10' : ''
+          isDragActive ? 'bg-blue-50/20 ring-2 ring-blue-500/50 dark:bg-blue-900/10' : ''
         }`}
       >
         <input {...getInputProps()} />
@@ -119,7 +123,7 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
         )}
 
         <div className="flex items-center justify-between border-b border-slate-100 px-4 pb-2 pt-4 dark:border-gray-800/50">
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-gray-300">
+          <h3 className="select-none text-sm font-semibold text-slate-700 dark:text-gray-300">
             {displayedFileReferences.length} {displayedFileReferences.length === 1 ? 'Image' : 'Images'}
           </h3>
           <Button
@@ -135,7 +139,7 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
 
         <motion.div
           layoutScroll
-          className="flex w-full flex-nowrap items-center overflow-x-auto overflow-y-hidden overscroll-x-contain px-4 pt-4 pb-3 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-600"
+          className="flex w-full select-none flex-nowrap items-center overflow-x-auto overflow-y-hidden overscroll-x-contain px-4 pb-3 pt-4 [-webkit-touch-callout:none] [-webkit-user-select:none] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent dark:[&::-webkit-scrollbar-thumb]:bg-slate-600"
         >
           {displayedFileReferences.length === 0 && (
             <div className="pointer-events-none flex w-full flex-col items-center justify-center py-8 text-center">
@@ -150,7 +154,7 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
             axis="x"
             values={displayedFileReferences}
             onReorder={handleReorder}
-            className="flex w-max items-center gap-4"
+            className="flex w-max select-none items-center gap-4"
           >
             {displayedFileReferences.map((fileReference) => (
               <GalleryThumbnail
@@ -164,7 +168,9 @@ export const GalleryUploader: React.FC<GalleryUploaderProperties> = ({
             ))}
           </Reorder.Group>
 
-          {displayedFileReferences.length > 0 && <div className="pointer-events-none h-24 w-8 shrink-0" />}
+          {displayedFileReferences.length > 0 && (
+            <div className="pointer-events-none h-24 w-8 shrink-0" />
+          )}
         </motion.div>
       </Card>
     </div>
