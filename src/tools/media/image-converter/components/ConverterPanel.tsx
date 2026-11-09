@@ -1,6 +1,7 @@
-// src/tools/media/image-converter/ConverterPanel.tsx
+// src/tools/media/image-converter/components/ConverterPanel.tsx
 import { motion } from 'motion/react';
 import { Button } from '@/core/components/ui/Button';
+import { Spinner } from '@/core/components/ui/Spinner';
 import { spring } from '@/config/motion';
 import type { OutputFormat } from '../useImageConverter';
 
@@ -38,7 +39,6 @@ export const ConverterPanel: React.FC<ConverterPanelProps> = ({
   selectedFormat,
   outputQuality,
   isConverting,
-  progressPercent,
   conversionError,
   onFormatChange,
   onOutputQualityChange,
@@ -106,10 +106,23 @@ export const ConverterPanel: React.FC<ConverterPanelProps> = ({
         <Button
           onClick={onConvert}
           variant="primary"
-          className="w-full"
+          className={`w-full h-12 rounded-full transition-all duration-300 flex items-center justify-center font-medium ${
+            isConverting 
+              ? 'bg-[#E8F0FE] text-[#1A73E8] hover:bg-[#E8F0FE] dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/30 shadow-none' 
+              : ''
+          }`}
           disabled={isConverting}
         >
-          {isConverting ? `Converting... ${progressPercent}%` : 'Convert'}
+          {isConverting ? (
+            <>
+              <Spinner className="w-5 h-5 mr-2.5" />
+              <span className="relative flex items-center">
+                Converting<span className="br-loading-dots"></span>
+              </span>
+            </>
+          ) : (
+            'Convert'
+          )}
         </Button>
       </div>
     </div>

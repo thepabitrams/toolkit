@@ -1,8 +1,8 @@
 // src/tools/media/background-remove/remove/RemoveControls.tsx
 import React from 'react';
-import { motion } from 'motion/react';
 import { FiRefreshCw } from 'react-icons/fi';
 import { Button } from '@/core/components/ui';
+import { Spinner } from '@/core/components/ui/Spinner';
 import { StatusMessage } from '../components/StatusMessage';
 import '../style/animations.css';
 
@@ -15,32 +15,6 @@ interface RemoveControlsProps {
   onRetry: () => void;
   availableModels: { id: string; name: string }[];
 }
-
-const ChromeSpinner: React.FC = () => (
-  <motion.svg
-    viewBox="0 0 50 50"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-    className="w-5 h-5 mr-2.5"
-    animate={{ rotate: 360 }}
-    transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-  >
-    <circle cx="25" cy="25" r="20" opacity="0.2" strokeWidth="4" />
-    <motion.circle
-      cx="25"
-      cy="25"
-      r="20"
-      strokeWidth="4"
-      animate={{
-        strokeDasharray: ['1, 150', '90, 150', '90, 150'],
-        strokeDashoffset: [0, -35, -124],
-      }}
-      transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-    />
-  </motion.svg>
-);
 
 export const RemoveControls: React.FC<RemoveControlsProps> = ({
   status, errorMessage, selectedModelId, onModelChange, onGenerate, onRetry, availableModels
@@ -83,9 +57,8 @@ export const RemoveControls: React.FC<RemoveControlsProps> = ({
       >
         {isBusy ? (
           <>
-            <ChromeSpinner />
+            <Spinner className="w-5 h-5 mr-2.5" />
             <span className="relative flex items-center">
-              {/* 👈 Use the imported class */}
               Processing<span className="br-loading-dots"></span>
             </span>
           </>
