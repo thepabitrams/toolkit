@@ -17,15 +17,9 @@ importers:
       '@huggingface/transformers':
         specifier: ^4.3.1
         version: 4.3.1(@types/node@24.19.2)
-      '@jsquash/avif':
-        specifier: 1.1.2-single-thread-only
-        version: 1.1.2-single-thread-only
       '@jsquash/jpeg':
         specifier: ^1.6.0
         version: 1.6.0
-      '@jsquash/jxl':
-        specifier: 1.0.2-single-thread-only
-        version: 1.0.2-single-thread-only
       '@jsquash/png':
         specifier: ^3.1.1
         version: 3.1.1
@@ -62,6 +56,9 @@ importers:
       image-in-browser:
         specifier: ^3.7.0
         version: 3.7.0
+      imagescript:
+        specifier: ^3.17.0
+        version: 3.17.0
       motion:
         specifier: ^14.6.0
         version: 14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -1104,14 +1101,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@jsquash/avif@1.1.2-single-thread-only':
-    resolution: {integrity: sha512-r1u3qVIEQAWQ9lexC+aVB2JmbXkGGHV+o5Eak4S1QxYaPbg6JAJcNssqFS9BKkJ+xx7r7sNJUZU8Ar+YlGvUNA==}
-
   '@jsquash/jpeg@1.6.0':
     resolution: {integrity: sha512-zwN46Awh1VM6gXlIcALwb5WzqK5H2e6+Awcs1QP8AvS8ohsK/sbE4esvmH4jhlhW7+CgiUUww66vg0aTnlSIMA==}
-
-  '@jsquash/jxl@1.0.2-single-thread-only':
-    resolution: {integrity: sha512-zjgmhVkllq9tfSCwfhnpUbpMC2Oj2GicWR7TH0/ISmjsF1Jw6P8jEOOR+tLTKr6W6HrxFOc3hTWj5e54WKKPqw==}
 
   '@jsquash/png@3.1.1':
     resolution: {integrity: sha512-C10pc+0H6j0h8fENOfnGOvkXCmvpSQTDGlfGd0sHphZhPSGTyLjIrHba0FaZZdsKqA/wlmhYicUHb92vfZphaw==}
@@ -1977,6 +1968,10 @@ packages:
 
   image-in-browser@3.7.0:
     resolution: {integrity: sha512-TSwLCxb/MW97krcfY6YTNM3oqVcH9ZwT17ygDwB2vYEtEMHs4H5INUr7L6civIS5WeciB6HS/ZbS6RFWPHzOHQ==}
+
+  imagescript@3.17.0:
+    resolution: {integrity: sha512-EtSPb4J8e23y3xM2I6zXPbyTHzCoflor6nCLlSfaf7SjLUoJ/1K+lj5fIIpKLGbDjpBa3kTsRNFI37U2v6xudw==}
+    engines: {node: '>=22.13.0'}
 
   iron-webcrypto@1.2.1:
     resolution: {integrity: sha512-feOM6FaSr6rEABp/eDfVseKyTMDt+KGpeB35SkVn9Tyn0CqvVsY3EwI0v5i8nMHyJnzCIQf7nsy3p41TPkJZhg==}
@@ -3511,11 +3506,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@jsquash/avif@1.1.2-single-thread-only': {}
-
   '@jsquash/jpeg@1.6.0': {}
-
-  '@jsquash/jxl@1.0.2-single-thread-only': {}
 
   '@jsquash/png@3.1.1': {}
 
@@ -4291,6 +4282,8 @@ snapshots:
   idb@8.0.4: {}
 
   image-in-browser@3.7.0: {}
+
+  imagescript@3.17.0: {}
 
   iron-webcrypto@1.2.1: {}
 
